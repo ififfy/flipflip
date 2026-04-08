@@ -23,20 +23,26 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneSelect extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
-    value: number;
-    allSceneGrids?: Array<SceneGrid>;
-    scene?: Scene;
-    menuIsOpen?: boolean;
-    autoFocus?: boolean;
-    includeExtra?: boolean;
-    onlyExtra?: boolean;
-    getSceneName(sceneID: string): string;
-    onChange(sceneID: number): void;
-  };
+interface SceneSelectProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  value: number;
+  allSceneGrids?: Array<SceneGrid>;
+  scene?: Scene;
+  menuIsOpen?: boolean;
+  autoFocus?: boolean;
+  includeExtra?: boolean;
+  onlyExtra?: boolean;
+  getSceneName(sceneID: string): string;
+  onChange(sceneID: number): void;
+}
+
+class SceneSelect extends React.Component<SceneSelectProps> {
+  readonly props: SceneSelectProps;
+
+  constructor(props: SceneSelectProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

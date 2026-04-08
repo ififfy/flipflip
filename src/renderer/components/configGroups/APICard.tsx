@@ -79,25 +79,43 @@ function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
-class APICard extends React.Component {
-  readonly props: {
-    classes: any;
-    settings: RemoteSettings;
-    onUpdateSettings(fn: (settings: RemoteSettings) => void): void;
-    onUpdateConfig(fn: (config: Config) => void): void;
+interface APICardProps {
+  classes: any;
+  settings: RemoteSettings;
+  onUpdateSettings(fn: (settings: RemoteSettings) => void): void;
+  onUpdateConfig(fn: (config: Config) => void): void;
+}
+
+class APICard extends React.Component<APICardProps> {
+  readonly props: APICardProps;
+
+  readonly state: {
+    openMenu: string;
+    menuType: string;
+    snackbarOpen: boolean;
+    snackbar: string;
+    snackbarSeverity: string;
+    input1: string;
+    input2: string;
+    input3: string;
+    input4: string;
   };
 
-  readonly state = {
-    openMenu: null as string,
-    menuType: null as string,
-    snackbarOpen: false,
-    snackbar: null as string,
-    snackbarSeverity: null as string,
-    input1: "",
-    input2: "",
-    input3: "",
-    input4: "",
-  };
+  constructor(props: APICardProps) {
+    super(props);
+
+    this.state = {
+      openMenu: null as string,
+      menuType: null as string,
+      snackbarOpen: false,
+      snackbar: null as string,
+      snackbarSeverity: null as string,
+      input1: "",
+      input2: "",
+      input3: "",
+      input4: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

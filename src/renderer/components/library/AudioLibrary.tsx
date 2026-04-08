@@ -411,64 +411,81 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioLibrary extends React.Component {
-  readonly props: {
-    classes: any;
-    cachePath: string;
+interface AudioLibraryProps {
+  classes: any;
+  cachePath: string;
+  filters: Array<string>;
+  library: Array<Audio>;
+  progressCurrent: number;
+  progressMode: string;
+  progressTitle: string;
+  progressTotal: number;
+  openTab: number;
+  playlists: Array<Playlist>;
+  selected: Array<string>;
+  specialMode: string;
+  tags: Array<Tag>;
+  tutorial: string;
+  yOffset: number;
+  goBack(): void;
+  onAddToPlaylist(): void;
+  onBatchTag(): void;
+  onBatchEdit(): void;
+  onBatchDetectBPM(): void;
+  onChangeTab(newTab: number): void;
+  onImportFromLibrary(sources: Array<Audio>): void;
+  onManageTags(): void;
+  onPlay(source: Audio, displayed: Array<Audio>): void;
+  onSort(algorithm: string, ascending: boolean): void;
+  onSortPlaylist(playist: string, algorithm: string, ascending: boolean): void;
+  onTutorial(tutorial: string): void;
+  onUpdateLibrary(fn: (library: Array<Audio>) => void): void;
+  onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void;
+  onUpdateMode(mode: string): void;
+  savePosition(
+    yOffset: number,
+    filters: Array<string>,
+    selected: Array<string>,
+  ): void;
+  systemMessage(message: string): void;
+}
+
+class AudioLibrary extends React.Component<AudioLibraryProps> {
+  readonly props: AudioLibraryProps;
+
+  readonly state: {
+    displaySources: Array<Audio>;
+    drawerOpen: boolean;
     filters: Array<string>;
-    library: Array<Audio>;
-    progressCurrent: number;
-    progressMode: string;
-    progressTitle: string;
-    progressTotal: number;
-    openTab: number;
-    playlists: Array<Playlist>;
     selected: Array<string>;
-    specialMode: string;
-    tags: Array<Tag>;
-    tutorial: string;
-    yOffset: number;
-    goBack(): void;
-    onAddToPlaylist(): void;
-    onBatchTag(): void;
-    onBatchEdit(): void;
-    onBatchDetectBPM(): void;
-    onChangeTab(newTab: number): void;
-    onImportFromLibrary(sources: Array<Audio>): void;
-    onManageTags(): void;
-    onPlay(source: Audio, displayed: Array<Audio>): void;
-    onSort(algorithm: string, ascending: boolean): void;
-    onSortPlaylist(
-      playist: string,
-      algorithm: string,
-      ascending: boolean,
-    ): void;
-    onTutorial(tutorial: string): void;
-    onUpdateLibrary(fn: (library: Array<Audio>) => void): void;
-    onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void;
-    onUpdateMode(mode: string): void;
-    savePosition(
-      yOffset: number,
-      filters: Array<string>,
-      selected: Array<string>,
-    ): void;
-    systemMessage(message: string): void;
+    selectedTags: Array<string>;
+    menuAnchorEl: any;
+    openMenu: string;
+    playlistID: number;
+    importURL: string;
+    loadingMetadata: boolean;
+    loadingSources: boolean;
+    error: boolean;
   };
 
-  readonly state = {
-    displaySources: Array<Audio>(),
-    drawerOpen: false,
-    filters: this.props.filters,
-    selected: this.props.selected,
-    selectedTags: Array<string>(),
-    menuAnchorEl: null as any,
-    openMenu: null as string,
-    playlistID: null as number,
-    importURL: null as string,
-    loadingMetadata: false,
-    loadingSources: false,
-    error: false,
-  };
+  constructor(props: AudioLibraryProps) {
+    super(props);
+
+    this.state = {
+      displaySources: Array<Audio>(),
+      drawerOpen: false,
+      filters: props.filters,
+      selected: props.selected,
+      selectedTags: Array<string>(),
+      menuAnchorEl: null as any,
+      openMenu: null as string,
+      playlistID: null as number,
+      importURL: null as string,
+      loadingMetadata: false,
+      loadingSources: false,
+      error: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

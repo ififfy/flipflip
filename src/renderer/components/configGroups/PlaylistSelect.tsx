@@ -21,14 +21,20 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PlaylistSelect extends React.Component {
-  readonly props: {
-    classes: any;
-    playlists: Array<Playlist>;
-    menuIsOpen?: boolean;
-    autoFocus?: boolean;
-    onChange(sceneID: number): void;
-  };
+interface PlaylistSelectProps {
+  classes: any;
+  playlists: Array<Playlist>;
+  menuIsOpen?: boolean;
+  autoFocus?: boolean;
+  onChange(sceneID: number): void;
+}
+
+class PlaylistSelect extends React.Component<PlaylistSelectProps> {
+  readonly props: PlaylistSelectProps;
+
+  constructor(props: PlaylistSelectProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

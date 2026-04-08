@@ -44,17 +44,28 @@ const styles = (theme: Theme) =>
     },
   });
 
-class CacheCard extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    onUpdateSettings(fn: (settings: CacheSettings) => void): void;
+interface CacheCardProps {
+  classes: any;
+  config: Config;
+  onUpdateSettings(fn: (settings: CacheSettings) => void): void;
+}
+
+class CacheCard extends React.Component<CacheCardProps> {
+  readonly props: CacheCardProps;
+
+  readonly state: {
+    cacheSize: string;
+    clearCacheAlert: boolean;
   };
 
-  readonly state = {
-    cacheSize: "--",
-    clearCacheAlert: false,
-  };
+  constructor(props: CacheCardProps) {
+    super(props);
+
+    this.state = {
+      cacheSize: "--",
+      clearCacheAlert: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

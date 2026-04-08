@@ -139,41 +139,51 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SourceListItem extends React.Component {
-  readonly props: {
-    classes: any;
-    checked: boolean;
-    config: Config;
-    index: number;
-    isEditing: number;
-    isLibrary: boolean;
-    isSelect: boolean;
-    source: LibrarySource;
-    sources: Array<LibrarySource>;
-    style: any;
-    tutorial: string;
-    useWeights?: boolean;
-    onClean(source: LibrarySource): void;
-    onClearBlacklist(sourceURL: string): void;
-    onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void;
-    onDelete(source: LibrarySource): void;
-    onDownload(source: LibrarySource): void;
-    onEditBlacklist(source: LibrarySource): void;
-    onEndEdit(newURL: string): void;
-    onOpenClipMenu(source: LibrarySource): void;
-    onOpenWeightMenu(source: LibrarySource): void;
-    onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void;
-    onRemove(source: LibrarySource): void;
-    onSourceOptions(source: LibrarySource): void;
-    onStartEdit(id: number): void;
-    onToggleSelect(): void;
-    savePosition(): void;
-    systemMessage(message: string): void;
+interface SourceListItemProps {
+  classes: any;
+  checked: boolean;
+  config: Config;
+  index: number;
+  isEditing: number;
+  isLibrary: boolean;
+  isSelect: boolean;
+  source: LibrarySource;
+  sources: Array<LibrarySource>;
+  style: any;
+  tutorial: string;
+  useWeights?: boolean;
+  onClean(source: LibrarySource): void;
+  onClearBlacklist(sourceURL: string): void;
+  onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void;
+  onDelete(source: LibrarySource): void;
+  onDownload(source: LibrarySource): void;
+  onEditBlacklist(source: LibrarySource): void;
+  onEndEdit(newURL: string): void;
+  onOpenClipMenu(source: LibrarySource): void;
+  onOpenWeightMenu(source: LibrarySource): void;
+  onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void;
+  onRemove(source: LibrarySource): void;
+  onSourceOptions(source: LibrarySource): void;
+  onStartEdit(id: number): void;
+  onToggleSelect(): void;
+  savePosition(): void;
+  systemMessage(message: string): void;
+}
+
+class SourceListItem extends React.Component<SourceListItemProps> {
+  readonly props: SourceListItemProps;
+
+  readonly state: {
+    urlInput: string;
   };
 
-  readonly state = {
-    urlInput: this.props.source.url,
-  };
+  constructor(props: SourceListItemProps) {
+    super(props);
+
+    this.state = {
+      urlInput: this.props.source.url,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

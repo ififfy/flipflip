@@ -37,37 +37,52 @@ const getRest = function (s: string) {
   return splitFirstWord(s)[1];
 };
 
-export default class CaptionProgram extends React.Component {
+interface CaptionProgramProps {
+  captionScript: CaptionScript;
+  currentAudio: Audio;
+  currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  persist: boolean;
+  repeat: string;
+  scale: number;
+  singleTrack: boolean;
+  timeToNextFrame: number;
+  getTags(source: string, clipID?: string): Array<Tag>;
+  goBack(): void;
+  playNextScene(): void;
+  jumpToHack?: ChildCallbackHack;
+  advance?(): void;
+  getCurrentTimestamp?(): number;
+  nextTrack?(): void;
+  onError?(e: string): void;
+}
+
+export default class CaptionProgram extends React.Component<CaptionProgramProps> {
+  readonly props: CaptionProgramProps;
+
+  readonly state: typeof captionProgramDefaults & {
+    countColors: Map<number, string>;
+    countColor: string;
+    countProgress: boolean;
+    countCurrent: number;
+    countTotal: number;
+    countChild: number;
+  };
+
   readonly el = React.createRef<HTMLDivElement>();
 
-  readonly props: {
-    captionScript: CaptionScript;
-    currentAudio: Audio;
-    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    persist: boolean;
-    repeat: string;
-    scale: number;
-    singleTrack: boolean;
-    timeToNextFrame: number;
-    getTags(source: string, clipID?: string): Array<Tag>;
-    goBack(): void;
-    playNextScene(): void;
-    jumpToHack?: ChildCallbackHack;
-    advance?(): void;
-    getCurrentTimestamp?(): number;
-    nextTrack?(): void;
-    onError?(e: string): void;
-  };
+  constructor(props: CaptionProgramProps) {
+    super(props);
 
-  readonly state = {
-    ...captionProgramDefaults,
-    countColors: new Map<number, string>(),
-    countColor: "#FFFFFF",
-    countProgress: false,
-    countCurrent: 0,
-    countTotal: 0,
-    countChild: 0,
-  };
+    this.state = {
+      ...captionProgramDefaults,
+      countColors: new Map<number, string>(),
+      countColor: "#FFFFFF",
+      countProgress: false,
+      countCurrent: 0,
+      countTotal: 0,
+      countChild: 0,
+    };
+  }
 
   _runningPromise: CancelablePromise = null;
   _timeout: number = null;

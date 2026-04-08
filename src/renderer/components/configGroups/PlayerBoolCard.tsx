@@ -10,11 +10,17 @@ import {
 
 import { DisplaySettings } from "../../../common/Config";
 
-export default class PlayerBoolCard extends React.Component {
-  readonly props: {
-    displaySettings: DisplaySettings;
-    onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void;
-  };
+interface PlayerBoolCardProps {
+  displaySettings: DisplaySettings;
+  onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void;
+}
+
+export default class PlayerBoolCard extends React.Component<PlayerBoolCardProps> {
+  readonly props: PlayerBoolCardProps;
+
+  constructor(props: PlayerBoolCardProps) {
+    super(props);
+  }
 
   render() {
     return (

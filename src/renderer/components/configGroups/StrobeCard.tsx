@@ -54,21 +54,27 @@ const styles = (theme: Theme) =>
     },
   });
 
-class StrobeCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    sidebar: boolean;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface StrobeCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  sidebar: boolean;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class StrobeCard extends React.Component<StrobeCardProps> {
+  readonly props: StrobeCardProps;
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly delaySinInputRef: React.RefObject<HTMLInputElement> =
     React.createRef();
+
+  constructor(props: StrobeCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

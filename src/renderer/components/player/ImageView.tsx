@@ -15,24 +15,30 @@ import ZoomMove from "./ZoomMove";
 import Slide from "./Slide";
 import StrobeImage from "./StrobeImage";
 
-export default class ImageView extends React.Component {
-  readonly props: {
-    image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    fitParent: boolean;
-    hasStarted: boolean;
-    scene: Scene;
-    config?: Config;
-    currentAudio?: Audio;
-    gridCoordinates?: Array<number>;
-    timeToNextFrame?: number;
-    toggleStrobe?: boolean;
-    pictureGrid?: boolean;
-    removeChild?: boolean;
-    className?: string;
-    onLoaded?(): void;
-    setSceneCopy?(children: React.ReactNode): void;
-    setVideo?(video: HTMLVideoElement): void;
-  };
+interface ImageViewProps {
+  image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  fitParent: boolean;
+  hasStarted: boolean;
+  scene: Scene;
+  config?: Config;
+  currentAudio?: Audio;
+  gridCoordinates?: Array<number>;
+  timeToNextFrame?: number;
+  toggleStrobe?: boolean;
+  pictureGrid?: boolean;
+  removeChild?: boolean;
+  className?: string;
+  onLoaded?(): void;
+  setSceneCopy?(children: React.ReactNode): void;
+  setVideo?(video: HTMLVideoElement): void;
+}
+
+export default class ImageView extends React.Component<ImageViewProps> {
+  readonly props: ImageViewProps;
+
+  constructor(props: ImageViewProps) {
+    super(props);
+  }
 
   _parentHeight: number;
   _parentWidth: number;

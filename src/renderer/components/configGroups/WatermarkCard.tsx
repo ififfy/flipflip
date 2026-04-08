@@ -32,16 +32,26 @@ const styles = (theme: Theme) =>
     },
   });
 
-class WatermarkCard extends React.Component {
-  readonly props: {
-    classes: any;
-    settings: GeneralSettings;
-    onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
+interface WatermarkCardProps {
+  classes: any;
+  settings: GeneralSettings;
+  onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
+}
+
+class WatermarkCard extends React.Component<WatermarkCardProps> {
+  readonly props: WatermarkCardProps;
+
+  readonly state: {
+    systemFonts: Array<string>;
   };
 
-  readonly state = {
-    systemFonts: Array<string>(),
-  };
+  constructor(props: WatermarkCardProps) {
+    super(props);
+
+    this.state = {
+      systemFonts: Array<string>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

@@ -85,23 +85,39 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioOptions extends React.Component {
-  readonly props: {
-    classes: any;
+interface AudioOptionsProps {
+  classes: any;
+  audio: Audio;
+  onCancel(): void;
+  onFinishEdit(common: Audio): void;
+}
+
+class AudioOptions extends React.Component<AudioOptionsProps> {
+  readonly props: AudioOptionsProps;
+
+  readonly state: {
     audio: Audio;
-    onCancel(): void;
-    onFinishEdit(common: Audio): void;
+    loadingBPM: boolean;
+    successBPM: boolean;
+    errorBPM: boolean;
+    loadingTag: boolean;
+    successTag: boolean;
+    errorTag: boolean;
   };
 
-  readonly state = {
-    audio: this.props.audio,
-    loadingBPM: false,
-    successBPM: false,
-    errorBPM: false,
-    loadingTag: false,
-    successTag: false,
-    errorTag: false,
-  };
+  constructor(props: AudioOptionsProps) {
+    super(props);
+
+    this.state = {
+      audio: props.audio,
+      loadingBPM: false,
+      successBPM: false,
+      errorBPM: false,
+      loadingTag: false,
+      successTag: false,
+      errorTag: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

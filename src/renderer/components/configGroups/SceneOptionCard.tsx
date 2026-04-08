@@ -109,27 +109,37 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneOptionCard extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
-    allSceneGrids: Array<SceneGrid>;
-    scene: Scene | SceneSettings;
-    sidebar: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-    isTagging?: boolean;
-    onGenerate?(scene: Scene | SceneGrid, children?: boolean): void;
-  };
+interface SceneOptionCardProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  allSceneGrids: Array<SceneGrid>;
+  scene: Scene | SceneSettings;
+  sidebar: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+  isTagging?: boolean;
+  onGenerate?(scene: Scene | SceneGrid, children?: boolean): void;
+}
 
-  readonly state = {
-    randomSceneList: null as Array<number>,
+class SceneOptionCard extends React.Component<SceneOptionCardProps> {
+  readonly props: SceneOptionCardProps;
+
+  readonly state: {
+    randomSceneList: Array<number>;
   };
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: SceneOptionCardProps) {
+    super(props);
+
+    this.state = {
+      randomSceneList: null as Array<number>,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

@@ -9,36 +9,46 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import CaptionScript from "../../../common/CaptionScript";
 import { RP } from "../../../common/const";
 
-export default class CaptionProgramPlaylist extends React.Component {
-  readonly props: {
-    playlistIndex: number;
-    playlist: {
-      scripts: Array<CaptionScript>;
-      shuffle: boolean;
-      repeat: string;
-    };
-    currentAudio: Audio;
-    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    scale: number;
-    scene: Scene;
-    timeToNextFrame: number;
-    getTags(source: string, clipID?: string): Array<Tag>;
-    goBack(): void;
-    orderScriptTags(script: CaptionScript): void;
-    playNextScene(): void;
-    jumpToHack?: ChildCallbackHack;
-    persist?: boolean;
-    advance?(): void;
-    getCurrentTimestamp?(): number;
-    onError?(e: string): void;
-    systemMessage?(message: string): void;
+interface CaptionProgramPlaylistProps {
+  playlistIndex: number;
+  playlist: {
+    scripts: Array<CaptionScript>;
+    shuffle: boolean;
+    repeat: string;
+  };
+  currentAudio: Audio;
+  currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  scale: number;
+  scene: Scene;
+  timeToNextFrame: number;
+  getTags(source: string, clipID?: string): Array<Tag>;
+  goBack(): void;
+  orderScriptTags(script: CaptionScript): void;
+  playNextScene(): void;
+  jumpToHack?: ChildCallbackHack;
+  persist?: boolean;
+  advance?(): void;
+  getCurrentTimestamp?(): number;
+  onError?(e: string): void;
+  systemMessage?(message: string): void;
+}
+
+export default class CaptionProgramPlaylist extends React.Component<CaptionProgramPlaylistProps> {
+  readonly props: CaptionProgramPlaylistProps;
+
+  readonly state: {
+    currentIndex: number;
+    playingScripts: Array<CaptionScript>;
   };
 
-  readonly state = {
-    currentIndex:
-      this.props.playlistIndex == 0 ? this.props.scene.scriptStartIndex : 0,
-    playingScripts: Array<CaptionScript>(),
-  };
+  constructor(props: CaptionProgramPlaylistProps) {
+    super(props);
+
+    this.state = {
+      currentIndex: props.playlistIndex == 0 ? props.scene.scriptStartIndex : 0,
+      playingScripts: Array<CaptionScript>(),
+    };
+  }
 
   render() {
     let script = this.state.playingScripts[this.state.currentIndex];

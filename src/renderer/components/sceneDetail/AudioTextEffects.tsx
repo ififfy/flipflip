@@ -9,20 +9,26 @@ import { SceneSettings } from "../../../common/Config";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 
-export default class AudioTextEffects extends React.Component {
-  readonly props: {
-    scene: Scene | SceneSettings;
-    onAddScript(playlistIndex: number): void;
-    onAddTracks(playlistIndex: number): void;
-    onPlayAudio(source: Audio, displayed: Array<Audio>): void;
-    onPlayScript(
-      source: CaptionScript,
-      sceneID: number,
-      displayed: Array<CaptionScript>,
-    ): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    systemMessage(message: string): void;
-  };
+interface AudioTextEffectsProps {
+  scene: Scene | SceneSettings;
+  onAddScript(playlistIndex: number): void;
+  onAddTracks(playlistIndex: number): void;
+  onPlayAudio(source: Audio, displayed: Array<Audio>): void;
+  onPlayScript(
+    source: CaptionScript,
+    sceneID: number,
+    displayed: Array<CaptionScript>,
+  ): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  systemMessage(message: string): void;
+}
+
+export default class AudioTextEffects extends React.Component<AudioTextEffectsProps> {
+  readonly props: AudioTextEffectsProps;
+
+  constructor(props: AudioTextEffectsProps) {
+    super(props);
+  }
 
   render() {
     return (

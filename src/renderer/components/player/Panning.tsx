@@ -6,23 +6,34 @@ import { getEaseFunction } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class Panning extends React.Component {
-  readonly props: {
+interface PanningProps {
+  togglePan: boolean;
+  currentAudio: Audio;
+  timeToNextFrame: number;
+  scene: Scene;
+  panFunction: Function;
+  image?: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  parentHeight?: number;
+  parentWidth?: number;
+  children?: React.ReactNode;
+}
+
+export default class Panning extends React.Component<PanningProps> {
+  readonly props: PanningProps;
+
+  readonly state: {
     togglePan: boolean;
-    currentAudio: Audio;
-    timeToNextFrame: number;
-    scene: Scene;
-    panFunction: Function;
-    image?: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    parentHeight?: number;
-    parentWidth?: number;
-    children?: React.ReactNode;
+    duration: number;
   };
 
-  readonly state = {
-    togglePan: false,
-    duration: this.getDuration(),
-  };
+  constructor(props: PanningProps) {
+    super(props);
+
+    this.state = {
+      togglePan: false,
+      duration: this.getDuration(),
+    };
+  }
 
   _panTimeout: number = null;
   _panOut = false;

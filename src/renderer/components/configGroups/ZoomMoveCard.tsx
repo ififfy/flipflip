@@ -63,22 +63,28 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ZoomMoveCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    sidebar: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface ZoomMoveCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  sidebar: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class ZoomMoveCard extends React.Component<ZoomMoveCardProps> {
+  readonly props: ZoomMoveCardProps;
 
   readonly horizInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly vertInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: ZoomMoveCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

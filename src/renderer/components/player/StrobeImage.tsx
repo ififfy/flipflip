@@ -6,13 +6,19 @@ import { getEaseFunction } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class StrobeImage extends React.Component {
-  readonly props: {
-    scene: Scene;
-    timeToNextFrame: number;
-    currentAudio: Audio;
-    children?: React.ReactNode;
-  };
+interface StrobeImageProps {
+  scene: Scene;
+  timeToNextFrame: number;
+  currentAudio: Audio;
+  children?: React.ReactNode;
+}
+
+export default class StrobeImage extends React.Component<StrobeImageProps> {
+  readonly props: StrobeImageProps;
+
+  constructor(props: StrobeImageProps) {
+    super(props);
+  }
 
   render() {
     return <this.StrobeImageLayer>{this.props.children}</this.StrobeImageLayer>;

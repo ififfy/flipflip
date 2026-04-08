@@ -25,47 +25,64 @@ function isEmpty(allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 }
 
-export default class SourceScraper extends React.Component {
-  readonly props: {
-    config: Config;
-    scene: Scene;
-    currentAudio: Audio;
-    opacity: number;
-    isPlaying: boolean;
-    gridView: boolean;
-    hasStarted: boolean;
-    historyOffset: number;
-    advanceHack: ChildCallbackHack;
-    deleteHack?: ChildCallbackHack;
-    gridCoordinates?: Array<number>;
-    isOverlay?: boolean;
-    nextScene?: Scene;
-    strobeLayer?: string;
-    setHistoryOffset(historyOffset: number): void;
-    setHistoryPaths(historyPaths: Array<any>): void;
-    firstImageLoaded(): void;
-    finishedLoading(empty: boolean): void;
-    setProgress(total: number, current: number, message: string[]): void;
-    setVideo(video: HTMLVideoElement): void;
-    setCount(sourceURL: string, count: number, countComplete: boolean): void;
-    cache(i: HTMLImageElement | HTMLVideoElement): void;
-    systemMessage(message: string): void;
-    onEndScene?(): void;
-    setTimeToNextFrame?(timeToNextFrame: number): void;
-    setSceneCopy?(children: React.ReactNode): void;
-    playNextScene?(): void;
+interface SourceScraperProps {
+  config: Config;
+  scene: Scene;
+  currentAudio: Audio;
+  opacity: number;
+  isPlaying: boolean;
+  gridView: boolean;
+  hasStarted: boolean;
+  historyOffset: number;
+  advanceHack: ChildCallbackHack;
+  deleteHack?: ChildCallbackHack;
+  gridCoordinates?: Array<number>;
+  isOverlay?: boolean;
+  nextScene?: Scene;
+  strobeLayer?: string;
+  setHistoryOffset(historyOffset: number): void;
+  setHistoryPaths(historyPaths: Array<any>): void;
+  firstImageLoaded(): void;
+  finishedLoading(empty: boolean): void;
+  setProgress(total: number, current: number, message: string[]): void;
+  setVideo(video: HTMLVideoElement): void;
+  setCount(sourceURL: string, count: number, countComplete: boolean): void;
+  cache(i: HTMLImageElement | HTMLVideoElement): void;
+  systemMessage(message: string): void;
+  onEndScene?(): void;
+  setTimeToNextFrame?(timeToNextFrame: number): void;
+  setSceneCopy?(children: React.ReactNode): void;
+  playNextScene?(): void;
+}
+
+export default class SourceScraper extends React.Component<SourceScraperProps> {
+  readonly props: SourceScraperProps;
+
+  readonly state: {
+    allURLs: Map<string, Array<string>>;
+    allPosts: Map<string, string>;
+    restart: boolean;
+    preload: boolean;
+    videoVolume: number;
+    captcha: any;
+    load: boolean;
+    singleImage: number;
   };
 
-  readonly state = {
-    allURLs: new Map<string, Array<string>>(),
-    allPosts: new Map<string, string>(),
-    restart: false,
-    preload: false,
-    videoVolume: this.props.scene.videoVolume,
-    captcha: null as any,
-    load: false,
-    singleImage: null as number,
-  };
+  constructor(props: SourceScraperProps) {
+    super(props);
+
+    this.state = {
+      allURLs: new Map<string, Array<string>>(),
+      allPosts: new Map<string, string>(),
+      restart: false,
+      preload: false,
+      videoVolume: props.scene.videoVolume,
+      captcha: null as any,
+      load: false,
+      singleImage: null as number,
+    };
+  }
 
   _isMounted = false;
   _backForth: number = null;

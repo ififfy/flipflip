@@ -344,61 +344,79 @@ const styles = (theme: Theme) =>
     },
   });
 
-class Library extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
+interface LibraryProps {
+  classes: any;
+  config: Config;
+  filters: Array<string>;
+  library: Array<LibrarySource>;
+  progressCurrent: number;
+  progressMode: string;
+  progressTitle: string;
+  progressTotal: number;
+  selected: Array<string>;
+  specialMode: string;
+  tags: Array<Tag>;
+  tutorial: string;
+  yOffset: number;
+  goBack(): void;
+  onAddSource(scene: Scene, type: string, ...args: any[]): void;
+  onBatchClip(): void;
+  onBatchTag(): void;
+  onClearBlacklist(sourceURL: string): void;
+  onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  onDownload(source: LibrarySource): void;
+  onEditBlacklist(sourceURL: string, blacklist: string): void;
+  onExportLibrary(): void;
+  onImportFromLibrary(sources: Array<LibrarySource>): void;
+  onImportLibrary(importLibrary: any): void;
+  onImportReddit(): void;
+  onImportTumblr(): void;
+  onManageTags(): void;
+  onMarkOffline(): void;
+  onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  onSort(scene: Scene, algorithm: string, ascending: boolean): void;
+  onTutorial(tutorial: string): void;
+  onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void;
+  onUpdateMode(mode: string): void;
+  onUpdateVideoMetadata(): void;
+  savePosition(
+    yOffset: number,
+    filters: Array<string>,
+    selected: Array<string>,
+  ): void;
+  systemMessage(message: string): void;
+}
+
+class Library extends React.Component<LibraryProps> {
+  readonly props: LibraryProps;
+
+  readonly state: {
+    displaySources: Array<LibrarySource>;
+    drawerOpen: false;
     filters: Array<string>;
-    library: Array<LibrarySource>;
-    progressCurrent: number;
-    progressMode: string;
-    progressTitle: string;
-    progressTotal: number;
     selected: Array<string>;
-    specialMode: string;
-    tags: Array<Tag>;
-    tutorial: string;
-    yOffset: number;
-    goBack(): void;
-    onAddSource(scene: Scene, type: string, ...args: any[]): void;
-    onBatchClip(): void;
-    onBatchTag(): void;
-    onClearBlacklist(sourceURL: string): void;
-    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    onDownload(source: LibrarySource): void;
-    onEditBlacklist(sourceURL: string, blacklist: string): void;
-    onExportLibrary(): void;
-    onImportFromLibrary(sources: Array<LibrarySource>): void;
-    onImportLibrary(importLibrary: any): void;
-    onImportReddit(): void;
-    onImportTumblr(): void;
-    onManageTags(): void;
-    onMarkOffline(): void;
-    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    onSort(scene: Scene, algorithm: string, ascending: boolean): void;
-    onTutorial(tutorial: string): void;
-    onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void;
-    onUpdateMode(mode: string): void;
-    onUpdateVideoMetadata(): void;
-    savePosition(
-      yOffset: number,
-      filters: Array<string>,
-      selected: Array<string>,
-    ): void;
-    systemMessage(message: string): void;
+    selectedTags: Array<string>;
+    menuAnchorEl: any;
+    openMenu: string;
+    moveDialog: boolean;
+    importFile: string;
   };
 
-  readonly state = {
-    displaySources: Array<LibrarySource>(),
-    drawerOpen: false,
-    filters: this.props.filters,
-    selected: this.props.selected,
-    selectedTags: Array<string>(),
-    menuAnchorEl: null as any,
-    openMenu: null as string,
-    moveDialog: false,
-    importFile: "",
-  };
+  constructor(props: LibraryProps) {
+    super(props);
+
+    this.state = {
+      displaySources: Array<LibrarySource>(),
+      drawerOpen: false,
+      filters: props.filters,
+      selected: props.selected,
+      selectedTags: Array<string>(),
+      menuAnchorEl: null as any,
+      openMenu: null as string,
+      moveDialog: false,
+      importFile: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

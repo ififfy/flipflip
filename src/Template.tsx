@@ -7,10 +7,16 @@ import withStyles from "@mui/styles/withStyles";
 
 const styles = (theme: Theme) => createStyles({});
 
-class Template extends React.Component {
-  readonly props: {
-    classes: any;
-  };
+interface TemplateProps {
+  classes: any;
+}
+
+class Template extends React.Component<TemplateProps> {
+  readonly props: TemplateProps;
+
+  constructor(props: TemplateProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

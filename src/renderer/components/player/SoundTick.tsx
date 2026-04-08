@@ -1,17 +1,23 @@
 import * as React from "react";
 import Sound from "react-sound";
 
-export default class SoundTick extends React.Component {
-  readonly props: {
-    url: string;
-    playing: any;
-    speed: number;
-    volume: number;
-    tick: boolean;
-    onPlaying(soundData: any): void;
-    onError(errorCode: number, description: string): void;
-    onFinishedPlaying(): void;
-  };
+interface SoundTickProps {
+  url: string;
+  playing: any;
+  speed: number;
+  volume: number;
+  tick: boolean;
+  onPlaying(soundData: any): void;
+  onError(errorCode: number, description: string): void;
+  onFinishedPlaying(): void;
+}
+
+export default class SoundTick extends React.Component<SoundTickProps> {
+  readonly props: SoundTickProps;
+
+  constructor(props: SoundTickProps) {
+    super(props);
+  }
 
   shouldComponentUpdate(props: any) {
     return this.props.tick !== props.tick;

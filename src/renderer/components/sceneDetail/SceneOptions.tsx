@@ -31,19 +31,25 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneOptions extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
-    allSceneGrids: Array<SceneGrid>;
-    scene: Scene | SceneSettings;
-    tutorial: string;
-    isConfig: boolean;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface SceneOptionsProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  allSceneGrids: Array<SceneGrid>;
+  scene: Scene | SceneSettings;
+  tutorial: string;
+  isConfig: boolean;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class SceneOptions extends React.Component<SceneOptionsProps> {
+  readonly props: SceneOptionsProps;
+
+  constructor(props: SceneOptionsProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

@@ -20,24 +20,30 @@ import ThemeCard from "../configGroups/ThemeCard";
 import WatermarkCard from "../configGroups/WatermarkCard";
 import Masonry from "@mui/lab/Masonry/Masonry";
 
-export default class GeneralConfig extends React.Component {
-  readonly props: {
-    config: Config;
-    library: Array<LibrarySource>;
-    tags: Array<Tag>;
-    theme: Theme;
-    onBackup(): void;
-    onChangeThemeColor(colorTheme: any, primary: boolean): void;
-    onClean(): void;
-    onPortableOverride(): void;
-    onRestore(backupFile: string): void;
-    onToggleDarkMode(): void;
-    onUpdateCachingSettings(fn: (settings: CacheSettings) => void): void;
-    onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void;
-    onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void;
-    onUpdateRemoteSettings(fn: (settings: RemoteSettings) => void): void;
-    onUpdateConfig(fn: (config: Config) => void): void;
-  };
+interface GeneralConfigProps {
+  config: Config;
+  library: Array<LibrarySource>;
+  tags: Array<Tag>;
+  theme: Theme;
+  onBackup(): void;
+  onChangeThemeColor(colorTheme: any, primary: boolean): void;
+  onClean(): void;
+  onPortableOverride(): void;
+  onRestore(backupFile: string): void;
+  onToggleDarkMode(): void;
+  onUpdateCachingSettings(fn: (settings: CacheSettings) => void): void;
+  onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void;
+  onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void;
+  onUpdateRemoteSettings(fn: (settings: RemoteSettings) => void): void;
+  onUpdateConfig(fn: (config: Config) => void): void;
+}
+
+export default class GeneralConfig extends React.Component<GeneralConfigProps> {
+  readonly props: GeneralConfigProps;
+
+  constructor(props: GeneralConfigProps) {
+    super(props);
+  }
 
   render() {
     return (

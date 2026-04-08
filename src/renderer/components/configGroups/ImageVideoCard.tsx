@@ -66,19 +66,25 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ImageVideoCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    sidebar: boolean;
-    tutorial: string;
-    isConfig: boolean;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-    isPlayer?: boolean;
-  };
+interface ImageVideoCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  sidebar: boolean;
+  tutorial: string;
+  isConfig: boolean;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+  isPlayer?: boolean;
+}
+
+class ImageVideoCard extends React.Component<ImageVideoCardProps> {
+  readonly props: ImageVideoCardProps;
+
+  constructor(props: ImageVideoCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

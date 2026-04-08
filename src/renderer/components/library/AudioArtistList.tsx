@@ -54,18 +54,29 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioArtistList extends React.Component {
-  readonly props: {
-    classes: any;
-    sources: Array<Audio>;
-    showHelp: boolean;
-    onClickArtist(artist: string): void;
+interface AudioArtistListProps {
+  classes: any;
+  sources: Array<Audio>;
+  showHelp: boolean;
+  onClickArtist(artist: string): void;
+}
+
+class AudioArtistList extends React.Component<AudioArtistListProps> {
+  readonly props: AudioArtistListProps;
+
+  readonly state: {
+    artists: Map<string, string>;
+    hover: any;
   };
 
-  readonly state = {
-    artists: this.getArtists(),
-    hover: null as any,
-  };
+  constructor(props: AudioArtistListProps) {
+    super(props);
+
+    this.state = {
+      artists: this.getArtists(),
+      hover: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

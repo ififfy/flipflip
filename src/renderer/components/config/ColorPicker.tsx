@@ -56,18 +56,29 @@ const COLORS = [
   "#000",
 ];
 
-class ColorPicker extends React.Component {
-  readonly props: {
-    classes: any;
-    currentColor: string;
-    sidebar?: boolean;
-    onChangeColor(e: any): void;
+interface ColorPickerProps {
+  classes: any;
+  currentColor: string;
+  sidebar?: boolean;
+  onChangeColor(e: any): void;
+}
+
+class ColorPicker extends React.Component<ColorPickerProps> {
+  readonly props: ColorPickerProps;
+
+  readonly state: {
+    pickerColor: any;
+    pickerAnchorEl: any;
   };
 
-  readonly state = {
-    pickerColor: null as any,
-    pickerAnchorEl: null as any,
-  };
+  constructor(props: ColorPickerProps) {
+    super(props);
+
+    this.state = {
+      pickerColor: null as any,
+      pickerAnchorEl: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

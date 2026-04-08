@@ -54,21 +54,32 @@ const JiggleAnimation: any = Keyframes.Spring(
   },
 );
 
-export default class Jiggle extends React.Component {
-  readonly props: {
-    bounce?: boolean;
-    id?: string;
-    className?: string;
-    style?: any;
-    disable?: boolean;
-    onClick?(): void;
-    children?: React.ReactNode;
+interface JiggleProps {
+  bounce?: boolean;
+  id?: string;
+  className?: string;
+  style?: any;
+  disable?: boolean;
+  onClick?(): void;
+  children?: React.ReactNode;
+}
+
+export default class Jiggle extends React.Component<JiggleProps> {
+  readonly props: JiggleProps;
+
+  readonly state: {
+    jiggling: Array<string>;
+    hasStarted: boolean;
   };
 
-  readonly state = {
-    jiggling: Array<string>(),
-    hasStarted: false,
-  };
+  constructor(props: JiggleProps) {
+    super(props);
+
+    this.state = {
+      jiggling: Array<string>(),
+      hasStarted: false,
+    };
+  }
 
   jiggle = (e: any) => {
     const target = e.currentTarget;

@@ -68,17 +68,23 @@ const styles = (theme: Theme) =>
     },
   });
 
-class Tutorial extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    route: Route[];
-    scene: Scene | SceneGrid;
-    tutorial: string;
-    onDoneTutorial(lastTutorial: string): void;
-    onSetTutorial(nextTutorial: string): void;
-    onSkipAllTutorials(): void;
-  };
+interface TutorialProps {
+  classes: any;
+  config: Config;
+  route: Route[];
+  scene: Scene | SceneGrid;
+  tutorial: string;
+  onDoneTutorial(lastTutorial: string): void;
+  onSetTutorial(nextTutorial: string): void;
+  onSkipAllTutorials(): void;
+}
+
+class Tutorial extends React.Component<TutorialProps> {
+  readonly props: TutorialProps;
+
+  constructor(props: TutorialProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

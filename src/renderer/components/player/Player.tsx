@@ -29,94 +29,125 @@ import PlayerBars from "./PlayerBars";
 import SourceScraper from "./SourceScraper";
 import Strobe from "./Strobe";
 
-export default class Player extends React.Component {
-  readonly props: {
-    config: Config;
-    scene: Scene;
-    scenes: Array<Scene>;
-    sceneGrids: Array<SceneGrid>;
-    theme: Theme;
-    tutorial: string;
-    advanceHack?: ChildCallbackHack;
-    allLoaded?: boolean;
-    allTags?: Array<Tag>;
-    captionProgramJumpToHack?: ChildCallbackHack;
-    captionScale?: number;
-    gridCoordinates?: Array<number>;
-    gridView?: boolean;
-    hasStarted?: boolean;
-    preventSleep?: boolean;
-    tags?: Array<Tag>;
-    cache(i: HTMLImageElement | HTMLVideoElement): void;
-    getTags(source: string): Array<Tag>;
-    goBack(): void;
-    setCount(sourceURL: string, count: number, countComplete: boolean): void;
-    systemMessage(message: string): void;
-    blacklistFile?(sourceURL: string, fileToBlacklist: string): void;
-    goToTagSource?(source: LibrarySource): void;
-    goToClipSource?(source: LibrarySource): void;
-    navigateTagging?(offset: number): void;
-    nextScene?(): void;
-    onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void;
-    playTrack?(url: string): void;
-    changeAudioRoute?(aID: number): void;
-    toggleTag?(sourceID: number, tag: Tag): void;
-    inheritTags?(sourceID: number): void;
-    getCurrentTimestamp?(): number;
-    onCaptionError?(e: string): void;
-    onLoaded?(): void;
-    setProgress?(total: number, current: number, message: string[]): void;
-    setSceneCopy?(children: React.ReactNode): void;
-    setVideo?(video: HTMLVideoElement): void;
-    onGenerate?(scene: Scene | SceneGrid, children?: boolean): void;
-  };
+interface PlayerProps {
+  config: Config;
+  scene: Scene;
+  scenes: Array<Scene>;
+  sceneGrids: Array<SceneGrid>;
+  theme: Theme;
+  tutorial: string;
+  advanceHack?: ChildCallbackHack;
+  allLoaded?: boolean;
+  allTags?: Array<Tag>;
+  captionProgramJumpToHack?: ChildCallbackHack;
+  captionScale?: number;
+  gridCoordinates?: Array<number>;
+  gridView?: boolean;
+  hasStarted?: boolean;
+  preventSleep?: boolean;
+  tags?: Array<Tag>;
+  cache(i: HTMLImageElement | HTMLVideoElement): void;
+  getTags(source: string): Array<Tag>;
+  goBack(): void;
+  setCount(sourceURL: string, count: number, countComplete: boolean): void;
+  systemMessage(message: string): void;
+  blacklistFile?(sourceURL: string, fileToBlacklist: string): void;
+  goToTagSource?(source: LibrarySource): void;
+  goToClipSource?(source: LibrarySource): void;
+  navigateTagging?(offset: number): void;
+  nextScene?(): void;
+  onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void;
+  playTrack?(url: string): void;
+  changeAudioRoute?(aID: number): void;
+  toggleTag?(sourceID: number, tag: Tag): void;
+  inheritTags?(sourceID: number): void;
+  getCurrentTimestamp?(): number;
+  onCaptionError?(e: string): void;
+  onLoaded?(): void;
+  setProgress?(total: number, current: number, message: string[]): void;
+  setSceneCopy?(children: React.ReactNode): void;
+  setVideo?(video: HTMLVideoElement): void;
+  onGenerate?(scene: Scene | SceneGrid, children?: boolean): void;
+}
 
-  readonly state = {
-    canStart: this.props.scene.gridScene || this.props.scene.audioScene,
-    hasStarted:
-      this.props.hasStarted != null
-        ? this.props.hasStarted
-        : this.props.scene.audioScene,
-    isMainLoaded: this.props.scene.gridScene || this.props.scene.audioScene,
-    areOverlaysLoaded: Array<boolean>(this.props.scene.overlays.length).fill(
-      false,
-    ),
-    isEmpty: false,
-    isPlaying: true,
-    total: 0,
-    progress: 0,
-    progressMessage:
-      this.props.scene.sources.length > 0
-        ? [this.props.scene.sources[0].url]
-        : [""],
-    startTime: null as Date,
-    historyOffset: 0,
-    historyPaths: Array<any>(),
-    imagePlayerAdvanceHacks: new Array<Array<ChildCallbackHack>>(
-      this.props.scene.overlays.length + 1,
-    )
-      .fill(null)
-      .map((c) => [new ChildCallbackHack()]),
-    imagePlayerDeleteHack: new ChildCallbackHack(),
-    mainVideo: null as HTMLVideoElement,
-    overlayVideos: Array<Array<HTMLVideoElement>>(
-      this.props.scene.overlays.length,
-    )
-      .fill(null)
-      .map((n) => [null]),
-    currentAudio: null as Audio,
-    timeToNextFrame: null as number,
-    recentPictureGrid: false,
-    thumbImage: null as HTMLImageElement,
-    persistAudio: false,
-    persistText: false,
-    scriptPlaylists: null as {
+export default class Player extends React.Component<PlayerProps> {
+  readonly props: PlayerProps;
+
+  readonly state: {
+    canStart: boolean;
+    hasStarted: boolean;
+    isMainLoaded: boolean;
+    areOverlaysLoaded: Array<boolean>;
+    isEmpty: boolean;
+    isPlaying: boolean;
+    total: number;
+    progress: number;
+    progressMessage: string[];
+    startTime: Date;
+    historyOffset: number;
+    historyPaths: Array<any>;
+    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
+    imagePlayerDeleteHack: ChildCallbackHack;
+    mainVideo: HTMLVideoElement;
+    overlayVideos: Array<Array<HTMLVideoElement>>;
+    currentAudio: Audio;
+    timeToNextFrame: number;
+    recentPictureGrid: boolean;
+    thumbImage: HTMLImageElement;
+    persistAudio: boolean;
+    persistText: boolean;
+    scriptPlaylists: {
       scripts: CaptionScript[];
       shuffle: boolean;
       repeat: string;
-    }[],
-    hideCursor: false,
+    }[];
+    hideCursor: boolean;
   };
+
+  constructor(props: PlayerProps) {
+    super(props);
+
+    this.state = {
+      canStart: props.scene.gridScene || props.scene.audioScene,
+      hasStarted:
+        props.hasStarted != null ? props.hasStarted : props.scene.audioScene,
+      isMainLoaded: props.scene.gridScene || props.scene.audioScene,
+      areOverlaysLoaded: Array<boolean>(props.scene.overlays.length).fill(
+        false,
+      ),
+      isEmpty: false,
+      isPlaying: true,
+      total: 0,
+      progress: 0,
+      progressMessage:
+        props.scene.sources.length > 0 ? [props.scene.sources[0].url] : [""],
+      startTime: null as Date,
+      historyOffset: 0,
+      historyPaths: Array<any>(),
+      imagePlayerAdvanceHacks: new Array<Array<ChildCallbackHack>>(
+        props.scene.overlays.length + 1,
+      )
+        .fill(null)
+        .map((c) => [new ChildCallbackHack()]),
+      imagePlayerDeleteHack: new ChildCallbackHack(),
+      mainVideo: null as HTMLVideoElement,
+      overlayVideos: Array<Array<HTMLVideoElement>>(props.scene.overlays.length)
+        .fill(null)
+        .map((n) => [null]),
+      currentAudio: null as Audio,
+      timeToNextFrame: null as number,
+      recentPictureGrid: false,
+      thumbImage: null as HTMLImageElement,
+      persistAudio: false,
+      persistText: false,
+      scriptPlaylists: null as {
+        scripts: CaptionScript[];
+        shuffle: boolean;
+        repeat: string;
+      }[],
+      hideCursor: false,
+    };
+  }
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _interval: number = null;

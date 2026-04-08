@@ -10,22 +10,34 @@ import { SC, SL, TF } from "../../../common/const";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class Strobe extends React.Component {
-  readonly props: {
+interface StrobeProps {
+  toggleStrobe: boolean;
+  scene: Scene;
+  timeToNextFrame: number;
+  currentAudio: Audio;
+  zIndex: number;
+  strobeFunction?: Function;
+  children?: React.ReactNode;
+}
+
+export default class Strobe extends React.Component<StrobeProps> {
+  readonly props: StrobeProps;
+
+  readonly state: {
     toggleStrobe: boolean;
-    scene: Scene;
-    timeToNextFrame: number;
-    currentAudio: Audio;
-    zIndex: number;
-    strobeFunction?: Function;
-    children?: React.ReactNode;
+    duration: number;
+    delay: number;
   };
 
-  readonly state = {
-    toggleStrobe: false,
-    duration: this.getDuration(),
-    delay: 0,
-  };
+  constructor(props: StrobeProps) {
+    super(props);
+
+    this.state = {
+      toggleStrobe: false,
+      duration: this.getDuration(),
+      delay: 0,
+    };
+  }
 
   _strobeTimeout: number = null;
 

@@ -56,19 +56,30 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PlaylistList extends React.Component {
-  readonly props: {
-    classes: any;
-    playlists: Array<Playlist>;
-    audios: Array<Audio>;
-    showHelp: boolean;
-    onClickPlaylist(playlist: string): void;
+interface PlaylistListProps {
+  classes: any;
+  playlists: Array<Playlist>;
+  audios: Array<Audio>;
+  showHelp: boolean;
+  onClickPlaylist(playlist: string): void;
+}
+
+class PlaylistList extends React.Component<PlaylistListProps> {
+  readonly props: PlaylistListProps;
+
+  readonly state: {
+    playlists: Map<string, string[]>;
+    hover: any;
   };
 
-  readonly state = {
-    playlists: this.getPlaylists(),
-    hover: null as any,
-  };
+  constructor(props: PlaylistListProps) {
+    super(props);
+
+    this.state = {
+      playlists: this.getPlaylists(),
+      hover: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

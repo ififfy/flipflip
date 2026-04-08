@@ -73,24 +73,39 @@ function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
-class BackupCard extends React.Component {
-  readonly props: {
-    classes: any;
-    settings: GeneralSettings;
-    onBackup(): void;
-    onClean(): void;
-    onRestore(backupFile: string): void;
-    onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
+interface BackupCardProps {
+  classes: any;
+  settings: GeneralSettings;
+  onBackup(): void;
+  onClean(): void;
+  onRestore(backupFile: string): void;
+  onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
+}
+
+class BackupCard extends React.Component<BackupCardProps> {
+  readonly props: BackupCardProps;
+
+  readonly state: {
+    backups: Array<{ url: string; size: number }>;
+    backup: { url: string; size: number };
+    openMenu: string;
+    snackbarOpen: boolean;
+    snackbar: string;
+    snackbarSeverity: string;
   };
 
-  readonly state = {
-    backups: Array<{ url: string; size: number }>(),
-    backup: null as { url: string; size: number },
-    openMenu: null as string,
-    snackbarOpen: false,
-    snackbar: null as string,
-    snackbarSeverity: null as string,
-  };
+  constructor(props: BackupCardProps) {
+    super(props);
+
+    this.state = {
+      backups: Array<{ url: string; size: number }>(),
+      backup: null as { url: string; size: number },
+      openMenu: null as string,
+      snackbarOpen: false,
+      snackbar: null as string,
+      snackbarSeverity: null as string,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

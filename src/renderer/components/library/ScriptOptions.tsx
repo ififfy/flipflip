@@ -74,19 +74,31 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScriptOptions extends React.Component {
-  readonly props: {
-    classes: any;
+interface ScriptOptionsProps {
+  classes: any;
+  script: CaptionScript;
+  onCancel(): void;
+  onFinishEdit(common: CaptionScript): void;
+}
+
+class ScriptOptions extends React.Component<ScriptOptionsProps> {
+  readonly props: ScriptOptionsProps;
+
+  readonly state: {
     script: CaptionScript;
-    onCancel(): void;
-    onFinishEdit(common: CaptionScript): void;
+    loadingFonts: boolean;
+    systemFonts: Array<string>;
   };
 
-  readonly state = {
-    script: this.props.script,
-    loadingFonts: true,
-    systemFonts: Array<string>(),
-  };
+  constructor(props: ScriptOptionsProps) {
+    super(props);
+
+    this.state = {
+      script: props.script,
+      loadingFonts: true,
+      systemFonts: Array<string>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

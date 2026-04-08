@@ -72,26 +72,32 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScriptPlaylist extends React.Component {
-  readonly props: {
-    classes: any;
-    playlistIndex: number;
-    playlist: {
-      scripts: Array<CaptionScript>;
-      shuffle: boolean;
-      repeat: string;
-    };
-    scene: Scene;
-    onAddScript(playlistIndex: number): void;
-    onPlay(
-      source: CaptionScript,
-      sceneID: number,
-      displaySources: Array<CaptionScript>,
-    ): void;
-    onSourceOptions(script: CaptionScript): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    systemMessage(message: string): void;
+interface ScriptPlaylistProps {
+  classes: any;
+  playlistIndex: number;
+  playlist: {
+    scripts: Array<CaptionScript>;
+    shuffle: boolean;
+    repeat: string;
   };
+  scene: Scene;
+  onAddScript(playlistIndex: number): void;
+  onPlay(
+    source: CaptionScript,
+    sceneID: number,
+    displaySources: Array<CaptionScript>,
+  ): void;
+  onSourceOptions(script: CaptionScript): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  systemMessage(message: string): void;
+}
+
+class ScriptPlaylist extends React.Component<ScriptPlaylistProps> {
+  readonly props: ScriptPlaylistProps;
+
+  constructor(props: ScriptPlaylistProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

@@ -139,45 +139,58 @@ const styles = (theme: Theme) =>
     },
   });
 
-class GridSetup extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
-    autoEdit: boolean;
-    scene: SceneGrid;
-    tutorial: string;
-    goBack(): void;
-    onDelete(grid: SceneGrid): void;
-    onGenerate(
-      scene: Scene | SceneGrid,
-      children?: boolean,
-      force?: boolean,
-    ): void;
-    onPlayGrid(grid: SceneGrid): void;
-    onTutorial(tutorial: string): void;
-    onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void;
+interface GridSetupProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  autoEdit: boolean;
+  scene: SceneGrid;
+  tutorial: string;
+  goBack(): void;
+  onDelete(grid: SceneGrid): void;
+  onGenerate(
+    scene: Scene | SceneGrid,
+    children?: boolean,
+    force?: boolean,
+  ): void;
+  onPlayGrid(grid: SceneGrid): void;
+  onTutorial(tutorial: string): void;
+  onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void;
+}
+
+class GridSetup extends React.Component<GridSetupProps> {
+  readonly props: GridSetupProps;
+
+  readonly state: {
+    isEditingName: string;
+    isEditing: Array<number>;
+    menuAnchorEl: any;
+    height: number;
+    width: number;
+    dragging: boolean;
   };
 
-  readonly state = {
-    isEditingName: this.props.autoEdit
-      ? this.props.scene.name
-      : (null as string),
-    isEditing: null as Array<number>,
-    menuAnchorEl: null as any,
-    height:
-      this.props.scene.grid &&
-      this.props.scene.grid.length > 0 &&
-      this.props.scene.grid[0].length
-        ? this.props.scene.grid.length
-        : 1,
-    width:
-      this.props.scene.grid &&
-      this.props.scene.grid.length > 0 &&
-      this.props.scene.grid[0].length > 0
-        ? this.props.scene.grid[0].length
-        : 1,
-    dragging: false,
-  };
+  constructor(props: GridSetupProps) {
+    super(props);
+
+    this.state = {
+      isEditingName: props.autoEdit ? props.scene.name : (null as string),
+      isEditing: null as Array<number>,
+      menuAnchorEl: null as any,
+      height:
+        props.scene.grid &&
+        props.scene.grid.length > 0 &&
+        props.scene.grid[0].length
+          ? props.scene.grid.length
+          : 1,
+      width:
+        props.scene.grid &&
+        props.scene.grid.length > 0 &&
+        props.scene.grid[0].length > 0
+          ? props.scene.grid[0].length
+          : 1,
+      dragging: false,
+    };
+  }
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 

@@ -15,15 +15,21 @@ const styles = (theme: Theme) =>
     },
   });
 
-class MultiSceneSelect extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene;
-    allScenes: Array<Scene>;
-    values: Array<number>;
-    getSceneName(sceneID: string): void;
-    onChange(sceneIDs: Array<number>): void;
-  };
+interface MultiSceneSelectProps {
+  classes: any;
+  scene: Scene;
+  allScenes: Array<Scene>;
+  values: Array<number>;
+  getSceneName(sceneID: string): void;
+  onChange(sceneIDs: Array<number>): void;
+}
+
+class MultiSceneSelect extends React.Component<MultiSceneSelectProps> {
+  readonly props: MultiSceneSelectProps;
+
+  constructor(props: MultiSceneSelectProps) {
+    super(props);
+  }
 
   Option = (props: any) => (
     <div>

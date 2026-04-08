@@ -6,21 +6,33 @@ import { getEaseFunction } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class FadeInOut extends React.Component {
-  readonly props: {
+interface FadeInOutProps {
+  toggleFade: boolean;
+  currentAudio: Audio;
+  timeToNextFrame: number;
+  scene: Scene;
+  fadeFunction: Function;
+  children?: React.ReactNode;
+}
+
+export default class FadeInOut extends React.Component<FadeInOutProps> {
+  readonly props: FadeInOutProps;
+
+  readonly state: {
     toggleFade: boolean;
-    currentAudio: Audio;
-    timeToNextFrame: number;
-    scene: Scene;
-    fadeFunction: Function;
-    children?: React.ReactNode;
+    duration: number;
+    delay: number;
   };
 
-  readonly state = {
-    toggleFade: false,
-    duration: this.getDuration(),
-    delay: 0,
-  };
+  constructor(props: FadeInOutProps) {
+    super(props);
+
+    this.state = {
+      toggleFade: false,
+      duration: this.getDuration(),
+      delay: 0,
+    };
+  }
 
   _fadeTimeout: number = null;
   _fadeOut = false;

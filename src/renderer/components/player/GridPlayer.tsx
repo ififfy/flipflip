@@ -68,53 +68,68 @@ const styles = (theme: Theme) =>
     },
   });
 
-class GridPlayer extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    scene: SceneGrid;
-    allScenes: Array<Scene>;
-    sceneGrids: Array<SceneGrid>;
-    theme: Theme;
-    advanceHacks?: Array<ChildCallbackHack>;
-    hasStarted?: boolean;
-    cache(i: HTMLImageElement | HTMLVideoElement): void;
-    getTags(source: string): Array<Tag>;
-    goBack(): void;
-    onGenerate(
-      scene: Scene | SceneGrid,
-      children?: boolean,
-      force?: boolean,
-    ): void;
-    setCount(sourceURL: string, count: number, countComplete: boolean): void;
-    systemMessage(message: string): void;
-    finishedLoading?(empty: boolean): void;
-    setProgress?(total: number, current: number, message: string[]): void;
-    setVideo?(index: number, video: HTMLVideoElement): void;
-  };
+interface GridPlayerProps {
+  classes: any;
+  config: Config;
+  scene: SceneGrid;
+  allScenes: Array<Scene>;
+  sceneGrids: Array<SceneGrid>;
+  theme: Theme;
+  advanceHacks?: Array<ChildCallbackHack>;
+  hasStarted?: boolean;
+  cache(i: HTMLImageElement | HTMLVideoElement): void;
+  getTags(source: string): Array<Tag>;
+  goBack(): void;
+  onGenerate(
+    scene: Scene | SceneGrid,
+    children?: boolean,
+    force?: boolean,
+  ): void;
+  setCount(sourceURL: string, count: number, countComplete: boolean): void;
+  systemMessage(message: string): void;
+  finishedLoading?(empty: boolean): void;
+  setProgress?(total: number, current: number, message: string[]): void;
+  setVideo?(index: number, video: HTMLVideoElement): void;
+}
 
-  readonly state = {
-    scene: JSON.parse(JSON.stringify(this.props.scene)) as SceneGrid,
-    height:
-      this.props.scene.grid &&
-      this.props.scene.grid.length > 0 &&
-      this.props.scene.grid[0].length
-        ? this.props.scene.grid.length
-        : 1,
-    width:
-      this.props.scene.grid &&
-      this.props.scene.grid.length > 0 &&
-      this.props.scene.grid[0].length > 0
-        ? this.props.scene.grid[0].length
-        : 1,
-    sceneCopyGrid: this.props.scene.grid.map((r) =>
-      r.map((c) => null),
-    ) as Array<Array<React.ReactNode>>,
-    isLoaded: new Array<Array<boolean>>(),
-    hideCursor: false,
+class GridPlayer extends React.Component<GridPlayerProps> {
+  readonly props: GridPlayerProps;
+
+  readonly state: {
+    scene: SceneGrid;
+    height: number;
+    width: number;
+    sceneCopyGrid: Array<Array<React.ReactNode>>;
+    isLoaded: Array<Array<boolean>>;
+    hideCursor: boolean;
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
+
+  constructor(props: GridPlayerProps) {
+    super(props);
+
+    this.state = {
+      scene: JSON.parse(JSON.stringify(props.scene)) as SceneGrid,
+      height:
+        props.scene.grid &&
+        props.scene.grid.length > 0 &&
+        props.scene.grid[0].length
+          ? props.scene.grid.length
+          : 1,
+      width:
+        props.scene.grid &&
+        props.scene.grid.length > 0 &&
+        props.scene.grid[0].length > 0
+          ? props.scene.grid[0].length
+          : 1,
+      sceneCopyGrid: props.scene.grid.map((r) => r.map((c) => null)) as Array<
+        Array<React.ReactNode>
+      >,
+      isLoaded: new Array<Array<boolean>>(),
+      hideCursor: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

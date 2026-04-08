@@ -185,33 +185,50 @@ const styles = (theme: Theme) =>
     },
   });
 
-class VideoClipper extends React.Component {
-  readonly props: {
-    classes: any;
-    allTags: Array<Tag>;
-    isLibrary: boolean;
-    source: LibrarySource;
-    tutorial: string;
-    videoVolume: number;
-    cache(video: HTMLVideoElement): void;
-    goBack(): void;
-    navigateClipping(offset: number): void;
-    onTutorial(tutorial: string): void;
-    onStartVCTutorial(): void;
-    onSetDisabledClips(disabledClips: Array<number>): void;
-    onUpdateClips(url: string, clips: Array<Clip>): void;
+interface VideoClipperProps {
+  classes: any;
+  allTags: Array<Tag>;
+  isLibrary: boolean;
+  source: LibrarySource;
+  tutorial: string;
+  videoVolume: number;
+  cache(video: HTMLVideoElement): void;
+  goBack(): void;
+  navigateClipping(offset: number): void;
+  onTutorial(tutorial: string): void;
+  onStartVCTutorial(): void;
+  onSetDisabledClips(disabledClips: Array<number>): void;
+  onUpdateClips(url: string, clips: Array<Clip>): void;
+}
+
+class VideoClipper extends React.Component<VideoClipperProps> {
+  readonly props: VideoClipperProps;
+
+  readonly state: {
+    scene: Scene;
+    video: HTMLVideoElement;
+    empty: boolean;
+    isEditing: Clip;
+    isEditingValue: number[];
+    isEditingStartText: string;
+    isEditingEndText: string;
+    isTagging: boolean;
   };
 
-  readonly state = {
-    scene: new Scene(),
-    video: null as HTMLVideoElement,
-    empty: false,
-    isEditing: null as Clip,
-    isEditingValue: [0, 0],
-    isEditingStartText: "",
-    isEditingEndText: "",
-    isTagging: false,
-  };
+  constructor(props: VideoClipperProps) {
+    super(props);
+
+    this.state = {
+      scene: new Scene(),
+      video: null as HTMLVideoElement,
+      empty: false,
+      isEditing: null as Clip,
+      isEditingValue: [0, 0],
+      isEditingStartText: "",
+      isEditingEndText: "",
+      isTagging: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

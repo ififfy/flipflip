@@ -16,16 +16,26 @@ import {
 import { GeneralSettings } from "../../../common/Config";
 import { portablePath } from "../../data/utils";
 
-export default class PlayerBoolCard2 extends React.Component {
-  readonly props: {
-    generalSettings: GeneralSettings;
-    onPortableOverride(): void;
-    onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void;
+interface PlayerBoolCard2Props {
+  generalSettings: GeneralSettings;
+  onPortableOverride(): void;
+  onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void;
+}
+
+export default class PlayerBoolCard2 extends React.Component<PlayerBoolCard2Props> {
+  readonly props: PlayerBoolCard2Props;
+
+  readonly state: {
+    portableDialog: boolean;
   };
 
-  readonly state = {
-    portableDialog: false,
-  };
+  constructor(props: PlayerBoolCard2Props) {
+    super(props);
+
+    this.state = {
+      portableDialog: false,
+    };
+  }
 
   render() {
     return (

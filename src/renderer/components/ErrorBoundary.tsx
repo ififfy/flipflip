@@ -24,23 +24,39 @@ import {
 import { convertFromEpoch, saveDir } from "../data/utils";
 import { path_join } from "../dummy/path";
 
-export default class ErrorBoundary extends React.Component {
-  readonly props: {
-    children: React.ReactNode;
-    version: string;
-    goBack(): void;
-    onRestore(backupFile: string): void;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  version: string;
+  goBack(): void;
+  onRestore(backupFile: string): void;
+}
+
+export default class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
+  readonly props: ErrorBoundaryProps;
+
+  readonly state: {
+    hasError: boolean;
+    error: Error;
+    info: React.ErrorInfo;
+    resetCheck: boolean;
+    backupCheck: boolean;
+    backup: { url: string; size: number };
+    backups: Array<{ url: string; size: number }>;
   };
 
-  readonly state = {
-    hasError: false,
-    error: null as Error,
-    info: null as React.ErrorInfo,
-    resetCheck: false,
-    backupCheck: false,
-    backup: null as { url: string; size: number },
-    backups: Array<{ url: string; size: number }>(),
-  };
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+
+    this.state = {
+      hasError: false,
+      error: null as Error,
+      info: null as React.ErrorInfo,
+      resetCheck: false,
+      backupCheck: false,
+      backup: null as { url: string; size: number },
+      backups: Array<{ url: string; size: number }>(),
+    };
+  }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     // Display fallback UI

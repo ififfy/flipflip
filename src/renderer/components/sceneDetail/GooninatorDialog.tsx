@@ -32,19 +32,31 @@ const styles = (theme: Theme) =>
     },
   });
 
-class GooninatorDialog extends React.Component {
-  readonly props: {
-    classes: any;
-    open: boolean;
-    onClose(): void;
-    onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+interface GooninatorDialogProps {
+  classes: any;
+  open: boolean;
+  onClose(): void;
+  onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+}
+
+class GooninatorDialog extends React.Component<GooninatorDialogProps> {
+  readonly props: GooninatorDialogProps;
+
+  readonly state: {
+    importType: string;
+    importURL: string;
+    rootDir: string;
   };
 
-  readonly state = {
-    importType: GT.tumblr,
-    importURL: "",
-    rootDir: "",
-  };
+  constructor(props: GooninatorDialogProps) {
+    super(props);
+
+    this.state = {
+      importType: GT.tumblr,
+      importURL: "",
+      rootDir: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

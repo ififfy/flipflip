@@ -312,50 +312,66 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScriptLibrary extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
+interface ScriptLibraryProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  filters: Array<string>;
+  library: Array<CaptionScript>;
+  selected: Array<string>;
+  specialMode: string;
+  tags: Array<Tag>;
+  tutorial: string;
+  yOffset: number;
+  goBack(): void;
+  onBatchTag(): void;
+  onEditScript(source: CaptionScript): void;
+  onImportFromLibrary(sources: Array<CaptionScript>): void;
+  onImportToScriptor(source: CaptionScript): void;
+  onManageTags(): void;
+  onPlay(
+    source: CaptionScript,
+    sceneID: string,
+    displayed: Array<CaptionScript>,
+  ): void;
+  onSort(algorithm: string, ascending: boolean): void;
+  onTutorial(tutorial: string): void;
+  onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
+  onUpdateMode(mode: string): void;
+  onUpdateScript(script: CaptionScript): void;
+  savePosition(
+    yOffset: number,
+    filters: Array<string>,
+    selected: Array<string>,
+  ): void;
+  systemMessage(message: string): void;
+}
+
+class ScriptLibrary extends React.Component<ScriptLibraryProps> {
+  readonly props: ScriptLibraryProps;
+
+  readonly state: {
+    displaySources: Array<CaptionScript>;
+    drawerOpen: boolean;
     filters: Array<string>;
-    library: Array<CaptionScript>;
     selected: Array<string>;
-    specialMode: string;
-    tags: Array<Tag>;
-    tutorial: string;
-    yOffset: number;
-    goBack(): void;
-    onBatchTag(): void;
-    onEditScript(source: CaptionScript): void;
-    onImportFromLibrary(sources: Array<CaptionScript>): void;
-    onImportToScriptor(source: CaptionScript): void;
-    onManageTags(): void;
-    onPlay(
-      source: CaptionScript,
-      sceneID: string,
-      displayed: Array<CaptionScript>,
-    ): void;
-    onSort(algorithm: string, ascending: boolean): void;
-    onTutorial(tutorial: string): void;
-    onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
-    onUpdateMode(mode: string): void;
-    onUpdateScript(script: CaptionScript): void;
-    savePosition(
-      yOffset: number,
-      filters: Array<string>,
-      selected: Array<string>,
-    ): void;
-    systemMessage(message: string): void;
+    selectedTags: Array<string>;
+    menuAnchorEl: any;
+    openMenu: string;
   };
 
-  readonly state = {
-    displaySources: Array<CaptionScript>(),
-    drawerOpen: false,
-    filters: this.props.filters,
-    selected: this.props.selected,
-    selectedTags: Array<string>(),
-    menuAnchorEl: null as any,
-    openMenu: null as string,
-  };
+  constructor(props: ScriptLibraryProps) {
+    super(props);
+
+    this.state = {
+      displaySources: Array<CaptionScript>(),
+      drawerOpen: false,
+      filters: props.filters,
+      selected: props.selected,
+      selectedTags: Array<string>(),
+      menuAnchorEl: null as any,
+      openMenu: null as string,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

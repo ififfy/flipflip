@@ -31,11 +31,17 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PictureGrid extends React.Component {
-  readonly props: {
-    classes: any;
-    pictures: Array<any>;
-  };
+interface PictureGridProps {
+  classes: any;
+  pictures: Array<any>;
+}
+
+class PictureGrid extends React.Component<PictureGridProps> {
+  readonly props: PictureGridProps;
+
+  constructor(props: PictureGridProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

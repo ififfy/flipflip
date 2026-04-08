@@ -140,23 +140,38 @@ const styles = (theme: Theme) =>
     },
   });
 
-class TagManager extends React.Component {
-  readonly props: {
-    classes: any;
+interface TagManagerProps {
+  classes: any;
+  tags: Array<Tag>;
+  goBack(): void;
+  onSort(scene: Scene, algorithm: string, ascending: boolean): void;
+  onUpdateTags(tags: Array<Tag>): void;
+}
+
+class TagManager extends React.Component<TagManagerProps> {
+  readonly props: TagManagerProps;
+
+  readonly state: {
+    openMenu: string;
+    menuAnchorEl: any;
     tags: Array<Tag>;
-    goBack(): void;
-    onSort(scene: Scene, algorithm: string, ascending: boolean): void;
-    onUpdateTags(tags: Array<Tag>): void;
+    isEditing: number;
+    tagName: string;
+    tagPhrase: string;
   };
 
-  readonly state = {
-    openMenu: null as string,
-    menuAnchorEl: null as any,
-    tags: Array<Tag>(),
-    isEditing: -1,
-    tagName: "",
-    tagPhrase: "",
-  };
+  constructor(props: TagManagerProps) {
+    super(props);
+
+    this.state = {
+      openMenu: null as string,
+      menuAnchorEl: null as any,
+      tags: Array<Tag>(),
+      isEditing: -1,
+      tagName: "",
+      tagPhrase: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

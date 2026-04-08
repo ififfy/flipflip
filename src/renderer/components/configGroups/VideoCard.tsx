@@ -10,18 +10,24 @@ import VideoControl from "../player/VideoControl";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 import SceneGrid from "../../../common/SceneGrid";
 
-export default class VideoCard extends React.Component {
-  readonly props: {
-    scene: Scene;
-    otherScenes: Array<Scene | SceneGrid>;
-    isPlaying: boolean;
-    mainVideo: HTMLVideoElement;
-    mainClip: Clip;
-    mainClipValue: Array<number>;
-    otherVideos: Array<Array<HTMLVideoElement>>;
-    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-  };
+interface VideoCardProps {
+  scene: Scene;
+  otherScenes: Array<Scene | SceneGrid>;
+  isPlaying: boolean;
+  mainVideo: HTMLVideoElement;
+  mainClip: Clip;
+  mainClipValue: Array<number>;
+  otherVideos: Array<Array<HTMLVideoElement>>;
+  imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+}
+
+export default class VideoCard extends React.Component<VideoCardProps> {
+  readonly props: VideoCardProps;
+
+  constructor(props: VideoCardProps) {
+    super(props);
+  }
 
   render() {
     let mainVideoTitle = "";

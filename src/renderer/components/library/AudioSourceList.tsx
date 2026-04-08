@@ -51,33 +51,46 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioSourceList extends React.Component {
-  readonly props: {
-    classes: any;
-    cachePath: string;
-    isSelect: boolean;
-    selected: Array<string>;
-    showHelp: boolean;
-    sources: Array<Audio>;
-    yOffset: number;
-    tutorial: string;
-    playlist?: string;
-    onClickAlbum(album: string): void;
-    onClickArtist(artist: string): void;
-    onPlay(source: Audio, displayed: Array<Audio>): void;
-    onUpdateSelected(selected: Array<string>): void;
-    onUpdateLibrary(fn: (library: Array<Audio>) => void): void;
-    onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void;
-    savePosition(): void;
-    systemMessage(message: string): void;
+interface AudioSourceListProps {
+  classes: any;
+  cachePath: string;
+  isSelect: boolean;
+  selected: Array<string>;
+  showHelp: boolean;
+  sources: Array<Audio>;
+  yOffset: number;
+  tutorial: string;
+  playlist?: string;
+  onClickAlbum(album: string): void;
+  onClickArtist(artist: string): void;
+  onPlay(source: Audio, displayed: Array<Audio>): void;
+  onUpdateSelected(selected: Array<string>): void;
+  onUpdateLibrary(fn: (library: Array<Audio>) => void): void;
+  onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void;
+  savePosition(): void;
+  systemMessage(message: string): void;
+}
+
+class AudioSourceList extends React.Component<AudioSourceListProps> {
+  readonly props: AudioSourceListProps;
+
+  readonly state: {
+    sourceOptions: Audio;
+    deleteDialog: Audio;
+    sourceEdit: Audio;
+    lastSelected: number;
   };
 
-  readonly state = {
-    sourceOptions: null as Audio,
-    deleteDialog: null as Audio,
-    sourceEdit: null as Audio,
-    lastSelected: null as number,
-  };
+  constructor(props: AudioSourceListProps) {
+    super(props);
+
+    this.state = {
+      sourceOptions: null as Audio,
+      deleteDialog: null as Audio,
+      sourceEdit: null as Audio,
+      lastSelected: null as number,
+    };
+  }
 
   onSortEnd = ({
     oldIndex,

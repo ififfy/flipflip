@@ -420,64 +420,82 @@ function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
-class SceneDetail extends React.Component {
-  readonly props: {
-    classes: any;
-    allScenes: Array<Scene>;
-    allSceneGrids: Array<SceneGrid>;
-    autoEdit: boolean;
-    config: Config;
-    library: Array<LibrarySource>;
-    scene: Scene;
-    tags: Array<Tag>;
-    tutorial: string;
-    goBack(): void;
-    onAddSource(scene: Scene, type: string, ...args: any[]): void;
-    onAddScript(playlistIndex: number): void;
-    onAddTracks(playlistIndex: number): void;
-    onClearBlacklist(sourceURL: string): void;
-    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    onCloneScene(scene: Scene): void;
-    onDelete(scene: Scene): void;
-    onDownload(source: LibrarySource): void;
-    onEditBlacklist(sourceURL: string, blacklist: string): void;
-    onExport(scene: Scene): void;
-    onGenerate(
-      scene: Scene | SceneGrid,
-      children?: boolean,
-      force?: boolean,
-    ): void;
-    onPlayScene(scene: Scene): void;
-    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    onPlayAudio(source: Audio, displayed: Array<Audio>): void;
-    onPlayScript(
-      source: CaptionScript,
-      sceneID: number,
-      displayed: Array<CaptionScript>,
-    ): void;
-    onResetScene(scene: Scene): void;
-    onSaveAsScene(scene: Scene): void;
-    onSort(scene: Scene, algorithm: string, ascending: boolean): void;
-    onTutorial(tutorial: string): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    systemMessage(message: string): void;
+interface SceneDetailProps {
+  classes: any;
+  allScenes: Array<Scene>;
+  allSceneGrids: Array<SceneGrid>;
+  autoEdit: boolean;
+  config: Config;
+  library: Array<LibrarySource>;
+  scene: Scene;
+  tags: Array<Tag>;
+  tutorial: string;
+  goBack(): void;
+  onAddSource(scene: Scene, type: string, ...args: any[]): void;
+  onAddScript(playlistIndex: number): void;
+  onAddTracks(playlistIndex: number): void;
+  onClearBlacklist(sourceURL: string): void;
+  onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  onCloneScene(scene: Scene): void;
+  onDelete(scene: Scene): void;
+  onDownload(source: LibrarySource): void;
+  onEditBlacklist(sourceURL: string, blacklist: string): void;
+  onExport(scene: Scene): void;
+  onGenerate(
+    scene: Scene | SceneGrid,
+    children?: boolean,
+    force?: boolean,
+  ): void;
+  onPlayScene(scene: Scene): void;
+  onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  onPlayAudio(source: Audio, displayed: Array<Audio>): void;
+  onPlayScript(
+    source: CaptionScript,
+    sceneID: number,
+    displayed: Array<CaptionScript>,
+  ): void;
+  onResetScene(scene: Scene): void;
+  onSaveAsScene(scene: Scene): void;
+  onSort(scene: Scene, algorithm: string, ascending: boolean): void;
+  onTutorial(tutorial: string): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  systemMessage(message: string): void;
+}
+
+class SceneDetail extends React.Component<SceneDetailProps> {
+  readonly props: SceneDetailProps;
+
+  readonly state: {
+    isEditingName: string;
+    drawerOpen: boolean;
+    menuAnchorEl: any;
+    openMenu: string;
+    snackbarOpen: boolean;
+    snackbar: string;
+    snackbarSeverity: string;
+    sceneEffects: string;
+    confirmCopy: boolean;
+    displaySources: Array<LibrarySource>;
+    filters: Array<string>;
   };
 
-  readonly state = {
-    isEditingName: this.props.autoEdit
-      ? this.props.scene.name
-      : (null as string),
-    drawerOpen: false,
-    menuAnchorEl: null as any,
-    openMenu: null as string,
-    snackbarOpen: false,
-    snackbar: null as string,
-    snackbarSeverity: null as string,
-    sceneEffects: "",
-    confirmCopy: false,
-    displaySources: Array<LibrarySource>(),
-    filters: Array<string>(),
-  };
+  constructor(props: SceneDetailProps) {
+    super(props);
+
+    this.state = {
+      isEditingName: props.autoEdit ? props.scene.name : (null as string),
+      drawerOpen: false,
+      menuAnchorEl: null as any,
+      openMenu: null as string,
+      snackbarOpen: false,
+      snackbar: null as string,
+      snackbarSeverity: null as string,
+      sceneEffects: "",
+      confirmCopy: false,
+      displaySources: Array<LibrarySource>(),
+      filters: Array<string>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

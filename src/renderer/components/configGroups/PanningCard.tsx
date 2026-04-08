@@ -63,22 +63,28 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PanningCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    sidebar: boolean;
-    easingControls: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface PanningCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  sidebar: boolean;
+  easingControls: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class PanningCard extends React.Component<PanningCardProps> {
+  readonly props: PanningCardProps;
 
   readonly horizInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly vertInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: PanningCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

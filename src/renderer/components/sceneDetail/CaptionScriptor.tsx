@@ -236,39 +236,63 @@ const styles = (theme: Theme) =>
     },
   });
 
-class CaptionScriptor extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    openScript: CaptionScript;
-    scenes: Array<Scene>;
-    sceneGrids: Array<SceneGrid>;
-    theme: Theme;
-    tutorial: string;
-    onAddFromLibrary(): void;
-    getTags(source: string): Array<Tag>;
-    goBack(): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
+interface CaptionScriptorProps {
+  classes: any;
+  config: Config;
+  openScript: CaptionScript;
+  scenes: Array<Scene>;
+  sceneGrids: Array<SceneGrid>;
+  theme: Theme;
+  tutorial: string;
+  onAddFromLibrary(): void;
+  getTags(source: string): Array<Tag>;
+  goBack(): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
+}
+
+class CaptionScriptor extends React.Component<CaptionScriptorProps> {
+  readonly props: CaptionScriptorProps;
+
+  readonly state: {
+    captionScript: CaptionScript;
+    sceneScripts: Array<CaptionScript>;
+    selectScript: string;
+    scene: Scene;
+    error: string;
+    fullscreen: boolean;
+    sceneChanged: boolean;
+    scriptChanged: boolean;
+    loadFromSceneError: boolean;
+    openMenu: string;
+    menuAnchorEl: any;
+    captionProgramJumpToHack: ChildCallbackHack;
+    codeMirrorAddHack: ChildCallbackHack;
+    codeMirrorOverwriteHack: ChildCallbackHack;
+    systemFonts: Array<string>;
   };
 
-  readonly state = {
-    captionScript: new CaptionScript({ script: "" }),
-    sceneScripts: null as Array<CaptionScript>,
-    selectScript: "",
-    scene: null as Scene,
-    error: null as string,
-    fullscreen: false,
-    sceneChanged: false,
-    scriptChanged: false,
-    loadFromSceneError: false,
-    openMenu: null as string,
-    menuAnchorEl: null as any,
-    captionProgramJumpToHack: new ChildCallbackHack(),
-    codeMirrorAddHack: new ChildCallbackHack(),
-    codeMirrorOverwriteHack: new ChildCallbackHack(),
-    systemFonts: Array<string>(),
-  };
+  constructor(props: CaptionScriptorProps) {
+    super(props);
+
+    this.state = {
+      captionScript: new CaptionScript({ script: "" }),
+      sceneScripts: null as Array<CaptionScript>,
+      selectScript: "",
+      scene: null as Scene,
+      error: null as string,
+      fullscreen: false,
+      sceneChanged: false,
+      scriptChanged: false,
+      loadFromSceneError: false,
+      openMenu: null as string,
+      menuAnchorEl: null as any,
+      captionProgramJumpToHack: new ChildCallbackHack(),
+      codeMirrorAddHack: new ChildCallbackHack(),
+      codeMirrorOverwriteHack: new ChildCallbackHack(),
+      systemFonts: Array<string>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

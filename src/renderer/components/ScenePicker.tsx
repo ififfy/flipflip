@@ -397,62 +397,85 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScenePicker extends React.Component {
-  readonly props: {
-    classes: any;
-    canGenerate: boolean;
-    canGrid: boolean;
-    config: Config;
-    grids: Array<SceneGrid>;
-    audioLibraryCount: number;
-    scriptLibraryCount: number;
-    libraryCount: number;
-    openTab: number;
-    scenes: Array<Scene>;
-    sceneGroups: Array<SceneGroup>;
-    tutorial: string;
-    version: string;
-    onAddGenerator(): void;
-    onAddGrid(): void;
-    onAddGroup(type: string): void;
-    onAddScene(): void;
-    onChangeTab(newTab: number): void;
-    onDeleteGroup(group: SceneGroup): void;
-    onDeleteScenes(sceneIDs: Array<number>): void;
-    onImportScene(importScenes: any, addToLibrary: boolean): void;
-    onOpenConfig(): void;
-    onOpenAudioLibrary(): void;
-    onOpenScriptLibrary(): void;
-    onOpenCaptionScriptor(): void;
-    onOpenLibrary(): void;
-    onOpenScene(scene: Scene): void;
-    onOpenGrid(grid: SceneGrid): void;
-    onTutorial(tutorial: string): void;
-    onSort(algorithm: string, ascending: boolean): void;
-    onUpdateConfig(config: Config): void;
-    onUpdateGroups(groups: Array<SceneGroup>): void;
-    onUpdateScenes(scenes: Array<Scene>): void;
-    onUpdateGrids(grids: Array<SceneGrid>): void;
-    startTutorial(): void;
-    systemMessage(message: string): void;
+interface ScenePickerProps {
+  classes: any;
+  canGenerate: boolean;
+  canGrid: boolean;
+  config: Config;
+  grids: Array<SceneGrid>;
+  audioLibraryCount: number;
+  scriptLibraryCount: number;
+  libraryCount: number;
+  openTab: number;
+  scenes: Array<Scene>;
+  sceneGroups: Array<SceneGroup>;
+  tutorial: string;
+  version: string;
+  onAddGenerator(): void;
+  onAddGrid(): void;
+  onAddGroup(type: string): void;
+  onAddScene(): void;
+  onChangeTab(newTab: number): void;
+  onDeleteGroup(group: SceneGroup): void;
+  onDeleteScenes(sceneIDs: Array<number>): void;
+  onImportScene(importScenes: any, addToLibrary: boolean): void;
+  onOpenConfig(): void;
+  onOpenAudioLibrary(): void;
+  onOpenScriptLibrary(): void;
+  onOpenCaptionScriptor(): void;
+  onOpenLibrary(): void;
+  onOpenScene(scene: Scene): void;
+  onOpenGrid(grid: SceneGrid): void;
+  onTutorial(tutorial: string): void;
+  onSort(algorithm: string, ascending: boolean): void;
+  onUpdateConfig(config: Config): void;
+  onUpdateGroups(groups: Array<SceneGroup>): void;
+  onUpdateScenes(scenes: Array<Scene>): void;
+  onUpdateGrids(grids: Array<SceneGrid>): void;
+  startTutorial(): void;
+  systemMessage(message: string): void;
+}
+
+class ScenePicker extends React.Component<ScenePickerProps> {
+  readonly props: ScenePickerProps;
+
+  readonly state: {
+    drawerOpen: boolean;
+    newVersion: string;
+    newVersionLink: string;
+    isFirstWindow: boolean;
+    menuAnchorEl: any;
+    openMenu: string;
+    displayScenes: Array<Scene>;
+    displayGrids: Array<SceneGrid>;
+    filters: Array<string>;
+    deleteScenes: Array<number>;
+    importFile: string;
+    importSources: boolean;
+    isEditing: number;
+    isEditingName: string;
   };
 
-  readonly state = {
-    drawerOpen: false,
-    newVersion: "",
-    newVersionLink: "",
-    isFirstWindow: false,
-    menuAnchorEl: null as any,
-    openMenu: null as string,
-    displayScenes: Array<Scene>(),
-    displayGrids: Array<SceneGrid>(),
-    filters: Array<string>(),
-    deleteScenes: null as Array<number>,
-    importFile: "",
-    importSources: false,
-    isEditing: -1,
-    isEditingName: "",
-  };
+  constructor(props: ScenePickerProps) {
+    super(props);
+
+    this.state = {
+      drawerOpen: false,
+      newVersion: "",
+      newVersionLink: "",
+      isFirstWindow: false,
+      menuAnchorEl: null as any,
+      openMenu: null as string,
+      displayScenes: Array<Scene>(),
+      displayGrids: Array<SceneGrid>(),
+      filters: Array<string>(),
+      deleteScenes: null as Array<number>,
+      importFile: "",
+      importSources: false,
+      isEditing: -1,
+      isEditingName: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

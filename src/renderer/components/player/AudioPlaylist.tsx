@@ -93,36 +93,46 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioPlaylist extends React.Component {
-  readonly props: {
-    classes: any;
-    playlistIndex: number;
-    playlist: { audios: Array<Audio>; shuffle: boolean; repeat: string };
-    scene: Scene;
-    sidebar: boolean;
-    startPlaying: boolean;
-    onAddTracks(playlistIndex: number): void;
-    onSourceOptions(audio: Audio): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    persist?: boolean;
-    shorterSeek?: boolean;
-    showMsTimestamp?: boolean;
-    scenePaths?: Array<any>;
-    goBack?(): void;
-    orderAudioTags?(audio: Audio): void;
-    onPlay?(source: Audio, displaySources: Array<Audio>): void;
-    onPlaying?(position: number, duration: number): void;
-    playTrack?(url: string): void;
-    playNextScene?(): void;
-    setCurrentAudio?(audio: Audio): void;
-    systemMessage?(message: string): void;
+interface AudioPlaylistProps {
+  classes: any;
+  playlistIndex: number;
+  playlist: { audios: Array<Audio>; shuffle: boolean; repeat: string };
+  scene: Scene;
+  sidebar: boolean;
+  startPlaying: boolean;
+  onAddTracks(playlistIndex: number): void;
+  onSourceOptions(audio: Audio): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  persist?: boolean;
+  shorterSeek?: boolean;
+  showMsTimestamp?: boolean;
+  scenePaths?: Array<any>;
+  goBack?(): void;
+  orderAudioTags?(audio: Audio): void;
+  onPlay?(source: Audio, displaySources: Array<Audio>): void;
+  onPlaying?(position: number, duration: number): void;
+  playTrack?(url: string): void;
+  playNextScene?(): void;
+  setCurrentAudio?(audio: Audio): void;
+  systemMessage?(message: string): void;
+}
+
+class AudioPlaylist extends React.Component<AudioPlaylistProps> {
+  readonly props: AudioPlaylistProps;
+
+  readonly state: {
+    currentIndex: number;
+    playingAudios: Array<Audio>;
   };
 
-  readonly state = {
-    currentIndex:
-      this.props.playlistIndex == 0 ? this.props.scene.audioStartIndex : 0,
-    playingAudios: Array<Audio>(),
-  };
+  constructor(props: AudioPlaylistProps) {
+    super(props);
+
+    this.state = {
+      currentIndex: props.playlistIndex == 0 ? props.scene.audioStartIndex : 0,
+      playingAudios: Array<Audio>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

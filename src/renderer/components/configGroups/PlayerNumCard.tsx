@@ -23,14 +23,20 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PlayerNumCard extends React.Component {
-  readonly props: {
-    classes: any;
-    library: Array<LibrarySource>;
-    tags: Array<Tag>;
-    settings: DisplaySettings;
-    onUpdateSettings(fn: (settings: DisplaySettings) => void): void;
-  };
+interface PlayerNumCardProps {
+  classes: any;
+  library: Array<LibrarySource>;
+  tags: Array<Tag>;
+  settings: DisplaySettings;
+  onUpdateSettings(fn: (settings: DisplaySettings) => void): void;
+}
+
+class PlayerNumCard extends React.Component<PlayerNumCardProps> {
+  readonly props: PlayerNumCardProps;
+
+  constructor(props: PlayerNumCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

@@ -49,33 +49,46 @@ function getTimestampFromMs(ms: number): string {
   return getTimestamp(secs);
 }
 
-class AudioControl extends React.Component {
-  readonly props: {
-    classes: any;
-    audio: Audio;
-    audioEnabled: boolean;
-    singleTrack: boolean;
-    lastTrack: boolean;
-    repeat: string;
-    scenePaths: Array<any>;
-    startPlaying: boolean;
-    shorterSeek?: boolean;
-    showMsTimestamp?: boolean;
-    onAudioSliderChange(e: MouseEvent, value: number): void;
-    nextTrack?(): void;
-    prevTrack?(): void;
-    goBack?(): void;
-    onPlaying?(position: number, duration: number): void;
-    playTrack?(url: string): void;
-    playNextScene?(): void;
+interface AudioControlProps {
+  classes: any;
+  audio: Audio;
+  audioEnabled: boolean;
+  singleTrack: boolean;
+  lastTrack: boolean;
+  repeat: string;
+  scenePaths: Array<any>;
+  startPlaying: boolean;
+  shorterSeek?: boolean;
+  showMsTimestamp?: boolean;
+  onAudioSliderChange(e: MouseEvent, value: number): void;
+  nextTrack?(): void;
+  prevTrack?(): void;
+  goBack?(): void;
+  onPlaying?(position: number, duration: number): void;
+  playTrack?(url: string): void;
+  playNextScene?(): void;
+}
+
+class AudioControl extends React.Component<AudioControlProps> {
+  readonly props: AudioControlProps;
+
+  readonly state: {
+    playing: boolean;
+    position: number;
+    duration: number;
+    tick: boolean;
   };
 
-  readonly state = {
-    playing: this.props.startPlaying,
-    position: 0,
-    duration: 0,
-    tick: false,
-  };
+  constructor(props: AudioControlProps) {
+    super(props);
+
+    this.state = {
+      playing: props.startPlaying,
+      position: 0,
+      duration: 0,
+      tick: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

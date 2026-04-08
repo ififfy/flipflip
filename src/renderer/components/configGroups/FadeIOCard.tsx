@@ -60,20 +60,26 @@ const styles = (theme: Theme) =>
     },
   });
 
-class FadeIOCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    sidebar: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface FadeIOCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  sidebar: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class FadeIOCard extends React.Component<FadeIOCardProps> {
+  readonly props: FadeIOCardProps;
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: FadeIOCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

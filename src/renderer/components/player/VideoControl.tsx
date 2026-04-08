@@ -49,28 +49,41 @@ const styles = (theme: Theme) =>
     },
   });
 
-class VideoControl extends React.Component {
-  readonly props: {
-    classes: any;
-    video: HTMLVideoElement;
-    useHotkeys?: boolean;
-    player?: boolean;
-    volume?: any;
-    clip?: Clip;
-    clipValue?: Array<number>;
-    clips?: Array<Clip>;
-    skip?: number;
-    onChangeVolume(volume: number): void;
-    onChangeSpeed?(speed: number): void;
-    nextTrack?(): void;
+interface VideoControlProps {
+  classes: any;
+  video: HTMLVideoElement;
+  useHotkeys?: boolean;
+  player?: boolean;
+  volume?: any;
+  clip?: Clip;
+  clipValue?: Array<number>;
+  clips?: Array<Clip>;
+  skip?: number;
+  onChangeVolume(volume: number): void;
+  onChangeSpeed?(speed: number): void;
+  nextTrack?(): void;
+}
+
+class VideoControl extends React.Component<VideoControlProps> {
+  readonly props: VideoControlProps;
+
+  readonly state: {
+    playing: boolean;
+    update: boolean;
+    marks: Array<{ value: number; label: string }>;
+    showSpeed: boolean;
   };
 
-  readonly state = {
-    playing: true,
-    update: true,
-    marks: Array<{ value: number; label: string }>(),
-    showSpeed: false,
-  };
+  constructor(props: VideoControlProps) {
+    super(props);
+
+    this.state = {
+      playing: true,
+      update: true,
+      marks: Array<{ value: number; label: string }>(),
+      showSpeed: false,
+    };
+  }
 
   render() {
     if (this.props.video == null)

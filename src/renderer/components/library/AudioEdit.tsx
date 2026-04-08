@@ -68,20 +68,30 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioEdit extends React.Component {
-  readonly props: {
-    classes: any;
+interface AudioEditProps {
+  classes: any;
+  audio: Audio;
+  cachePath: string;
+  title: string;
+  allowSuggestion?: boolean;
+  onCancel(): void;
+  onFinishEdit(common: Audio): void;
+}
+
+class AudioEdit extends React.Component<AudioEditProps> {
+  readonly props: AudioEditProps;
+
+  readonly state: {
     audio: Audio;
-    cachePath: string;
-    title: string;
-    allowSuggestion?: boolean;
-    onCancel(): void;
-    onFinishEdit(common: Audio): void;
   };
 
-  readonly state = {
-    audio: this.props.audio,
-  };
+  constructor(props: AudioEditProps) {
+    super(props);
+
+    this.state = {
+      audio: props.audio,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

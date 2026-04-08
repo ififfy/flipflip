@@ -6,14 +6,20 @@ import { getEaseFunction } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class CrossFade extends React.Component {
-  readonly props: {
-    image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    scene: Scene;
-    timeToNextFrame: number;
-    currentAudio: Audio;
-    children?: React.ReactNode;
-  };
+interface CrossFadeProps {
+  image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  scene: Scene;
+  timeToNextFrame: number;
+  currentAudio: Audio;
+  children?: React.ReactNode;
+}
+
+export default class CrossFade extends React.Component<CrossFadeProps> {
+  readonly props: CrossFadeProps;
+
+  constructor(props: CrossFadeProps) {
+    super(props);
+  }
 
   render() {
     if (this.props.scene.crossFade) {

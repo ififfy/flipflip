@@ -171,31 +171,41 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioSourceListItem extends React.Component {
-  readonly props: {
-    classes: any;
-    checked: boolean;
-    index: number;
-    isSelect: boolean;
-    lastSelected: boolean;
-    source: Audio;
-    sources: Array<Audio>;
-    style: any;
-    onClickAlbum(album: string): void;
-    onClickArtist(artist: string): void;
-    onDelete(source: Audio): void;
-    onEditSource(source: Audio): void;
-    onPlay(source: Audio, displaySources: Array<Audio>): void;
-    onRemove(source: Audio): void;
-    onSourceOptions(source: Audio): void;
-    onToggleSelect(): void;
-    savePosition(): void;
-    systemMessage(message: string): void;
+interface AudioSourceListItemProps {
+  classes: any;
+  checked: boolean;
+  index: number;
+  isSelect: boolean;
+  lastSelected: boolean;
+  source: Audio;
+  sources: Array<Audio>;
+  style: any;
+  onClickAlbum(album: string): void;
+  onClickArtist(artist: string): void;
+  onDelete(source: Audio): void;
+  onEditSource(source: Audio): void;
+  onPlay(source: Audio, displaySources: Array<Audio>): void;
+  onRemove(source: Audio): void;
+  onSourceOptions(source: Audio): void;
+  onToggleSelect(): void;
+  savePosition(): void;
+  systemMessage(message: string): void;
+}
+
+class AudioSourceListItem extends React.Component<AudioSourceListItemProps> {
+  readonly props: AudioSourceListItemProps;
+
+  readonly state: {
+    urlInput: string;
   };
 
-  readonly state = {
-    urlInput: this.props.source.url,
-  };
+  constructor(props: AudioSourceListItemProps) {
+    super(props);
+
+    this.state = {
+      urlInput: props.source.url,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

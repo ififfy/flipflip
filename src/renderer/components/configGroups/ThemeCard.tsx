@@ -20,13 +20,19 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ThemeCard extends React.Component {
-  readonly props: {
-    classes: any;
-    theme: Theme;
-    onChangeThemeColor(colorTheme: any, primary: boolean): void;
-    onToggleDarkMode(): void;
-  };
+interface ThemeCardProps {
+  classes: any;
+  theme: Theme;
+  onChangeThemeColor(colorTheme: any, primary: boolean): void;
+  onToggleDarkMode(): void;
+}
+
+class ThemeCard extends React.Component<ThemeCardProps> {
+  readonly props: ThemeCardProps;
+
+  constructor(props: ThemeCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

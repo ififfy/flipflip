@@ -36,19 +36,31 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ColorSetPicker extends React.Component {
-  readonly props: {
-    classes: any;
-    currentColors: Array<string>;
-    sidebar?: boolean;
-    onChangeColors(e: any): void;
+interface ColorSetPickerProps {
+  classes: any;
+  currentColors: Array<string>;
+  sidebar?: boolean;
+  onChangeColors(e: any): void;
+}
+
+class ColorSetPicker extends React.Component<ColorSetPickerProps> {
+  readonly props: ColorSetPickerProps;
+
+  readonly state: {
+    pickerIndex: number;
+    pickerColor: string;
+    pickerAnchorEl: any;
   };
 
-  readonly state = {
-    pickerIndex: null as number,
-    pickerColor: null as string,
-    pickerAnchorEl: null as any,
-  };
+  constructor(props: ColorSetPickerProps) {
+    super(props);
+
+    this.state = {
+      pickerIndex: null as number,
+      pickerColor: null as string,
+      pickerAnchorEl: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

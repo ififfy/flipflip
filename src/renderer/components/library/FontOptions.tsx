@@ -41,14 +41,20 @@ const styles = (theme: Theme) =>
     },
   });
 
-class FontOptions extends React.Component {
-  readonly props: {
-    classes: any;
-    name: string;
-    options: FontSettingsI;
-    systemFonts: Array<string>;
-    onUpdateOptions(fn: (options: FontSettingsI) => void): void;
-  };
+interface FontOptionsProps {
+  classes: any;
+  name: string;
+  options: FontSettingsI;
+  systemFonts: Array<string>;
+  onUpdateOptions(fn: (options: FontSettingsI) => void): void;
+}
+
+class FontOptions extends React.Component<FontOptionsProps> {
+  readonly props: FontOptionsProps;
+
+  constructor(props: FontOptionsProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

@@ -305,19 +305,30 @@ export const timestampRegex =
 //   });
 // });
 
-export default class CodeMirror extends React.Component {
-  readonly props: {
-    onGutterClick(editor: any, clickedLine: number): void;
-    onUpdateScript(text: string, changed?: boolean): void;
-    addHack?: ChildCallbackHack;
-    className?: string;
-    overwriteHack?: ChildCallbackHack;
+interface CodeMirrorProps {
+  onGutterClick(editor: any, clickedLine: number): void;
+  onUpdateScript(text: string, changed?: boolean): void;
+  addHack?: ChildCallbackHack;
+  className?: string;
+  overwriteHack?: ChildCallbackHack;
+}
+
+export default class CodeMirror extends React.Component<CodeMirrorProps> {
+  readonly props: CodeMirrorProps;
+
+  readonly state: {
+    scriptText: string;
+    cursor: { line: number; ch: number };
   };
 
-  readonly state = {
-    scriptText: "",
-    cursor: { line: 0, ch: 0 },
-  };
+  constructor(props: CodeMirrorProps) {
+    super(props);
+
+    this.state = {
+      scriptText: "",
+      cursor: { line: 0, ch: 0 },
+    };
+  }
 
   render() {
     return (

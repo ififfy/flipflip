@@ -60,20 +60,26 @@ const styles = (theme: Theme) =>
     },
   });
 
-class CrossFadeCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    sidebar: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface CrossFadeCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  sidebar: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class CrossFadeCard extends React.Component<CrossFadeCardProps> {
+  readonly props: CrossFadeCardProps;
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: CrossFadeCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

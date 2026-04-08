@@ -6,14 +6,20 @@ import { getEaseFunction } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class ZoomMove extends React.Component {
-  readonly props: {
-    scene: Scene;
-    reset: boolean;
-    timeToNextFrame: number;
-    currentAudio: Audio;
-    children?: React.ReactNode;
-  };
+interface ZoomMoveProps {
+  scene: Scene;
+  reset: boolean;
+  timeToNextFrame: number;
+  currentAudio: Audio;
+  children?: React.ReactNode;
+}
+
+export default class ZoomMove extends React.Component<ZoomMoveProps> {
+  readonly props: ZoomMoveProps;
+
+  constructor(props: ZoomMoveProps) {
+    super(props);
+  }
 
   render() {
     return <this.ZoomMoveLayer>{this.props.children}</this.ZoomMoveLayer>;

@@ -110,17 +110,27 @@ interface Column {
   enabled: boolean;
 }
 
-class AlbumListItem extends React.Component {
-  readonly props: {
-    album: Album;
-    classes: any;
-    selectedAlbums: number[];
-    onSelect(albumID: number, selected: boolean): void;
+interface AlbumListItemProps {
+  album: Album;
+  classes: any;
+  selectedAlbums: number[];
+  onSelect(albumID: number, selected: boolean): void;
+}
+
+class AlbumListItem extends React.Component<AlbumListItemProps> {
+  readonly props: AlbumListItemProps;
+
+  readonly state: {
+    foldersOpen: boolean;
   };
 
-  readonly state = {
-    foldersOpen: false,
-  };
+  constructor(props: AlbumListItemProps) {
+    super(props);
+
+    this.state = {
+      foldersOpen: false,
+    };
+  }
 
   setOpen(foldersOpen = false, e: MouseEvent) {
     e.stopPropagation();
@@ -173,36 +183,55 @@ class AlbumListItem extends React.Component {
   }
 }
 
-class PiwigoDialog extends React.Component {
-  readonly props: {
-    config: any;
-    classes: any;
-    open: boolean;
-    onClose(): void;
-    onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+interface PiwigoDialogProps {
+  config: any;
+  classes: any;
+  open: boolean;
+  onClose(): void;
+  onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+}
+
+class PiwigoDialog extends React.Component<PiwigoDialogProps> {
+  readonly props: PiwigoDialogProps;
+
+  readonly state: {
+    listType: string;
+    albums: Album[];
+    tags: Tag[];
+    loggedIn: boolean;
+    selectedAlbums: number[];
+    selectedTags: number[];
+    tagModeAnd: boolean;
+    sortRandom: boolean;
+    recursiveMode: boolean;
+    sortOrder: Column[];
   };
 
-  readonly state = {
-    listType: PW.apiTypeCategory,
-    albums: [] as Album[],
-    tags: [] as Tag[],
-    loggedIn: false,
-    selectedAlbums: [] as number[],
-    selectedTags: [] as number[],
-    tagModeAnd: false,
-    sortRandom: false,
-    recursiveMode: false,
-    sortOrder: Object.values(PWS)
-      .filter((pw) => pw != PWS.sortOptionRandom)
-      .map((pw) => {
-        return {
-          label: en.get(pw),
-          name: pw,
-          direction: "DESC",
-          enabled: false,
-        } as Column;
-      }),
-  };
+  constructor(props: PiwigoDialogProps) {
+    super(props);
+
+    this.state = {
+      listType: PW.apiTypeCategory,
+      albums: [],
+      tags: [],
+      loggedIn: false,
+      selectedAlbums: [],
+      selectedTags: [],
+      tagModeAnd: false,
+      sortRandom: false,
+      recursiveMode: false,
+      sortOrder: Object.values(PWS)
+        .filter((pw) => pw != PWS.sortOptionRandom)
+        .map((pw) => {
+          return {
+            label: en.get(pw),
+            name: pw,
+            direction: "DESC",
+            enabled: false,
+          } as Column;
+        }),
+    };
+  }
 
   render() {
     const {

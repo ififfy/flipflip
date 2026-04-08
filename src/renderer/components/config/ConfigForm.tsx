@@ -200,35 +200,51 @@ function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
-class ConfigForm extends React.Component {
-  readonly props: {
-    classes: any;
+interface ConfigFormProps {
+  classes: any;
+  config: Config;
+  library: Array<LibrarySource>;
+  scenes: Array<Scene>;
+  sceneGrids: Array<SceneGrid>;
+  tags: Array<Tag>;
+  theme: Theme;
+  goBack(): void;
+  onBackup(): void;
+  onChangeThemeColor(colorTheme: any, primary: boolean): void;
+  onClean(): void;
+  onDefault(): void;
+  onResetTutorials(): void;
+  onRestore(backupFile: string): void;
+  onToggleDarkMode(): void;
+  onUpdateConfig(config: Config): void;
+}
+
+class ConfigForm extends React.Component<ConfigFormProps> {
+  readonly props: ConfigFormProps;
+
+  readonly state: {
+    changeMade: boolean;
     config: Config;
-    library: Array<LibrarySource>;
-    scenes: Array<Scene>;
-    sceneGrids: Array<SceneGrid>;
-    tags: Array<Tag>;
-    theme: Theme;
-    goBack(): void;
-    onBackup(): void;
-    onChangeThemeColor(colorTheme: any, primary: boolean): void;
-    onClean(): void;
-    onDefault(): void;
-    onResetTutorials(): void;
-    onRestore(backupFile: string): void;
-    onToggleDarkMode(): void;
-    onUpdateConfig(config: Config): void;
+    drawerOpen: boolean;
+    openMenu: string;
+    openTab: number;
+    errorSnackOpen: boolean;
+    errorSnack: string;
   };
 
-  readonly state = {
-    changeMade: false,
-    config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
-    drawerOpen: false,
-    openMenu: null as string,
-    openTab: 2,
-    errorSnackOpen: false,
-    errorSnack: null as string,
-  };
+  constructor(props: ConfigFormProps) {
+    super(props);
+
+    this.state = {
+      changeMade: false,
+      config: JSON.parse(JSON.stringify(props.config)), // Make a copy
+      drawerOpen: false,
+      openMenu: null as string,
+      openTab: 2,
+      errorSnackOpen: false,
+      errorSnack: null as string,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

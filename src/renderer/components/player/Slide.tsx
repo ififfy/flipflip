@@ -6,14 +6,20 @@ import { getEaseFunction, getRandomNumber } from "../../data/utils";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 
-export default class Slide extends React.Component {
-  readonly props: {
-    image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
-    scene: Scene;
-    timeToNextFrame: number;
-    currentAudio: Audio;
-    children?: React.ReactNode;
-  };
+interface SlideProps {
+  image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+  scene: Scene;
+  timeToNextFrame: number;
+  currentAudio: Audio;
+  children?: React.ReactNode;
+}
+
+export default class Slide extends React.Component<SlideProps> {
+  readonly props: SlideProps;
+
+  constructor(props: SlideProps) {
+    super(props);
+  }
 
   render() {
     return <this.SlideLayer>{this.props.children}</this.SlideLayer>;

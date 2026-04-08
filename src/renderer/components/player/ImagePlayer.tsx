@@ -29,46 +29,65 @@ class GifInfo {
   durationChrome: number;
 }
 
-export default class ImagePlayer extends React.Component {
-  readonly props: {
-    config: Config;
-    scene: Scene;
-    currentAudio: Audio;
-    gridView: boolean;
-    advanceHack: ChildCallbackHack;
-    allURLs: Map<string, Array<string>>;
-    allPosts: Map<string, string>;
-    isPlaying: boolean;
-    historyOffset: number;
-    hasStarted: boolean;
-    singleImage: number;
-    deleteHack?: ChildCallbackHack;
-    gridCoordinates?: Array<number>;
-    isOverlay?: boolean;
-    strobeLayer?: string;
-    setHistoryPaths(historyPaths: Array<any>): void;
-    setHistoryOffset(historyOffset: number): void;
-    onLoaded(): void;
-    setVideo(video: HTMLVideoElement): void;
-    cache(i: HTMLImageElement | HTMLVideoElement): void;
-    onEndScene?(): void;
-    setSceneCopy?(children: React.ReactNode): void;
-    setTimeToNextFrame?(timeToNextFrame: number): void;
-    playNextScene?(): void;
-  };
+interface ImagePlayerProps {
+  config: Config;
+  scene: Scene;
+  currentAudio: Audio;
+  gridView: boolean;
+  advanceHack: ChildCallbackHack;
+  allURLs: Map<string, Array<string>>;
+  allPosts: Map<string, string>;
+  isPlaying: boolean;
+  historyOffset: number;
+  hasStarted: boolean;
+  singleImage: number;
+  deleteHack?: ChildCallbackHack;
+  gridCoordinates?: Array<number>;
+  isOverlay?: boolean;
+  strobeLayer?: string;
+  setHistoryPaths(historyPaths: Array<any>): void;
+  setHistoryOffset(historyOffset: number): void;
+  onLoaded(): void;
+  setVideo(video: HTMLVideoElement): void;
+  cache(i: HTMLImageElement | HTMLVideoElement): void;
+  onEndScene?(): void;
+  setSceneCopy?(children: React.ReactNode): void;
+  setTimeToNextFrame?(timeToNextFrame: number): void;
+  playNextScene?(): void;
+}
 
-  readonly state = {
+export default class ImagePlayer extends React.Component<ImagePlayerProps> {
+  readonly props: ImagePlayerProps;
+
+  readonly state: {
     readyToDisplay: Array<
       HTMLImageElement | HTMLVideoElement | HTMLIFrameElement
-    >(),
+    >;
     historyPaths: Array<
       HTMLImageElement | HTMLVideoElement | HTMLIFrameElement
-    >(),
-    timeToNextFrame: 0,
-    timeoutID: 0,
-    nextImageID: 0,
-    historyOffset: 0,
+    >;
+    timeToNextFrame: number;
+    timeoutID: number;
+    nextImageID: number;
+    historyOffset: number;
   };
+
+  constructor(props: ImagePlayerProps) {
+    super(props);
+
+    this.state = {
+      readyToDisplay: Array<
+        HTMLImageElement | HTMLVideoElement | HTMLIFrameElement
+      >(),
+      historyPaths: Array<
+        HTMLImageElement | HTMLVideoElement | HTMLIFrameElement
+      >(),
+      timeToNextFrame: 0,
+      timeoutID: 0,
+      nextImageID: 0,
+      historyOffset: 0,
+    };
+  }
 
   _backForth: number = null;
   _isMounted: boolean;

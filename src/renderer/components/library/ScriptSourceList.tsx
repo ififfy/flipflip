@@ -55,40 +55,57 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScriptSourceList extends React.Component {
-  readonly props: {
-    classes: any;
-    library: Array<CaptionScript>;
-    scenes: Array<Scene>;
-    showHelp: boolean;
-    sources: Array<CaptionScript>;
-    tutorial: string;
-    onEditScript(source: CaptionScript): void;
-    onPlay(
-      source: CaptionScript,
-      sceneID: number,
-      displayed: Array<CaptionScript>,
-    ): void;
-    onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
-    onUpdateScript(script: CaptionScript): void;
-    systemMessage(message: string): void;
-    specialMode?: string;
-    selected?: Array<string>;
-    yOffset?: number;
-    onUpdateSelected?(selected: Array<string>): void;
-    savePosition?(): void;
+interface ScriptSourceListProps {
+  classes: any;
+  library: Array<CaptionScript>;
+  scenes: Array<Scene>;
+  showHelp: boolean;
+  sources: Array<CaptionScript>;
+  tutorial: string;
+  onEditScript(source: CaptionScript): void;
+  onPlay(
+    source: CaptionScript,
+    sceneID: number,
+    displayed: Array<CaptionScript>,
+  ): void;
+  onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
+  onUpdateScript(script: CaptionScript): void;
+  systemMessage(message: string): void;
+  specialMode?: string;
+  selected?: Array<string>;
+  yOffset?: number;
+  onUpdateSelected?(selected: Array<string>): void;
+  savePosition?(): void;
+}
+
+class ScriptSourceList extends React.Component<ScriptSourceListProps> {
+  readonly props: ScriptSourceListProps;
+
+  readonly state: {
+    sourceOptions: CaptionScript;
+    lastSelected: number;
+    isEditing: number;
+    mouseX: any;
+    mouseY: any;
+    deleteDialog: CaptionScript;
+    beginPlay: CaptionScript;
+    playWithScene: number;
   };
 
-  readonly state = {
-    sourceOptions: null as CaptionScript,
-    lastSelected: null as number,
-    isEditing: -1,
-    mouseX: null as any,
-    mouseY: null as any,
-    deleteDialog: null as CaptionScript,
-    beginPlay: null as CaptionScript,
-    playWithScene: null as number,
-  };
+  constructor(props: ScriptSourceListProps) {
+    super(props);
+
+    this.state = {
+      sourceOptions: null as CaptionScript,
+      lastSelected: null as number,
+      isEditing: -1,
+      mouseX: null as any,
+      mouseY: null as any,
+      deleteDialog: null as CaptionScript,
+      beginPlay: null as CaptionScript,
+      playWithScene: null as number,
+    };
+  }
 
   onSortEnd = ({
     oldIndex,

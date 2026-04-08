@@ -29,32 +29,43 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene;
-    sidebar: boolean;
-    startPlaying: boolean;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    persist?: boolean;
-    shorterSeek?: boolean;
-    showMsTimestamp?: boolean;
-    scenePaths?: Array<any>;
-    goBack?(): void;
-    onAddTracks?(playlistIndex: number): void;
-    onPlay?(source: Audio, displayed: Array<Audio>): void;
-    onPlaying?(position: number, duration: number): void;
-    orderAudioTags?(audio: Audio): void;
-    playTrack?(url: string): void;
-    playNextScene?(): void;
-    setCurrentAudio?(audio: Audio): void;
-    systemMessage?(message: string): void;
+interface AudioCardProps {
+  classes: any;
+  scene: Scene;
+  sidebar: boolean;
+  startPlaying: boolean;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  persist?: boolean;
+  shorterSeek?: boolean;
+  showMsTimestamp?: boolean;
+  scenePaths?: Array<any>;
+  goBack?(): void;
+  onAddTracks?(playlistIndex: number): void;
+  onPlay?(source: Audio, displayed: Array<Audio>): void;
+  onPlaying?(position: number, duration: number): void;
+  orderAudioTags?(audio: Audio): void;
+  playTrack?(url: string): void;
+  playNextScene?(): void;
+  setCurrentAudio?(audio: Audio): void;
+  systemMessage?(message: string): void;
+}
+
+class AudioCard extends React.Component<AudioCardProps> {
+  readonly props: AudioCardProps;
+
+  readonly state: {
+    sourceOptionsPlaylist: number;
+    sourceOptions: Audio;
   };
 
-  readonly state = {
-    sourceOptionsPlaylist: -1,
-    sourceOptions: null as Audio,
-  };
+  constructor(props: AudioCardProps) {
+    super(props);
+
+    this.state = {
+      sourceOptionsPlaylist: -1,
+      sourceOptions: null as Audio,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

@@ -55,12 +55,18 @@ const colors = [
   color.blueGrey,
 ];
 
-class ThemeColorPicker extends React.Component {
-  readonly props: {
-    classes: any;
-    currentColor: string;
-    onChangeColor(colorTheme: any): void;
-  };
+interface ThemeColorPickerProps {
+  classes: any;
+  currentColor: string;
+  onChangeColor(colorTheme: any): void;
+}
+
+class ThemeColorPicker extends React.Component<ThemeColorPickerProps> {
+  readonly props: ThemeColorPickerProps;
+
+  constructor(props: ThemeColorPickerProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

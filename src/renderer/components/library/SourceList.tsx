@@ -95,43 +95,63 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SourceList extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    library: Array<LibrarySource>;
-    showHelp: boolean;
-    sources: Array<LibrarySource>;
-    tutorial: string;
-    onClearBlacklist(sourceURL: string): void;
-    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    onDownload(source: LibrarySource): void;
-    onEditBlacklist(sourceURL: string, blacklist: string): void;
-    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
-    systemMessage(message: string): void;
-    isSelect?: boolean;
-    selected?: Array<string>;
-    yOffset?: number;
-    useWeights?: boolean;
-    onUpdateLibrary?(fn: (library: Array<LibrarySource>) => void): void;
-    onUpdateScene?(fn: (scene: Scene) => void): void;
-    onUpdateSelected?(selected: Array<string>): void;
-    savePosition?(): void;
+interface SourceListProps {
+  classes: any;
+  config: Config;
+  library: Array<LibrarySource>;
+  showHelp: boolean;
+  sources: Array<LibrarySource>;
+  tutorial: string;
+  onClearBlacklist(sourceURL: string): void;
+  onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  onDownload(source: LibrarySource): void;
+  onEditBlacklist(sourceURL: string, blacklist: string): void;
+  onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
+  systemMessage(message: string): void;
+  isSelect?: boolean;
+  selected?: Array<string>;
+  yOffset?: number;
+  useWeights?: boolean;
+  onUpdateLibrary?(fn: (library: Array<LibrarySource>) => void): void;
+  onUpdateScene?(fn: (scene: Scene) => void): void;
+  onUpdateSelected?(selected: Array<string>): void;
+  savePosition?(): void;
+}
+
+class SourceList extends React.Component<SourceListProps> {
+  readonly props: SourceListProps;
+
+  readonly state: {
+    cachePath: string;
+    isEditing: number;
+    mouseX: any;
+    mouseY: any;
+    clipMenu: LibrarySource;
+    weightMenu: LibrarySource;
+    blacklistSource: string;
+    editBlacklist: string;
+    sourceOptionsType: string;
+    sourceOptions: LibrarySource;
+    deleteDialog: LibrarySource;
   };
 
-  readonly state = {
-    cachePath: null as string,
-    isEditing: -1,
-    mouseX: null as any,
-    mouseY: null as any,
-    clipMenu: null as LibrarySource,
-    weightMenu: null as LibrarySource,
-    blacklistSource: null as string,
-    editBlacklist: null as string,
-    sourceOptionsType: null as string,
-    sourceOptions: null as LibrarySource,
-    deleteDialog: null as LibrarySource,
-  };
+  constructor(props: SourceListProps) {
+    super(props);
+
+    this.state = {
+      cachePath: null as string,
+      isEditing: -1,
+      mouseX: null as any,
+      mouseY: null as any,
+      clipMenu: null as LibrarySource,
+      weightMenu: null as LibrarySource,
+      blacklistSource: null as string,
+      editBlacklist: null as string,
+      sourceOptionsType: null as string,
+      sourceOptions: null as LibrarySource,
+      deleteDialog: null as LibrarySource,
+    };
+  }
 
   onSortEnd = ({
     oldIndex,

@@ -60,20 +60,26 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SlideCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    sidebar: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface SlideCardProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  sidebar: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class SlideCard extends React.Component<SlideCardProps> {
+  readonly props: SlideCardProps;
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  constructor(props: SlideCardProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;

@@ -247,62 +247,78 @@ const styles = (theme: Theme) =>
     },
   });
 
-class PlayerBars extends React.Component {
-  readonly props: {
-    classes: any;
-    config: Config;
-    hasStarted: boolean;
-    historyPaths: Array<any>;
-    historyOffset: number;
-    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
-    imagePlayerDeleteHack: ChildCallbackHack;
-    isEmpty: boolean;
-    isPlaying: boolean;
-    mainVideo: HTMLVideoElement;
-    overlayVideos: Array<Array<HTMLVideoElement>>;
-    persistAudio: boolean;
-    persistText: boolean;
-    recentPictureGrid: boolean;
-    scene: Scene;
-    scenes: Array<Scene>;
-    sceneGrids: Array<SceneGrid>;
-    title: string;
-    tutorial: string;
-    goBack(): void;
-    historyBack(): void;
-    historyForward(): void;
-    navigateTagging(offset: number): void;
-    onGenerate(
-      scene: Scene | SceneGrid,
-      children?: boolean,
-      force?: boolean,
-    ): void;
-    onRecentPictureGrid(): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    playNextScene(): void;
-    play(): void;
-    pause(): void;
-    setCurrentAudio(audio: Audio): void;
-    allTags?: Array<Tag>;
-    tags?: Array<Tag>;
-    blacklistFile?(sourceURL: string, fileToBlacklist: string): void;
-    goToTagSource?(source: LibrarySource): void;
-    goToClipSource?(source: LibrarySource): void;
-    playTrack?(url: string): void;
-    onPlaying?(position: number, duration: number): void;
-    toggleTag?(sourceID: number, tag: Tag): void;
-    inheritTags?(sourceID: number): void;
+interface PlayerBarsProps {
+  classes: any;
+  config: Config;
+  hasStarted: boolean;
+  historyPaths: Array<any>;
+  historyOffset: number;
+  imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
+  imagePlayerDeleteHack: ChildCallbackHack;
+  isEmpty: boolean;
+  isPlaying: boolean;
+  mainVideo: HTMLVideoElement;
+  overlayVideos: Array<Array<HTMLVideoElement>>;
+  persistAudio: boolean;
+  persistText: boolean;
+  recentPictureGrid: boolean;
+  scene: Scene;
+  scenes: Array<Scene>;
+  sceneGrids: Array<SceneGrid>;
+  title: string;
+  tutorial: string;
+  goBack(): void;
+  historyBack(): void;
+  historyForward(): void;
+  navigateTagging(offset: number): void;
+  onGenerate(
+    scene: Scene | SceneGrid,
+    children?: boolean,
+    force?: boolean,
+  ): void;
+  onRecentPictureGrid(): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  playNextScene(): void;
+  play(): void;
+  pause(): void;
+  setCurrentAudio(audio: Audio): void;
+  allTags?: Array<Tag>;
+  tags?: Array<Tag>;
+  blacklistFile?(sourceURL: string, fileToBlacklist: string): void;
+  goToTagSource?(source: LibrarySource): void;
+  goToClipSource?(source: LibrarySource): void;
+  playTrack?(url: string): void;
+  onPlaying?(position: number, duration: number): void;
+  toggleTag?(sourceID: number, tag: Tag): void;
+  inheritTags?(sourceID: number): void;
+}
+
+class PlayerBars extends React.Component<PlayerBarsProps> {
+  readonly props: PlayerBarsProps;
+
+  readonly state: {
+    appBarHover: boolean;
+    drawerHover: boolean;
+    tagDrawerHover: boolean;
+    blacklistSource: string;
+    blacklistFile: string;
+    deletePath: string;
+    deleteError: string;
   };
 
-  readonly state = {
-    appBarHover: false,
-    drawerHover: false,
-    tagDrawerHover: false,
-    blacklistSource: null as string,
-    blacklistFile: null as string,
-    deletePath: null as string,
-    deleteError: null as string,
-  };
+  constructor(props: PlayerBarsProps) {
+    super(props);
+
+    this.state = {
+      appBarHover: false,
+      drawerHover: false,
+      tagDrawerHover: false,
+      blacklistSource: null as string,
+      blacklistFile: null as string,
+      deletePath: null as string,
+      deleteError: null as string,
+    };
+  }
 
   _interval: number = null;
   _appBarTimeout: any = null;

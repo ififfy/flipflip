@@ -42,25 +42,36 @@ const styles = (theme: Theme) =>
     },
   });
 
-class TextCard extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene;
-    sidebar?: boolean;
-    onAddScript(playlistIndex: number): void;
-    onPlay(
-      source: CaptionScript,
-      sceneID: number,
-      displayed: Array<CaptionScript>,
-    ): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
-    systemMessage(message: string): void;
+interface TextCardProps {
+  classes: any;
+  scene: Scene;
+  sidebar?: boolean;
+  onAddScript(playlistIndex: number): void;
+  onPlay(
+    source: CaptionScript,
+    sceneID: number,
+    displayed: Array<CaptionScript>,
+  ): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+  systemMessage(message: string): void;
+}
+
+class TextCard extends React.Component<TextCardProps> {
+  readonly props: TextCardProps;
+
+  readonly state: {
+    sourceOptionsPlaylist: number;
+    sourceOptions: CaptionScript;
   };
 
-  readonly state = {
-    sourceOptionsPlaylist: -1,
-    sourceOptions: null as CaptionScript,
-  };
+  constructor(props: TextCardProps) {
+    super(props);
+
+    this.state = {
+      sourceOptionsPlaylist: -1,
+      sourceOptions: null as CaptionScript,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

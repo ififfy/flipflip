@@ -110,32 +110,42 @@ const styles = (theme: Theme) =>
     },
   });
 
-class ScriptSourceListItem extends React.Component {
-  readonly props: {
-    classes: any;
-    checked: boolean;
-    index: number;
-    isEditing: number;
-    specialMode: string;
-    lastSelected: boolean;
-    source: CaptionScript;
-    style: any;
-    tutorial: string;
-    onDelete(source: CaptionScript): void;
-    onEditScript(source: CaptionScript): void;
-    onEndEdit(newURL: string): void;
-    onPlay(source: CaptionScript): void;
-    onRemove(source: CaptionScript): void;
-    onSourceOptions(source: CaptionScript): void;
-    onStartEdit(id: number): void;
-    onToggleSelect(): void;
-    savePosition(): void;
-    systemMessage(message: string): void;
+interface ScriptSourceListItemProps {
+  classes: any;
+  checked: boolean;
+  index: number;
+  isEditing: number;
+  specialMode: string;
+  lastSelected: boolean;
+  source: CaptionScript;
+  style: any;
+  tutorial: string;
+  onDelete(source: CaptionScript): void;
+  onEditScript(source: CaptionScript): void;
+  onEndEdit(newURL: string): void;
+  onPlay(source: CaptionScript): void;
+  onRemove(source: CaptionScript): void;
+  onSourceOptions(source: CaptionScript): void;
+  onStartEdit(id: number): void;
+  onToggleSelect(): void;
+  savePosition(): void;
+  systemMessage(message: string): void;
+}
+
+class ScriptSourceListItem extends React.Component<ScriptSourceListItemProps> {
+  readonly props: ScriptSourceListItemProps;
+
+  readonly state: {
+    urlInput: string;
   };
 
-  readonly state = {
-    urlInput: this.props.source.url,
-  };
+  constructor(props: ScriptSourceListItemProps) {
+    super(props);
+
+    this.state = {
+      urlInput: this.props.source.url,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

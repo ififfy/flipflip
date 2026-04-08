@@ -29,34 +29,46 @@ const styles = (theme: Theme) =>
     },
   });
 
-class LibrarySearch extends React.Component {
-  readonly props: {
-    classes: any;
-    displaySources: Array<LibrarySource | Audio>;
-    tags: Array<Tag>;
-    filters: Array<string>;
-    placeholder: string;
-    autoFocus?: boolean;
-    controlShouldRenderValue?: boolean;
-    hideSelectedOptions?: boolean;
-    isClearable?: boolean;
-    isCreatable?: boolean;
-    menuIsOpen?: boolean;
-    noTypes?: boolean;
-    onlyTags?: boolean;
-    onlyTagsAndTypes?: boolean;
-    onlyUsed?: boolean;
-    showCheckboxes?: boolean;
-    fullWidth?: boolean;
-    withBrackets?: boolean;
-    onUpdateFilters(filter: Array<string>): void;
+interface LibrarySearchProps {
+  classes: any;
+  displaySources: Array<LibrarySource | Audio>;
+  tags: Array<Tag>;
+  filters: Array<string>;
+  placeholder: string;
+  autoFocus?: boolean;
+  controlShouldRenderValue?: boolean;
+  hideSelectedOptions?: boolean;
+  isClearable?: boolean;
+  isCreatable?: boolean;
+  menuIsOpen?: boolean;
+  noTypes?: boolean;
+  onlyTags?: boolean;
+  onlyTagsAndTypes?: boolean;
+  onlyUsed?: boolean;
+  showCheckboxes?: boolean;
+  fullWidth?: boolean;
+  withBrackets?: boolean;
+  onUpdateFilters(filter: Array<string>): void;
+}
+
+class LibrarySearch extends React.Component<LibrarySearchProps> {
+  readonly props: LibrarySearchProps;
+
+  readonly state: {
+    searchInput: string;
+    options: Array<{ label: string; value: string }>;
+    defaultValues: Array<{ label: string; value: string }>;
   };
 
-  readonly state = {
-    searchInput: "",
-    options: Array<{ label: string; value: string }>(),
-    defaultValues: Array<{ label: string; value: string }>(),
-  };
+  constructor(props: LibrarySearchProps) {
+    super(props);
+
+    this.state = {
+      searchInput: "",
+      options: Array<{ label: string; value: string }>(),
+      defaultValues: Array<{ label: string; value: string }>(),
+    };
+  }
 
   Option = (props: any) => (
     <div>

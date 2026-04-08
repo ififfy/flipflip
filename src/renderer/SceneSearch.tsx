@@ -22,20 +22,32 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneSearch extends React.Component {
-  readonly props: {
-    classes: any;
-    displaySources: Array<Scene>;
-    filters: Array<string>;
-    placeholder: string;
-    onUpdateFilters(filter: Array<string>): void;
+interface SceneSearchProps {
+  classes: any;
+  displaySources: Array<Scene>;
+  filters: Array<string>;
+  placeholder: string;
+  onUpdateFilters(filter: Array<string>): void;
+}
+
+class SceneSearch extends React.Component<SceneSearchProps> {
+  readonly props: SceneSearchProps;
+
+  readonly state: {
+    searchInput: string;
+    options: Array<{ label: string; value: string }>;
+    defaultValues: Array<{ label: string; value: string }>;
   };
 
-  readonly state = {
-    searchInput: "",
-    options: Array<{ label: string; value: string }>(),
-    defaultValues: Array<{ label: string; value: string }>(),
-  };
+  constructor(props: SceneSearchProps) {
+    super(props);
+
+    this.state = {
+      searchInput: "",
+      options: Array<{ label: string; value: string }>(),
+      defaultValues: Array<{ label: string; value: string }>(),
+    };
+  }
 
   render() {
     const classes = this.props.classes;

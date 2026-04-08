@@ -34,17 +34,27 @@ const styles = (theme: Theme) =>
     },
   });
 
-class URLDialog extends React.Component {
-  readonly props: {
-    classes: any;
-    open: boolean;
-    onClose(): void;
-    onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+interface URLDialogProps {
+  classes: any;
+  open: boolean;
+  onClose(): void;
+  onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
+}
+
+class URLDialog extends React.Component<URLDialogProps> {
+  readonly props: URLDialogProps;
+
+  readonly state: {
+    importURLs: string;
   };
 
-  readonly state = {
-    importURLs: "",
-  };
+  constructor(props: URLDialogProps) {
+    super(props);
+
+    this.state = {
+      importURLs: "",
+    };
+  }
 
   render() {
     const classes = this.props.classes;

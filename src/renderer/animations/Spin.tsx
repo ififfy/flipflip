@@ -1,18 +1,28 @@
 import * as React from "react";
 import { Spring, animated } from "react-spring/renderprops";
 
-export default class Spin extends React.Component {
-  readonly props: {
-    className?: string;
-    title?: string;
-    style?: any;
-    onClick?(): void;
-    children?: React.ReactNode;
+interface SpinProps {
+  className?: string;
+  title?: string;
+  style?: any;
+  onClick?(): void;
+  children?: React.ReactNode;
+}
+
+export default class Spin extends React.Component<SpinProps> {
+  readonly props: SpinProps;
+
+  readonly state: {
+    toggle: boolean;
   };
 
-  readonly state = {
-    toggle: false,
-  };
+  constructor(props: SpinProps) {
+    super(props);
+
+    this.state = {
+      toggle: false,
+    };
+  }
 
   render() {
     return (

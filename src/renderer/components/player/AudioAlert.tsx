@@ -45,15 +45,25 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioAlert extends React.Component {
-  readonly props: {
-    classes: any;
-    audio: Audio;
+interface AudioAlertProps {
+  classes: any;
+  audio: Audio;
+}
+
+class AudioAlert extends React.Component<AudioAlertProps> {
+  readonly props: AudioAlertProps;
+
+  readonly state: {
+    visible: boolean;
   };
 
-  readonly state = {
-    visible: false,
-  };
+  constructor(props: AudioAlertProps) {
+    super(props);
+
+    this.state = {
+      visible: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

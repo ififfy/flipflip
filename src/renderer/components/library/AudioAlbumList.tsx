@@ -56,19 +56,30 @@ const styles = (theme: Theme) =>
     },
   });
 
-class AudioAlbumList extends React.Component {
-  readonly props: {
-    classes: any;
-    sources: Array<Audio>;
-    showHelp: boolean;
-    onClickAlbum(album: string): void;
-    onClickArtist(artist: string): void;
+interface AudioAlbumListProps {
+  classes: any;
+  sources: Array<Audio>;
+  showHelp: boolean;
+  onClickAlbum(album: string): void;
+  onClickArtist(artist: string): void;
+}
+
+class AudioAlbumList extends React.Component<AudioAlbumListProps> {
+  readonly props: AudioAlbumListProps;
+
+  readonly state: {
+    albums: Map<string, { artist: string; thumb: string; count: number }>;
+    hover: any;
   };
 
-  readonly state = {
-    albums: this.getAlbums(),
-    hover: null as any,
-  };
+  constructor(props: AudioAlbumListProps) {
+    super(props);
+
+    this.state = {
+      albums: this.getAlbums(),
+      hover: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

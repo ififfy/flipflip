@@ -265,12 +265,18 @@ function LusciousIcon(props: any) {
   );
 }
 
-export default class SourceIcon extends React.Component {
-  readonly props: {
-    url?: string;
-    type?: string;
-    className?: string;
-  };
+interface SourceIconProps {
+  url?: string;
+  type?: string;
+  className?: string;
+}
+
+export default class SourceIcon extends React.Component<SourceIconProps> {
+  readonly props: SourceIconProps;
+
+  constructor(props: SourceIconProps) {
+    super(props);
+  }
 
   render() {
     let type = "";

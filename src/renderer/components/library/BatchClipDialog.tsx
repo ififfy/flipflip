@@ -33,20 +33,31 @@ const styles = (theme: Theme) =>
     },
   });
 
-class BatchClipDialog extends React.Component {
-  readonly props: {
-    classes: any;
-    open: boolean;
-    library: Array<LibrarySource>;
-    selected: Array<string>;
-    onCloseDialog(): void;
-    onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void;
+interface BatchClipDialogProps {
+  classes: any;
+  open: boolean;
+  library: Array<LibrarySource>;
+  selected: Array<string>;
+  onCloseDialog(): void;
+  onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void;
+}
+
+class BatchClipDialog extends React.Component<BatchClipDialogProps> {
+  readonly props: BatchClipDialogProps;
+
+  readonly state: {
+    clipOffset: number[];
+    creatingClips: boolean;
   };
 
-  readonly state = {
-    clipOffset: [0, 0],
-    creatingClips: false,
-  };
+  constructor(props: BatchClipDialogProps) {
+    super(props);
+
+    this.state = {
+      clipOffset: [0, 0],
+      creatingClips: false,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

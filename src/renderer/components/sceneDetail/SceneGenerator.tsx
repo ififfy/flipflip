@@ -131,24 +131,38 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneGenerator extends React.Component {
-  readonly props: {
-    classes: any;
-    library: Array<LibrarySource>;
-    scene: Scene;
-    tags: Array<Tag>;
-    tutorial: string;
-    onTutorial(tutorial: string): void;
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+interface SceneGeneratorProps {
+  classes: any;
+  library: Array<LibrarySource>;
+  scene: Scene;
+  tags: Array<Tag>;
+  tutorial: string;
+  onTutorial(tutorial: string): void;
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+}
+
+class SceneGenerator extends React.Component<SceneGeneratorProps> {
+  readonly props: SceneGeneratorProps;
+
+  readonly state: {
+    isWeighing: number;
+    isEditing: number;
+    addRule: boolean;
+    advRule: boolean;
+    menuAnchorEl: any;
   };
 
-  readonly state = {
-    isWeighing: -1,
-    isEditing: -1,
-    addRule: false,
-    advRule: false,
-    menuAnchorEl: null as any,
-  };
+  constructor(props: SceneGeneratorProps) {
+    super(props);
+
+    this.state = {
+      isWeighing: -1,
+      isEditing: -1,
+      addRule: false,
+      advRule: false,
+      menuAnchorEl: null as any,
+    };
+  }
 
   render() {
     const classes = this.props.classes;

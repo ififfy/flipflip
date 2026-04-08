@@ -31,17 +31,23 @@ const styles = (theme: Theme) =>
     },
   });
 
-class SceneEffects extends React.Component {
-  readonly props: {
-    classes: any;
-    scene: Scene | SceneSettings;
-    easingControls: boolean;
-    tutorial: string;
-    onUpdateScene(
-      scene: Scene | SceneSettings,
-      fn: (scene: Scene | SceneSettings) => void,
-    ): void;
-  };
+interface SceneEffectsProps {
+  classes: any;
+  scene: Scene | SceneSettings;
+  easingControls: boolean;
+  tutorial: string;
+  onUpdateScene(
+    scene: Scene | SceneSettings,
+    fn: (scene: Scene | SceneSettings) => void,
+  ): void;
+}
+
+class SceneEffects extends React.Component<SceneEffectsProps> {
+  readonly props: SceneEffectsProps;
+
+  constructor(props: SceneEffectsProps) {
+    super(props);
+  }
 
   render() {
     const classes = this.props.classes;
