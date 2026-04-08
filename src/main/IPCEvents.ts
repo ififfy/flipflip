@@ -50,7 +50,7 @@ import {
 } from "./actions";
 import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
-import { getSourceType } from "src/common/utils";
+import { getSourceType } from "../common/utils";
 
 // Define functions
 function onRequestCreateNewWindow() {
