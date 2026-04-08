@@ -10,33 +10,6 @@ import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import { getFileGroup, getFileName, isVideo } from "../../common/utils";
 
-const pm = (object: any) => {
-  if (
-    object?.source &&
-    object?.data &&
-    object?.allURLs &&
-    object?.weight &&
-    object?.helpers
-  ) {
-    const source = object.source;
-    if (source.blacklist && source.blacklist.length > 0) {
-      object.data = object.data.filter(
-        (url: string) => !source.blacklist.includes(url),
-      );
-    }
-    object.allURLs = processAllURLs(
-      object.data,
-      object.allURLs,
-      object.source,
-      object.weight,
-      object.helpers,
-    );
-  }
-
-  // @ts-ignore
-  postMessage(object);
-};
-
 export const processAllURLs = (
   data: string[],
   allURLs: Map<string, string[]>,
@@ -106,6 +79,7 @@ export const loadRemoteImageURLList = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const url = source.url;
   wretch(url)
@@ -123,7 +97,7 @@ export const loadRemoteImageURLList = (
         let convertedSource = Array<string>();
         let convertedCount = 0;
         for (let url of lines) {
-          convertURL(url)
+          convertURL(url, pm)
             .then((urls: Array<string>) => {
               convertedSource = convertedSource.concat(urls);
               convertedCount++;
@@ -200,6 +174,7 @@ export const loadTumblr = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 3000;
   let configured =
@@ -298,7 +273,7 @@ export const loadTumblr = (
         let convertedSource = Array<string>();
         let convertedCount = 0;
         for (let url of images) {
-          convertURL(url)
+          convertURL(url, pm)
             .then((urls: Array<string>) => {
               convertedSource = convertedSource.concat(urls);
               convertedCount++;
@@ -385,6 +360,7 @@ export const loadReddit = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
@@ -402,7 +378,7 @@ export const loadReddit = (
           let convertedListing = Array<string>();
           let convertedCount = 0;
           for (let s of submissionListing) {
-            convertURL(s.url)
+            convertURL(s.url, pm)
               .then((urls: Array<string>) => {
                 convertedListing = convertedListing.concat(urls);
                 convertedCount++;
@@ -527,7 +503,7 @@ export const loadReddit = (
             let convertedListing = Array<string>();
             let convertedCount = 0;
             for (let s of submissionListing) {
-              convertURL(s.url)
+              convertURL(s.url, pm)
                 .then((urls: Array<string>) => {
                   convertedListing = convertedListing.concat(urls);
                   convertedCount++;
@@ -612,7 +588,7 @@ export const loadReddit = (
             let convertedListing = Array<string>();
             let convertedCount = 0;
             for (let s of submissionListing) {
-              convertURL(s.url)
+              convertURL(s.url, pm)
                 .then((urls: Array<string>) => {
                   convertedListing = convertedListing.concat(urls);
                   convertedCount++;
@@ -713,6 +689,7 @@ export const loadRedGifs = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 10000;
   const url = source.url;
@@ -851,6 +828,7 @@ const loadImageFapGallery = (
     retries: number;
     uuid: string;
   }) => void,
+  pm: (object: any) => void,
 ) => {
   wretch(galleryURL)
     .get()
@@ -943,6 +921,7 @@ const loadImageFapGallery = (
               images,
               baseGalleryURL,
               onFinishedLoading,
+              pm,
             ),
           2000,
         );
@@ -969,6 +948,7 @@ export const loadImageFap = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -988,6 +968,7 @@ export const loadImageFap = (
       images,
       baseGalleryURL,
       (h) => (h.next = null),
+      pm,
     );
   } else if (url.includes("/organizer/")) {
     if (helpers.next == 0) {
@@ -1050,6 +1031,7 @@ export const loadImageFap = (
             images,
             baseGalleryURL,
             (h) => (h.next[1] += 1),
+            pm,
           );
         } else {
           let images = Array<string>();
@@ -1198,6 +1180,7 @@ export const loadSexCom = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1339,13 +1322,14 @@ export const loadImgur = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 3000;
   const url = source.url;
   imgur
     .getAlbumInfo(getFileGroup(url))
     .then((json: any) => {
-      const images = json.data.images.map((i: any) => i.link);
+      const images = json.images.map((i: any) => i.link);
       helpers.next = null;
       helpers.count =
         helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
@@ -1377,6 +1361,7 @@ export const loadDeviantArt = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 3000;
   const url = source.url;
@@ -1448,6 +1433,7 @@ export const loadE621 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1716,6 +1702,7 @@ export const loadDanbooru = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1945,6 +1932,7 @@ export const loadGelbooru1 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2084,6 +2072,7 @@ export const loadGelbooru2 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2194,6 +2183,7 @@ export const loadEHentai = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2290,6 +2280,7 @@ export const loadLuscious = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 5000;
   const url = source.url;
@@ -2609,6 +2600,7 @@ export const loadBDSMlr = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   let url = source.url;
@@ -2703,6 +2695,7 @@ export const loadPiwigo = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   let url = source.url;
@@ -2872,6 +2865,7 @@ export const loadHydrus = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
+  pm: (object: any) => void,
 ) => {
   const timeout = 8000;
   const chunk = 1000;
@@ -3086,7 +3080,10 @@ export function isImage(path: string, strict: boolean): boolean {
 }
 
 let _redgifOAuth: any = null;
-async function convertURL(url: string): Promise<Array<string>> {
+async function convertURL(
+  url: string,
+  pm: (object: any) => void,
+): Promise<Array<string>> {
   if (url.includes(".gifv")) {
     return [url.replace(".gifv", ".mp4")];
   }

@@ -271,6 +271,8 @@ const IPC = {
   readTextFile: "ipc.readTextFile",
   cacheImage: "ipc.cacheImage",
   getCacheSize: "ipc.getCacheSize",
+  scrapeFilesRequest: "ipc.scrapeFilesRequest",
+  scrapeFilesResponse: "ipc.scrapeFilesResponse",
 };
 
 const MO = {

@@ -15,11 +15,6 @@ import ImagePlayer from "./ImagePlayer";
 import { fs_readDirectoryNames } from "../../dummy/fs";
 import { path_join } from "../../dummy/path";
 
-let workerInstance: any = null;
-let workerListener: any = null;
-let nextWorkerInstance: any = null;
-let nextWorkerListener: any = null;
-
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
@@ -176,9 +171,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
     this._isMounted = true;
     // Create an instance of your worker
     const uuid = uuidv4();
-    workerInstance = worker();
     if (!restart) {
-      workerInstance.reset();
       this._promiseQueue = new Array<{
         source: LibrarySource;
         helpers: { next: any; count: number; retries: number; uuid: string };
@@ -266,13 +259,13 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const receiveMessage = (message: any) => {
-        let object = message.data;
+      window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
-        )
+        ) {
           return;
+        }
 
         if (object?.captcha != null && this.state.captcha == null) {
           this.setState({
@@ -338,47 +331,21 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             promiseLoop();
             if (this.props.nextScene && this.props.playNextScene) {
               n = 0;
-              nextWorkerInstance = worker();
               nextSourceLoop();
             }
           }
         }
-      };
+      });
 
-      if (this.props.config.generalSettings.prioritizePerformance) {
-        // Attach an event listener to receive calculations from your worker
-        if (workerListener != null) {
-          workerInstance?.removeEventListener("message", workerListener);
-        }
-        workerListener = receiveMessage.bind(this);
-        workerInstance.addEventListener("message", workerListener);
-        scrapeFiles(
-          workerInstance,
-          workerListener,
-          this.state.allURLs,
-          this.state.allPosts,
-          this.props.config,
-          d,
-          this.props.scene.imageTypeFilter,
-          this.props.scene.weightFunction,
-          { next: -1, count: 0, retries: 0, uuid: uuid },
-        );
-      } else {
-        scrapeFiles(
-          workerInstance,
-          workerListener,
-          this.state.allURLs,
-          this.state.allPosts,
-          this.props.config,
-          d,
-          this.props.scene.imageTypeFilter,
-          this.props.scene.weightFunction,
-          { next: -1, count: 0, retries: 0, uuid: uuid },
-          true,
-        ).then((data) => {
-          receiveMessage(data);
-        });
-      }
+      window.ipc.scrapeFiles(
+        this.state.allURLs,
+        this.state.allPosts,
+        this.props.config,
+        d,
+        this.props.scene.imageTypeFilter,
+        this.props.scene.weightFunction,
+        { next: -1, count: 0, retries: 0, uuid: uuid },
+      );
     };
 
     let nextSourceLoop = () => {
@@ -389,8 +356,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const receiveMessage = (message: any) => {
-        let object = message.data;
+      window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
@@ -444,45 +410,17 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             );
           }
         }
-      };
+      });
 
-      if (this.props.config.generalSettings.prioritizePerformance) {
-        // Attach an event listener to receive calculations from your worker
-        if (nextWorkerListener != null) {
-          nextWorkerInstance?.removeEventListener(
-            "message",
-            nextWorkerListener,
-          );
-        }
-        nextWorkerListener = receiveMessage.bind(this);
-        nextWorkerInstance.addEventListener("message", nextWorkerListener);
-        scrapeFiles(
-          nextWorkerInstance,
-          nextWorkerListener,
-          this._nextAllURLs,
-          this._nextAllPosts,
-          this.props.config,
-          d,
-          this.props.nextScene.imageTypeFilter,
-          this.props.nextScene.weightFunction,
-          { next: -1, count: 0, retries: 0, uuid: uuid },
-        );
-      } else {
-        scrapeFiles(
-          nextWorkerInstance,
-          nextWorkerListener,
-          this._nextAllURLs,
-          this._nextAllPosts,
-          this.props.config,
-          d,
-          this.props.nextScene.imageTypeFilter,
-          this.props.nextScene.weightFunction,
-          { next: -1, count: 0, retries: 0, uuid: uuid },
-          true,
-        ).then((data) => {
-          receiveMessage(data);
-        });
-      }
+      window.ipc.scrapeFiles(
+        this._nextAllURLs,
+        this._nextAllPosts,
+        this.props.config,
+        d,
+        this.props.nextScene.imageTypeFilter,
+        this.props.nextScene.weightFunction,
+        { next: -1, count: 0, retries: 0, uuid: uuid },
+      );
     };
 
     let promiseLoop = () => {
@@ -491,14 +429,10 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       }
       // Process until queue is empty or player has been stopped
       if (!this._isMounted || this._promiseQueue.length == 0) {
-        if (workerListener != null) {
-          workerInstance?.removeEventListener("message", workerListener);
-        }
         return;
       }
 
-      const receiveMessage = (message: any) => {
-        let object = message.data;
+      window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
@@ -560,43 +494,18 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             object?.timeout != null ? object.timeout : 1000,
           );
         }
-      };
+      });
 
       const promiseData = this._promiseQueue.shift();
-      if (this.props.config.generalSettings.prioritizePerformance) {
-        // Attach an event listener to receive calculations from your worker
-        if (workerListener != null) {
-          workerInstance?.removeEventListener("message", workerListener);
-        }
-        workerListener = receiveMessage.bind(this);
-        workerInstance.addEventListener("message", workerListener);
-        scrapeFiles(
-          workerInstance,
-          workerListener,
-          this.state.allURLs,
-          this.state.allPosts,
-          this.props.config,
-          promiseData.source,
-          this.props.scene.imageTypeFilter,
-          this.props.scene.weightFunction,
-          promiseData.helpers,
-        );
-      } else {
-        scrapeFiles(
-          workerInstance,
-          workerListener,
-          this.state.allURLs,
-          this.state.allPosts,
-          this.props.config,
-          promiseData.source,
-          this.props.scene.imageTypeFilter,
-          this.props.scene.weightFunction,
-          promiseData.helpers,
-          true,
-        ).then((data) => {
-          receiveMessage(data);
-        });
-      }
+      window.ipc.scrapeFiles(
+        this.state.allURLs,
+        this.state.allPosts,
+        this.props.config,
+        promiseData.source,
+        this.props.scene.imageTypeFilter,
+        this.props.scene.weightFunction,
+        promiseData.helpers,
+      );
     };
 
     if (this.state.preload) {
@@ -638,10 +547,6 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       this.setState({ videoVolume: this.props.scene.videoVolume });
     }
     if (props.scene.id !== this.props.scene.id) {
-      workerInstance?.removeEventListener("message", workerListener);
-      nextWorkerInstance?.removeEventListener("message", nextWorkerListener);
-      workerListener = null;
-      nextWorkerListener = null;
       if (
         props.nextScene != null &&
         this.props.scene.id === props.nextScene.id
@@ -710,12 +615,6 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
 
   componentWillUnmount() {
     this._isMounted = false;
-    workerInstance?.removeEventListener("message", workerListener);
-    nextWorkerInstance?.removeEventListener("message", nextWorkerListener);
-    workerListener = null;
-    nextWorkerListener = null;
-    workerInstance = null;
-    nextWorkerInstance = null;
     this._promiseQueue = null;
     this._nextPromiseQueue = null;
     this._nextAllURLs = null;

@@ -33,6 +33,10 @@ const config: ForgeConfig = {
           config: "vite.preload.config.ts",
           target: "preload",
         },
+        {
+          entry: "src/main/scraper/ScraperManager.ts",
+          config: "vite.scraper.config.ts",
+        },
       ],
       renderer: [
         {

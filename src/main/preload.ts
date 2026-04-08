@@ -4,6 +4,7 @@ import { IPC } from "../common/const";
 import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
+import LibrarySource from "../common/LibrarySource";
 // import { parseFile } from "music-metadata";
 
 // FIXME these are just dummys
@@ -222,7 +223,8 @@ contextBridge.exposeInMainWorld("ipc", {
   offShowRecentPictureGrid: (callback: () => void) =>
     ipcRenderer.off(IPC.showRecentPictureGrid, callback),
   startPowerSaveBlocker: () => ipcRenderer.invoke(IPC.startPowerSaveBlocker),
-  stopPowerSaveBlocker: () => ipcRenderer.send(IPC.stopPowerSaveBlocker),
+  stopPowerSaveBlocker: (powerSaveID: number) =>
+    ipcRenderer.send(IPC.stopPowerSaveBlocker, powerSaveID),
   clearBrowserCaches: () => ipcRenderer.send(IPC.clearBrowserCaches),
   getFileSize: (path: string) => ipcRenderer.invoke(IPC.getFileSize, path),
   readTextFile: (path: string) => ipcRenderer.invoke(IPC.readTextFile, path),
@@ -230,4 +232,27 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.cacheImage, config, url, source),
   getCacheSize: (config: Config) =>
     ipcRenderer.invoke(IPC.getCacheSize, config),
+  onScrapeFilesResponse: (callback: (message: any) => void) =>
+    ipcRenderer.once(IPC.scrapeFilesResponse, (event, message: any) =>
+      callback(message),
+    ),
+  scrapeFiles: (
+    allURLs: Map<string, string[]>,
+    allPosts: Map<string, string>,
+    config: Config,
+    source: LibrarySource,
+    imageTypeFilter: string,
+    weightFunction: string,
+    helpers: { next: any; count: number; retries: number; uuid: string },
+  ) =>
+    ipcRenderer.send(
+      IPC.scrapeFilesRequest,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      imageTypeFilter,
+      weightFunction,
+      helpers,
+    ),
 });

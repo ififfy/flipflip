@@ -4,6 +4,7 @@ import Backup from "./common/Backup";
 import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
 import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
 import { Config } from "./common/Config";
+import LibrarySource from "./common/LibrarySource";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -217,6 +218,16 @@ declare global {
       readTextFile: (path: string) => Promise<string>;
       cacheImage: (config: Config, url: string, source: string) => void;
       getCacheSize: (config: Config) => Promise<number>;
+      onScrapeFilesResponse: (callback: (message: any) => void) => void;
+      scrapeFiles: (
+        allURLs: Map<string, string[]>,
+        allPosts: Map<string, string>,
+        config: Config,
+        source: LibrarySource,
+        imageTypeFilter: string,
+        weightFunction: string,
+        helpers: { next: any; count: number; retries: number; uuid: string },
+      ) => void;
     };
   }
 }

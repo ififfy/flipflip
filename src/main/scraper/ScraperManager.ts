@@ -28,164 +28,7 @@ import {
   processAllURLs,
 } from "./Scrapers";
 import { getFileName, getSourceType, isVideo } from "../../common/utils";
-
-// Determine what kind of source we have based on the URL
-function scrapeFiles(
-  pm: Function,
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-) {
-  const sourceType = getSourceType(source.url);
-  if (sourceType == ST.local) {
-    // Local files
-    loadLocalDirectory(
-      pm,
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      null,
-    );
-  } else if (sourceType == ST.list) {
-    // Image List
-    helpers.next = null;
-    loadRemoteImageURLList(
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-    );
-  } else if (sourceType == ST.video) {
-    const cachePath =
-      getCachePath(source.url, config) + getFileName(source.url);
-    loadVideo(
-      pm,
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-    );
-  } else if (sourceType == ST.playlist) {
-    const cachePath =
-      getCachePath(source.url, config) + getFileName(source.url);
-    loadPlaylist(
-      pm,
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-    );
-  } else if (sourceType == ST.nimja) {
-    loadNimja(
-      pm,
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      null,
-    );
-  } else {
-    // Paging sources
-    let workerFunction: any;
-    if (sourceType == ST.tumblr) {
-      workerFunction = loadTumblr;
-    } else if (sourceType == ST.reddit) {
-      workerFunction = loadReddit;
-    } else if (sourceType == ST.redgifs) {
-      workerFunction = loadRedGifs;
-    } else if (sourceType == ST.imagefap) {
-      workerFunction = loadImageFap;
-    } else if (sourceType == ST.sexcom) {
-      workerFunction = loadSexCom;
-    } else if (sourceType == ST.imgur) {
-      workerFunction = loadImgur;
-    } else if (sourceType == ST.deviantart) {
-      workerFunction = loadDeviantArt;
-    } else if (sourceType == ST.danbooru) {
-      workerFunction = loadDanbooru;
-    } else if (sourceType == ST.e621) {
-      workerFunction = loadE621;
-    } else if (sourceType == ST.luscious) {
-      workerFunction = loadLuscious;
-    } else if (sourceType == ST.gelbooru1) {
-      workerFunction = loadGelbooru1;
-    } else if (sourceType == ST.gelbooru2) {
-      workerFunction = loadGelbooru2;
-    } else if (sourceType == ST.ehentai) {
-      workerFunction = loadEHentai;
-    } else if (sourceType == ST.bdsmlr) {
-      workerFunction = loadBDSMlr;
-    } else if (sourceType == ST.hydrus) {
-      workerFunction = loadHydrus;
-    } else if (sourceType == ST.piwigo) {
-      workerFunction = loadPiwigo;
-    }
-    if (helpers.next == -1) {
-      helpers.next = 0;
-      const cachePath = getCachePath(source.url, config);
-      if (
-        config.caching.enabled &&
-        fs.existsSync(cachePath) &&
-        fs.readdirSync(cachePath).length > 0
-      ) {
-        // If the cache directory exists, use it
-        loadLocalDirectory(
-          pm,
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          cachePath,
-        );
-      } else {
-        workerFunction(
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-        );
-      }
-    } else {
-      workerFunction(
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-      );
-    }
-  }
-}
+import { workerData, parentPort } from "worker_threads";
 
 const loadNimja = (
   pm: Function,
@@ -202,15 +45,13 @@ const loadNimja = (
   allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
   helpers.next = null;
   pm({
-    data: {
-      data: sources,
-      allURLs: allURLs,
-      allPosts: allPosts,
-      weight: weight,
-      helpers: helpers,
-      source: source,
-      timeout: 0,
-    },
+    data: sources,
+    allURLs: allURLs,
+    allPosts: allPosts,
+    weight: weight,
+    helpers: helpers,
+    source: source,
+    timeout: 0,
   });
 };
 
@@ -231,12 +72,10 @@ const loadLocalDirectory = (
   recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
     if (err) {
       pm({
-        data: {
-          error: err.message,
-          helpers: helpers,
-          source: source,
-          timeout: 0,
-        },
+        error: err.message,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
       });
     } else {
       const collator = new Intl.Collator(undefined, {
@@ -266,21 +105,19 @@ const loadLocalDirectory = (
       }
 
       pm({
-        data: {
-          data: sources,
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: 0,
-        },
+        data: sources,
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
       });
     }
   });
 };
 
-export const loadVideo = (
+const loadVideo = (
   pm: Function,
   allURLs: Map<string, Array<string>>,
   allPosts: Map<string, string>,
@@ -294,16 +131,14 @@ export const loadVideo = (
   const url = cachePath ? cachePath : source.url;
   const missingVideo = () => {
     pm({
-      data: {
-        error: "Could not find " + source.url,
-        data: [],
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      },
+      error: "Could not find " + source.url,
+      data: [],
+      allURLs: allURLs,
+      allPosts: allPosts,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
     });
   };
   const ifExists = (url: string) => {
@@ -348,15 +183,13 @@ export const loadVideo = (
     helpers.next = null;
 
     pm({
-      data: {
-        data: paths,
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      },
+      data: paths,
+      allURLs: allURLs,
+      allPosts: allPosts,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
     });
   };
 
@@ -382,7 +215,7 @@ export const loadVideo = (
   }
 };
 
-export const loadPlaylist = (
+const loadPlaylist = (
   pm: Function,
   allURLs: Map<string, Array<string>>,
   allPosts: Map<string, string>,
@@ -441,25 +274,197 @@ export const loadPlaylist = (
       helpers.next = null;
 
       pm({
-        data: {
-          data: urls,
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: 0,
-        },
+        data: urls,
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
       });
     })
     .catch((e) => {
       pm({
-        data: {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: 0,
-        },
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
       });
     });
 };
+
+const { allURLs, allPosts, config, source, filter, weight, helpers } =
+  workerData;
+const pm = (object: any) => {
+  if (
+    object?.source &&
+    object?.data &&
+    object?.allURLs &&
+    object?.weight &&
+    object?.helpers
+  ) {
+    const source = object.source;
+    if (source.blacklist && source.blacklist.length > 0) {
+      object.data = object.data.filter(
+        (url: string) => !source.blacklist.includes(url),
+      );
+    }
+    object.allURLs = processAllURLs(
+      object.data,
+      object.allURLs,
+      object.source,
+      object.weight,
+      object.helpers,
+    );
+  }
+
+  parentPort.postMessage(object);
+};
+
+// Determine what kind of source we have based on the URL
+const sourceType = getSourceType(source.url);
+if (sourceType == ST.local) {
+  // Local files
+  loadLocalDirectory(
+    pm,
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    null,
+  );
+} else if (sourceType == ST.list) {
+  // Image List
+  helpers.next = null;
+  loadRemoteImageURLList(
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    pm,
+  );
+} else if (sourceType == ST.video) {
+  const cachePath = getCachePath(source.url, config) + getFileName(source.url);
+  loadVideo(
+    pm,
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+  );
+} else if (sourceType == ST.playlist) {
+  const cachePath = getCachePath(source.url, config) + getFileName(source.url);
+  loadPlaylist(
+    pm,
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+  );
+} else if (sourceType == ST.nimja) {
+  loadNimja(
+    pm,
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    null,
+  );
+} else {
+  // Paging sources
+  let workerFunction: any;
+  if (sourceType == ST.tumblr) {
+    workerFunction = loadTumblr;
+  } else if (sourceType == ST.reddit) {
+    workerFunction = loadReddit;
+  } else if (sourceType == ST.redgifs) {
+    workerFunction = loadRedGifs;
+  } else if (sourceType == ST.imagefap) {
+    workerFunction = loadImageFap;
+  } else if (sourceType == ST.sexcom) {
+    workerFunction = loadSexCom;
+  } else if (sourceType == ST.imgur) {
+    workerFunction = loadImgur;
+  } else if (sourceType == ST.deviantart) {
+    workerFunction = loadDeviantArt;
+  } else if (sourceType == ST.danbooru) {
+    workerFunction = loadDanbooru;
+  } else if (sourceType == ST.e621) {
+    workerFunction = loadE621;
+  } else if (sourceType == ST.luscious) {
+    workerFunction = loadLuscious;
+  } else if (sourceType == ST.gelbooru1) {
+    workerFunction = loadGelbooru1;
+  } else if (sourceType == ST.gelbooru2) {
+    workerFunction = loadGelbooru2;
+  } else if (sourceType == ST.ehentai) {
+    workerFunction = loadEHentai;
+  } else if (sourceType == ST.bdsmlr) {
+    workerFunction = loadBDSMlr;
+  } else if (sourceType == ST.hydrus) {
+    workerFunction = loadHydrus;
+  } else if (sourceType == ST.piwigo) {
+    workerFunction = loadPiwigo;
+  }
+  if (helpers.next == -1) {
+    helpers.next = 0;
+    const cachePath = getCachePath(source.url, config);
+    if (
+      config.caching.enabled &&
+      fs.existsSync(cachePath) &&
+      fs.readdirSync(cachePath).length > 0
+    ) {
+      // If the cache directory exists, use it
+      loadLocalDirectory(
+        pm,
+        allURLs,
+        allPosts,
+        config,
+        source,
+        filter,
+        weight,
+        helpers,
+        cachePath,
+      );
+    } else {
+      workerFunction(
+        allURLs,
+        allPosts,
+        config,
+        source,
+        filter,
+        weight,
+        helpers,
+        pm,
+      );
+    }
+  } else {
+    workerFunction(
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      pm,
+    );
+  }
+}

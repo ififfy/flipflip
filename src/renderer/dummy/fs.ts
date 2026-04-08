@@ -6,7 +6,7 @@ export function fs_readFileSync(
 }
 
 export function fs_existsSync(path: string) {
-  return true;
+  return false;
 }
 
 export function fs_isDirectory(path: string) {

@@ -15,6 +15,7 @@ import {
 } from "electron";
 import { getCachePath, urlToPath } from "../renderer/data/utils";
 import getFolderSize from "get-folder-size";
+import { Worker } from "worker_threads";
 
 import {
   createNewWindow,
@@ -53,6 +54,9 @@ import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
 import { getFileName, getSourceType } from "../common/utils";
 import { outputFile } from "fs-extra";
+import LibrarySource from "src/common/LibrarySource";
+import { error } from "console";
+import path from "path";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -472,8 +476,8 @@ async function onClearBrowserCaches(ev: IpcMainEvent) {
   if (global.gc) {
     global.gc();
   }
-  webFrame.clearCache();
-  await window.webContents.session.clearCache();
+  webFrame?.clearCache();
+  await window.webContents?.session?.clearCache();
 }
 
 function onGetFileSize(ev: IpcMainEvent, path: string) {
@@ -541,6 +545,40 @@ function onGetCacheSize(ev: IpcMainEvent, config: Config) {
   });
 }
 
+function onScrapeFiles(
+  ev: IpcMainEvent,
+  allURLs: Map<string, string[]>,
+  allPosts: Map<string, string>,
+  config: Config,
+  source: LibrarySource,
+  filter: string,
+  weight: string,
+  helpers: { next: any; count: number; retries: number; uuid: string },
+) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  const worker = new Worker(path.join(__dirname, "ScraperManager.js"), {
+    workerData: { allURLs, allPosts, config, source, filter, weight, helpers },
+  });
+  worker.on("message", (message) => {
+    window.webContents.send(IPC.scrapeFilesResponse, message);
+  });
+  worker.on("error", (err) => {
+    window.webContents.send(IPC.scrapeFilesResponse, { error: String(err) });
+  });
+
+  worker.on("exit", (code) => {
+    if (code !== 0) {
+      window.webContents.send(IPC.scrapeFilesResponse, {
+        error: `Worker stopped with exit code ${code}`,
+      });
+    }
+  });
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -592,6 +630,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.readTextFile, onReadTextFile);
   ipcMain.on(IPC.cacheImage, onCacheImage);
   ipcMain.handle(IPC.getCacheSize, onGetCacheSize);
+  ipcMain.on(IPC.scrapeFilesRequest, onScrapeFiles);
 }
 
 export function releaseIpcEvents() {
