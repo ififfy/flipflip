@@ -168,6 +168,47 @@ declare global {
         nextSource: () => void,
       ) => void;
       copyImageToClipboard: (sourceURL: string) => void;
+      showPlayerContextMenu: (
+        config: Config,
+        url: string,
+        source: string,
+        post?: string,
+      ) => void;
+      onClosePlayerContextMenu: (callback: () => void) => void;
+      onBlacklistFile: (
+        callback: (
+          event: IpcRendererEvent,
+          literalSource: string,
+          path: string,
+        ) => void,
+      ) => void;
+      onDeletePath: (
+        callback: (event: IpcRendererEvent, path: string) => void,
+      ) => void;
+      onGoToTagSource: (
+        callback: (event: IpcRendererEvent, source: string) => void,
+      ) => void;
+      onGoToClipSource: (
+        callback: (event: IpcRendererEvent, source: string) => void,
+      ) => void;
+      onShowRecentPictureGrid: (callback: () => void) => void;
+      offBlacklistFile: (
+        callback: (
+          event: IpcRendererEvent,
+          literalSource: string,
+          path: string,
+        ) => void,
+      ) => void;
+      offDeletePath: (
+        callback: (event: IpcRendererEvent, path: string) => void,
+      ) => void;
+      offGoToTagSource: (
+        callback: (event: IpcRendererEvent, source: string) => void,
+      ) => void;
+      offGoToClipSource: (
+        callback: (event: IpcRendererEvent, source: string) => void,
+      ) => void;
+      offShowRecentPictureGrid: (callback: () => void) => void;
     };
   }
 }

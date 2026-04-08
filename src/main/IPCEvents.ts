@@ -1,5 +1,6 @@
 import fs from "fs";
 import wretch from "wretch";
+import fileUrl from "file-url";
 import {
   ipcMain,
   IpcMainEvent,
@@ -7,8 +8,10 @@ import {
   shell,
   clipboard,
   nativeImage,
+  Menu,
+  MenuItem,
 } from "electron";
-import { urlToPath } from "../renderer/data/utils";
+import { getCachePath, urlToPath } from "../renderer/data/utils";
 
 import {
   createNewWindow,
@@ -25,7 +28,7 @@ import {
   getWindow,
   setProgressBar,
 } from "./WindowManager";
-import { IPC } from "../common/const";
+import { IPC, ST } from "../common/const";
 import { getBackups } from "./utils";
 import {
   createNewAppStorage,
@@ -45,6 +48,7 @@ import {
 } from "./actions";
 import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
+import { getSourceType } from "src/common/utils";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -263,6 +267,187 @@ function onCopyImageToClipboard(ev: IpcMainEvent, sourceURL: string) {
   }
 }
 
+function onShowPlayerContextMenu(
+  ev: IpcMainEvent,
+  config: Config,
+  url: string,
+  source: string,
+  post?: string,
+) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  let contextMenu = new Menu();
+  const literalSource = source;
+  if (/^https?:\/\//g.exec(source) == null) {
+    source = urlToPath(fileUrl(source));
+  }
+  const isFile = url.startsWith("file://");
+  const path = urlToPath(url);
+  const type = getSourceType(source);
+  contextMenu.append(
+    new MenuItem({
+      label: literalSource,
+      click: () => {
+        clipboard.writeText(source);
+      },
+    }),
+  );
+  if (!!post) {
+    contextMenu.append(
+      new MenuItem({
+        label: post,
+        click: () => {
+          clipboard.writeText(post);
+        },
+      }),
+    );
+  }
+  contextMenu.append(
+    new MenuItem({
+      label: isFile ? path : url,
+      click: () => {
+        clipboard.writeText(isFile ? path : url);
+      },
+    }),
+  );
+  if (
+    url.toLocaleLowerCase().endsWith(".png") ||
+    url.toLocaleLowerCase().endsWith(".jpg") ||
+    url.toLocaleLowerCase().endsWith(".jpeg")
+  ) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Copy Image",
+        click: () => {
+          this.copyImageToClipboard(url);
+        },
+      }),
+    );
+  }
+  contextMenu.append(
+    new MenuItem({
+      label: "Open Source",
+      click: () => {
+        shell.openExternal(source);
+      },
+    }),
+  );
+  if (!!post) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Open Post",
+        click: () => {
+          shell.openExternal(post);
+        },
+      }),
+    );
+  }
+  contextMenu.append(
+    new MenuItem({
+      label: "Open File",
+      click: () => {
+        shell.openExternal(url);
+      },
+    }),
+  );
+  if (this.props.config.caching.enabled && type != ST.local) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Open Cached Images",
+        click: () => {
+          // for some reason windows uses URLs and everyone else uses paths
+          // FIXME
+          if (process.platform === "win32") {
+            shell.openExternal(getCachePath(source, config));
+          } else {
+            shell.openPath(getCachePath(source, config));
+          }
+        },
+      }),
+    );
+  }
+  if (
+    (!isFile && type != ST.video && type != ST.playlist) ||
+    type == ST.local
+  ) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Blacklist File",
+        click: () => {
+          window.webContents.send(
+            IPC.blacklistFile,
+            literalSource,
+            isFile ? path : url,
+          );
+        },
+      }),
+    );
+  }
+  if (isFile) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Reveal",
+        click: () => {
+          // for some reason windows uses URLs and everyone else uses paths
+          if (process.platform === "win32") {
+            shell.showItemInFolder(url);
+          } else {
+            shell.showItemInFolder(path);
+          }
+        },
+      }),
+    );
+    contextMenu.append(
+      new MenuItem({
+        label: "Delete",
+        click: () => {
+          window.webContents.send(IPC.deletePath, path);
+        },
+      }),
+    );
+  }
+  if (!this.props.allTags) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Goto Tag Source",
+        click: () => {
+          window.webContents.send(IPC.goToTagSource, source);
+        },
+      }),
+    );
+  }
+  if (type == ST.video) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Goto Clip Source",
+        click: () => {
+          window.webContents.send(IPC.goToClipSource, source);
+        },
+      }),
+    );
+  }
+  if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
+    contextMenu.append(
+      new MenuItem({
+        label: "Recent Picture Grid",
+        click: () => {
+          window.webContents.send(IPC.showRecentPictureGrid);
+        },
+      }),
+    );
+  }
+  contextMenu.popup({
+    window,
+    callback: () => {
+      window.webContents.send(IPC.closePlayerContextMenu);
+      contextMenu = null;
+    },
+  });
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -305,6 +490,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.setFullScreen, onSetFullScreen);
   ipcMain.on(IPC.playerMenuSetPlayPause, PlayerMenu.setIsPlaying);
   ipcMain.on(IPC.copyImageToClipboard, onCopyImageToClipboard);
+  ipcMain.on(IPC.showPlayerContextMenu, onShowPlayerContextMenu);
 }
 
 export function releaseIpcEvents() {

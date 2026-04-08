@@ -1,5 +1,5 @@
 // import fs from "fs";
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { IPC } from "../common/const";
 import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
@@ -178,4 +178,46 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.playerMenuSetPlayPause, play),
   copyImageToClipboard: (sourceURL: string) =>
     ipcRenderer.send(IPC.copyImageToClipboard, sourceURL),
+  showPlayerContextMenu: (
+    config: Config,
+    url: string,
+    source: string,
+    post?: string,
+  ) => ipcRenderer.send(IPC.showPlayerContextMenu, config, url, source, post),
+  onClosePlayerContextMenu: (callback: () => void) =>
+    ipcRenderer.once(IPC.closePlayerContextMenu, callback),
+  onBlacklistFile: (
+    callback: (
+      event: IpcRendererEvent,
+      literalSource: string,
+      path: string,
+    ) => void,
+  ) => ipcRenderer.on(IPC.blacklistFile, callback),
+  onDeletePath: (callback: (event: IpcRendererEvent, path: string) => void) =>
+    ipcRenderer.on(IPC.deletePath, callback),
+  onGoToTagSource: (
+    callback: (event: IpcRendererEvent, source: string) => void,
+  ) => ipcRenderer.on(IPC.goToTagSource, callback),
+  onGoToClipSource: (
+    callback: (event: IpcRendererEvent, source: string) => void,
+  ) => ipcRenderer.on(IPC.goToClipSource, callback),
+  onShowRecentPictureGrid: (callback: () => void) =>
+    ipcRenderer.on(IPC.showRecentPictureGrid, callback),
+  offBlacklistFile: (
+    callback: (
+      event: IpcRendererEvent,
+      literalSource: string,
+      path: string,
+    ) => void,
+  ) => ipcRenderer.off(IPC.blacklistFile, callback),
+  offDeletePath: (callback: (event: IpcRendererEvent, path: string) => void) =>
+    ipcRenderer.off(IPC.deletePath, callback),
+  offGoToTagSource: (
+    callback: (event: IpcRendererEvent, source: string) => void,
+  ) => ipcRenderer.off(IPC.goToTagSource, callback),
+  offGoToClipSource: (
+    callback: (event: IpcRendererEvent, source: string) => void,
+  ) => ipcRenderer.off(IPC.goToClipSource, callback),
+  offShowRecentPictureGrid: (callback: () => void) =>
+    ipcRenderer.off(IPC.showRecentPictureGrid, callback),
 });

@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import { fileUrl_fileURL } from "../../dummy/file-url";
 
 import {
   AppBar,
@@ -62,6 +61,7 @@ import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../../common/Audio";
 import SceneGrid from "../../../common/SceneGrid";
 import { fs_existsSync, fs_unlink } from "../../dummy/fs";
+import { IpcRendererEvent } from "electron";
 
 const drawerWidth = 340;
 
@@ -1224,132 +1224,45 @@ class PlayerBars extends React.Component {
   }
 
   showContextMenu = (e: MouseEvent) => {
-    if (this.props.tutorial != null) return;
-    // FIXME
-    // const contextMenu = new Menu();
-    // const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
-    // const url = img.src;
-    // let source = img.getAttribute("source");
-    // let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
-    // const literalSource = source;
-    // if (/^https?:\/\//g.exec(source) == null) {
-    //   source = urlToPath(fileUrl_fileURL(source));
-    // }
-    // const isFile = url.startsWith('file://');
-    // const path = urlToPath(url);
-    // const type = getSourceType(source);
-    // contextMenu.append(new MenuItem({
-    //   label: literalSource,
-    //   click: () => { navigator.clipboard.writeText(source); }
-    // }));
-    // if (!!post) {
-    //   contextMenu.append(new MenuItem({
-    //     label: post,
-    //     click: () => { navigator.clipboard.writeText(post); }
-    //   }));
-    // }
-    // contextMenu.append(new MenuItem({
-    //   label: isFile ? path : url,
-    //   click: () => { navigator.clipboard.writeText(isFile ? path : url); }
-    // }));
-    // if (url.toLocaleLowerCase().endsWith(".png") || url.toLocaleLowerCase().endsWith(".jpg") || url.toLocaleLowerCase().endsWith(".jpeg")) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Copy Image',
-    //     click: () => {
-    //       this.copyImageToClipboard(url);
-    //     }
-    //   }));
-    // }
-    // contextMenu.append(new MenuItem({
-    //   label: 'Open Source',
-    //   click: () => {
-    //     // FIXME
-    //     // remote.shell.openExternal(source);
-    //   }
-    // }));
-    // if (!!post) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Open Post',
-    //     click: () => {
-    //       // FIXME
-    //       // remote.shell.openExternal(post);
-    //     }
-    //   }));
-    // }
-    // contextMenu.append(new MenuItem({
-    //   label: 'Open File',
-    //   click: () => {
-    //     // FIXME
-    //     // remote.shell.openExternal(url);
-    //   }
-    // }));
-    // if (this.props.config.caching.enabled && type != ST.local) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Open Cached Images',
-    //     click: () => {
-    //       // for some reason windows uses URLs and everyone else uses paths
-    //       // FIXME
-    //       // if (process.platform === "win32") {
-    //       //   remote.shell.openExternal(getCachePath(source, this.props.config));
-    //       // } else {
-    //       //   remote.shell.openItem(getCachePath(source, this.props.config));
-    //       // }
-    //     }
-    //   }));
-    // }
-    // if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Blacklist File',
-    //     click: () => {
-    //       this.onBlacklistFile(literalSource, isFile ? path : url);
-    //     }
-    //   }));
-    // }
-    // if (isFile) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Reveal',
-    //     click: () => {
-    //       // for some reason windows uses URLs and everyone else uses paths
-    //       // FIXME
-    //       // if (process.platform === "win32") {
-    //       //   remote.shell.showItemInFolder(url);
-    //       // } else {
-    //       //   remote.shell.showItemInFolder(path);
-    //       // }
-    //     }
-    //   }));
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Delete',
-    //     click: () => {
-    //       this.onDeletePath(path);
-    //     }
-    //   }));
-    // }
-    // if (!this.props.allTags) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Goto Tag Source',
-    //     click: () => {
-    //       this.props.goToTagSource(new LibrarySource({url: source}));
-    //     }
-    //   }));
-    // }
-    // if (type == ST.video) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Goto Clip Source',
-    //     click: () => {
-    //       this.props.goToClipSource(new LibrarySource({url: source}));
-    //     }
-    //   }));
-    // }
-    // if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
-    //   contextMenu.append(new MenuItem({
-    //     label: 'Recent Picture Grid',
-    //     click: () => {
-    //       this.props.onRecentPictureGrid();
-    //     }
-    //   }));
-    // }
-    // contextMenu.popup({});
+    if (this.props.tutorial != null) {
+      return;
+    }
+    
+    const onBlacklistFile = (
+      ev: IpcRendererEvent,
+      source: string,
+      path: string,
+    ) => this.onBlacklistFile(source, path);
+    const onDeletePath = (ev: IpcRendererEvent, path: string) =>
+      this.onDeletePath(path);
+    const goToTagSource = (ev: IpcRendererEvent, source: string) =>
+      this.props.goToTagSource(new LibrarySource({ url: source }));
+    const goToClipSource = (ev: IpcRendererEvent, source: string) =>
+      this.props.goToClipSource(new LibrarySource({ url: source }));
+    const showRecentPictureGrid = () => this.props.onRecentPictureGrid();
+
+    window.ipc.onBlacklistFile(onBlacklistFile);
+    window.ipc.onDeletePath(onDeletePath);
+    window.ipc.onGoToTagSource(goToTagSource);
+    window.ipc.onGoToClipSource(goToClipSource);
+    window.ipc.onShowRecentPictureGrid(showRecentPictureGrid);
+    window.ipc.onClosePlayerContextMenu(() => {
+      window.ipc.offBlacklistFile(onBlacklistFile);
+      window.ipc.offDeletePath(onDeletePath);
+      window.ipc.offGoToTagSource(goToTagSource);
+      window.ipc.offGoToClipSource(goToClipSource);
+      window.ipc.offShowRecentPictureGrid(showRecentPictureGrid);
+    });
+
+    const img = this.props.recentPictureGrid
+      ? e.target
+      : this.props.historyPaths[
+          this.props.historyPaths.length - 1 + this.props.historyOffset
+        ];
+    const url = img.src;
+    let source = img.getAttribute("source");
+    let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
+    window.ipc.showPlayerContextMenu(this.props.config, url, source, post);
   };
 
   onKeyDown = (e: KeyboardEvent) => {

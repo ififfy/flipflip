@@ -256,6 +256,13 @@ const IPC = {
   setFullScreen: "ipc.setFullScreen",
   playerMenuSetPlayPause: "ipc.playerMenuSetPlayPause",
   copyImageToClipboard: "ipc.copyImageToClipboard",
+  showPlayerContextMenu: "ipc.showPlayerContextMenu",
+  closePlayerContextMenu: "ipc.closePlayerContextMenu",
+  blacklistFile: "ipc.blacklistFile",
+  deletePath: "ipc.deletePath",
+  goToTagSource: "ipc.goToTagSource",
+  goToClipSource: "ipc.goToClipSource",
+  showRecentPictureGrid: "ipc.showRecentPictureGrid",
 };
 
 const MO = {
