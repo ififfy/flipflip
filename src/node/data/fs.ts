@@ -32,10 +32,6 @@ export function fs_readDirectoryNames(path: string) {
     .map((dirent) => dirent.name);
 }
 
-export function fs_writeFileSync(path: string, text: string) {
-  fs.writeFileSync(path, text);
-}
-
 export function fs_mkdirSync(path: string) {
   if (!fs.existsSync(path)) {
     fs.mkdirSync(path);
@@ -55,14 +51,6 @@ export function fs_copyFileSync(src: string, dest: string) {
 
 export function fs_renameSync(src: string, dest: string) {
   fs.renameSync(src, dest);
-}
-
-export function fs_writeFile(
-  path: string,
-  data: string,
-  callback: (err: Error) => void,
-) {
-  fs.writeFile(path, data, callback);
 }
 
 export function fs_rimrafSync(path: string) {

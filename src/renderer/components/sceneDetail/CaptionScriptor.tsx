@@ -64,7 +64,6 @@ import CodeMirrorEditor, {
   tupleSetters,
 } from "./CodeMirrorEditor";
 import SceneGrid from "../../../common/SceneGrid";
-import { fs_writeFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

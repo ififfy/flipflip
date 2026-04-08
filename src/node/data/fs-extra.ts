@@ -1,8 +1,4 @@
-import { outputFile, move } from "fs-extra";
-
-export function fsExtra_outputFile(path: string, buffer: Buffer<ArrayBuffer>) {
-  outputFile(path, buffer);
-}
+import { move } from "fs-extra";
 
 export function fsExtra_move(
   from: string,

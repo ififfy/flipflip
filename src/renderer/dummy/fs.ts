@@ -23,8 +23,6 @@ export function fs_readDirectoryNames(path: string): string[] {
   return [];
 }
 
-export function fs_writeFileSync(path: string, text: string) {}
-
 export function fs_mkdirSync(path: string) {}
 
 export function fs_readdir(
@@ -37,13 +35,5 @@ export function fs_readdir(
 export function fs_copyFileSync(src: string, dest: string) {}
 
 export function fs_renameSync(src: string, dest: string) {}
-
-export function fs_writeFile(
-  path: string,
-  data: string,
-  callback: (err: Error) => void,
-) {
-  callback(null);
-}
 
 export function fs_rimrafSync(path: string) {}
