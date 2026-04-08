@@ -181,7 +181,7 @@ class SourceListItem extends React.Component<SourceListItemProps> {
     super(props);
 
     this.state = {
-      urlInput: this.props.source.url,
+      urlInput: props.source.url,
     };
   }
 
