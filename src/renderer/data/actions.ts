@@ -344,7 +344,7 @@ export function cacheImage(
     if (fileType == ST.hydrus || fileType == ST.piwigo) return;
 
     if (fileType != ST.local && i.src.startsWith("http")) {
-      window.ipc.cacheImage(state.config, i.src, i.getAttribute("source"))
+      window.ipc.cacheImage(state.config, i.src, i.getAttribute("source"));
     }
   }
 }
