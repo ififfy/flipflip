@@ -299,7 +299,7 @@ export async function openScript(windowId: number) {
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
 }
 
-export async function saveScript(windowId: number, script: string) {
+export async function saveScriptAs(windowId: number, script: string) {
   const window = currentWindows.get(windowId);
   if (window == null) {
     return undefined;

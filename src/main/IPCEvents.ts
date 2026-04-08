@@ -26,7 +26,7 @@ import {
   openScripts,
   openSubtitle,
   openScript,
-  saveScript,
+  saveScriptAs,
   getWindow,
   setProgressBar,
 } from "./WindowManager";
@@ -131,8 +131,12 @@ async function onOpenScript(ev: IpcMainEvent) {
   return await openScript(ev.sender.id);
 }
 
-async function onSaveScript(ev: IpcMainEvent, script: string) {
-  return await saveScript(ev.sender.id, script);
+async function onSaveScriptAs(ev: IpcMainEvent, script: string) {
+  return await saveScriptAs(ev.sender.id, script);
+}
+
+function onSaveScript(ev: IpcMainEvent, url: string, script: string) {
+  fs.writeFileSync(url, script);
 }
 
 async function onGetFonts(ev: IpcMainEvent) {
@@ -510,6 +514,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openScripts, onOpenScripts);
   ipcMain.handle(IPC.openSubtitle, onOpenSubtitle);
   ipcMain.handle(IPC.openScript, onOpenScript);
+  ipcMain.handle(IPC.saveScriptAs, onSaveScriptAs);
   ipcMain.handle(IPC.saveScript, onSaveScript);
   ipcMain.handle(IPC.getFonts, onGetFonts);
   ipcMain.on(IPC.tumblrAuthRequest, onTumblrAuthRequest);

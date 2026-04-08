@@ -100,7 +100,8 @@ declare global {
       openScripts: (shiftKey: boolean) => Promise<string[]>;
       openSubtitle: () => Promise<string | undefined>;
       openScript: () => Promise<string | undefined>;
-      saveScript: (script: string) => Promise<string | undefined>;
+      saveScript: (url: string, script: string) => Promise<void>;
+      saveScriptAs: (script: string) => Promise<string | undefined>;
       getFonts: () => Promise<string[]>;
       tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) => void;
       onTumblrAuthResponse: (

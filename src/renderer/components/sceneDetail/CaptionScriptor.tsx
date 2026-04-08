@@ -1313,36 +1313,37 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
     if (!this.state.captionScript.url) {
       this.onSaveAs(callback);
     } else if (!this.state.captionScript.url.startsWith("http")) {
-      fs_writeFileSync(
-        this.state.captionScript.url,
-        this.state.captionScript.script,
-      );
-      this.setState({ scriptChanged: false });
-      if (callback != null) {
-        callback();
-      }
+      const { url, script } = this.state.captionScript;
+      window.ipc.saveScript(url, script).then(() => {
+        this.setState({ scriptChanged: false });
+        if (callback != null) {
+          callback();
+        }
+      });
     }
   }
 
   onSaveAs(callback?: () => void) {
     this.onCloseDialog();
-    window.ipc.saveScript(this.state.captionScript.script).then((filePath) => {
-      if (filePath == null) {
-        return;
-      }
+    window.ipc
+      .saveScriptAs(this.state.captionScript.script)
+      .then((filePath) => {
+        if (filePath == null) {
+          return;
+        }
 
-      const setURL = (script: CaptionScript) => {
-        script.url = filePath;
-        return script;
-      };
-      this.setState({
-        captionScript: setURL(this.state.captionScript),
-        scriptChanged: false,
+        const setURL = (script: CaptionScript) => {
+          script.url = filePath;
+          return script;
+        };
+        this.setState({
+          captionScript: setURL(this.state.captionScript),
+          scriptChanged: false,
+        });
+        if (callback != null) {
+          callback();
+        }
       });
-      if (callback != null) {
-        callback();
-      }
-    });
   }
 
   onSaveToLibrary() {

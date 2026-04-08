@@ -52,7 +52,10 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.openScripts, shiftKey),
   openSubtitle: () => ipcRenderer.invoke(IPC.openSubtitle),
   openScript: () => ipcRenderer.invoke(IPC.openScript),
-  saveScript: (script: string) => ipcRenderer.invoke(IPC.saveScript, script),
+  saveScriptAs: (script: string) =>
+    ipcRenderer.invoke(IPC.saveScriptAs, script),
+  saveScript: (url: string, script: string) =>
+    ipcRenderer.invoke(IPC.saveScript, url, script),
   getFonts: () => ipcRenderer.invoke(IPC.getFonts),
   tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) =>
     ipcRenderer.send(IPC.tumblrAuthRequest, tumblrKey, tumblrSecret),

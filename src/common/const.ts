@@ -230,6 +230,7 @@ const IPC = {
   openScripts: "ipc.openScripts",
   openSubtitle: "ipc.openSubtitle",
   openScript: "ipc.openScript",
+  saveScriptAs: "ipc.saveScriptAs",
   saveScript: "ipc.saveScript",
   getFonts: "ipc.getFonts",
   tumblrAuthRequest: "ipc.tumblrAuthRequest",
