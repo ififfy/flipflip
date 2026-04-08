@@ -75,28 +75,39 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 export const timestampRegex =
   /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
-(function(mod) {
+(function (mod) {
   mod(CodeMirror);
-})(function(CodeMirror: any) {
-  CodeMirror.defineMode('flipflip', function() {
-
+})(function (CodeMirror: any) {
+  CodeMirror.defineMode("flipflip", function () {
     let words: any = {};
     function define(style: any, dict: any) {
-      for(let i = 0; i < dict.length; i++) {
+      for (let i = 0; i < dict.length; i++) {
         words[dict[i]] = style;
       }
     }
 
-    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(tupleSetters, singleSetters, stringSetters, booleanSetters, colorSetters, keywords, storers));
+    CodeMirror.registerHelper(
+      "hintWords",
+      "flipflip",
+      actions.concat(
+        tupleSetters,
+        singleSetters,
+        stringSetters,
+        booleanSetters,
+        colorSetters,
+        keywords,
+        storers,
+      ),
+    );
 
-    define('atom', tupleSetters);
-    define('atom', singleSetters);
-    define('atom', stringSetters);
-    define('atom', booleanSetters);
-    define('atom', colorSetters);
-    define('variable', keywords);
-    define('variable-3', storers);
-    define('builtin', actions);
+    define("atom", tupleSetters);
+    define("atom", singleSetters);
+    define("atom", stringSetters);
+    define("atom", booleanSetters);
+    define("atom", colorSetters);
+    define("variable", keywords);
+    define("variable-3", storers);
+    define("builtin", actions);
 
     function parse(stream: any, state: any) {
       if (stream.eatSpace()) return rt(null, state, stream);
@@ -104,7 +115,7 @@ export const timestampRegex =
       let sol = stream.sol();
       const ch = stream.next();
 
-      if (ch === '#' && sol) {
+      if (ch === "#" && sol) {
         stream.skipToEnd();
         return "comment";
       }
@@ -129,15 +140,25 @@ export const timestampRegex =
         state.tokens.push(ch);
         return rt("operator", state, stream);
       }
-      if (ch === "\\" && !stream.eol() && /n/.test(stream.peek()) && !sol && (command == "blink" || command == "cap" || command == "bigcap")) {
+      if (
+        ch === "\\" &&
+        !stream.eol() &&
+        /n/.test(stream.peek()) &&
+        !sol &&
+        (command == "blink" || command == "cap" || command == "bigcap")
+      ) {
         stream.next();
         state.tokens.push(ch);
         return rt("operator", state, stream);
       }
 
-      if (ch === "$" && command != null && command.toLowerCase() == "storephrase") {
+      if (
+        ch === "$" &&
+        command != null &&
+        command.toLowerCase() == "storephrase"
+      ) {
         stream.next();
-        if(stream.eol() || /\s/.test(stream.peek())) {
+        if (stream.eol() || /\s/.test(stream.peek())) {
           state.tokens.push(stream.current());
           return rt("number", state, stream);
         }
@@ -146,7 +167,7 @@ export const timestampRegex =
       if (/\d/.test(ch) && sol && !timestamp) {
         // Timestamp
         stream.eatWhile(/[\d:.]/);
-        if(stream.eol() || !/\w/.test(stream.peek())) {
+        if (stream.eol() || !/\w/.test(stream.peek())) {
           const timestamp = stream.current();
           state.tokens.push(timestamp);
           if (timestampRegex.exec(timestamp) != null) {
@@ -157,32 +178,48 @@ export const timestampRegex =
         }
       }
 
-      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
-        tupleSetters.includes(command) || singleSetters.includes(command) || colorSetters.includes(command) ||
-        (command == "playAudio" && state.tokens.length == (timestamp ? 3 : 2)))) {
+      if (
+        /[-\d]/.test(ch) &&
+        (command == "count" ||
+          command == "wait" ||
+          tupleSetters.includes(command) ||
+          singleSetters.includes(command) ||
+          colorSetters.includes(command) ||
+          (command == "playAudio" &&
+            state.tokens.length == (timestamp ? 3 : 2)))
+      ) {
         // Number parameter
         stream.eatWhile(/\d/);
-        if(stream.eol() || !/\w/.test(stream.peek())) {
+        if (stream.eol() || !/\w/.test(stream.peek())) {
           const cur = stream.current();
           state.tokens.push(cur);
           if (command == "playAudio" && (cur > 100 || cur < 0)) {
             return rt("error", state, stream);
-          } else if (((command == "count" || command == "playAudio" || tupleSetters.includes(command)) && state.tokens.length > (timestamp ? 4 : 3)) ||
-            ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > (timestamp ? 3 : 2))) {
+          } else if (
+            ((command == "count" ||
+              command == "playAudio" ||
+              tupleSetters.includes(command)) &&
+              state.tokens.length > (timestamp ? 4 : 3)) ||
+            ((command == "wait" || singleSetters.includes(command)) &&
+              state.tokens.length > (timestamp ? 3 : 2))
+          ) {
             return rt("error", state, stream);
           }
           return rt("number", state, stream);
         }
       }
 
-      if (command == "storeAudio" && state.tokens.length == (timestamp ? 2 : 1)) {
+      if (
+        command == "storeAudio" &&
+        state.tokens.length == (timestamp ? 2 : 1)
+      ) {
         if (ch == "'") {
           stream.eatWhile(/[^']/);
           if (stream.eol() || !/'/.test(stream.peek())) {
             return rt("error", state, stream);
           }
           stream.next();
-        } else if (ch == "\"") {
+        } else if (ch == '"') {
           stream.eatWhile(/[^"]/);
           if (stream.eol() || !/"/.test(stream.peek())) {
             return rt("error", state, stream);
@@ -203,9 +240,17 @@ export const timestampRegex =
       } else if (sol && words.hasOwnProperty(cur) && !keywords.includes(cur)) {
         // Command at start of line
         return rt(words[cur], state, stream);
-      } else if (!sol && command == "blink" && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
+      } else if (
+        !sol &&
+        command == "blink" &&
+        (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)
+      ) {
         // Keyword in blink command
-        if ((state.tokens.length == (timestamp ? 3 : 2) || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
+        if (
+          (state.tokens.length == (timestamp ? 3 : 2) ||
+            state.tokens[state.tokens.length - 2] == "/") &&
+          (stream.eol() || /\//.test(stream.peek()))
+        ) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
             return rt("error", state, stream);
           } else {
@@ -222,7 +267,11 @@ export const timestampRegex =
         } else {
           return rt("string", state, stream);
         }
-      } else if (!sol && (command == "cap" || command == "bigcap") && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
+      } else if (
+        !sol &&
+        (command == "cap" || command == "bigcap") &&
+        (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)
+      ) {
         // Keyword in a cap or bigcap command
         if (state.tokens.length == (timestamp ? 3 : 2) && stream.eol()) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
@@ -245,17 +294,23 @@ export const timestampRegex =
         // String Parameter
         if (command == "blink" && cur == "/") {
           return rt("operator", state, stream);
-        } else if (command == "count" || command == "wait"
-          || tupleSetters.includes(command) || singleSetters.includes(command)) {
+        } else if (
+          command == "count" ||
+          command == "wait" ||
+          tupleSetters.includes(command) ||
+          singleSetters.includes(command)
+        ) {
           return rt("error", state, stream);
         } else if (stringSetters.includes(command)) {
           const tf = getTimingFromString(cur);
           return rt(tf == null ? "error" : "variable", state, stream);
         } else if (booleanSetters.includes(command)) {
-          if (cur.toLowerCase() == "true" ||
-              cur.toLowerCase() == "t" ||
-              cur.toLowerCase() == "false" ||
-              cur.toLowerCase() == "f") {
+          if (
+            cur.toLowerCase() == "true" ||
+            cur.toLowerCase() == "t" ||
+            cur.toLowerCase() == "false" ||
+            cur.toLowerCase() == "f"
+          ) {
             return rt("number", state, stream);
           } else {
             return rt("error", state, stream);
@@ -267,9 +322,15 @@ export const timestampRegex =
           } else {
             return rt("error", state, stream);
           }
-        } else if (command == "playAudio" && state.tokens.length > (timestamp ? 3 : 2)) {
+        } else if (
+          command == "playAudio" &&
+          state.tokens.length > (timestamp ? 3 : 2)
+        ) {
           return rt("error", state, stream);
-        } else if (command == "storeAudio" && state.tokens.length > (timestamp ? 4 : 3)) {
+        } else if (
+          command == "storeAudio" &&
+          state.tokens.length > (timestamp ? 4 : 3)
+        ) {
           return rt("error", state, stream);
         }
         return rt("string", state, stream);
@@ -280,7 +341,10 @@ export const timestampRegex =
 
     function rt(type: string, state: any, stream: any) {
       if (stream.eol()) {
-        if (state.tokens.length > 0 && state.tokens[0].toLowerCase() == "storephrase") {
+        if (
+          state.tokens.length > 0 &&
+          state.tokens[0].toLowerCase() == "storephrase"
+        ) {
           const registerRegex = /^\$(\d)$/.exec(state.tokens[1]);
           if (registerRegex != null) {
             if (state.tokens.length > 1) {
@@ -297,8 +361,13 @@ export const timestampRegex =
     }
 
     return {
-      startState: function() {return {tokens: new Array<string>(), storedPhrases: new Map<number, boolean>()};},
-      token: function(stream: any, state: any) {
+      startState: function () {
+        return {
+          tokens: new Array<string>(),
+          storedPhrases: new Map<number, boolean>(),
+        };
+      },
+      token: function (stream: any, state: any) {
         return parse(stream, state);
       },
     };
