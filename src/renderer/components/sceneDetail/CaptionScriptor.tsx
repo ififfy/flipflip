@@ -2,9 +2,8 @@ import * as React from "react";
 import wretch from "wretch";
 import clsx from "clsx";
 
-// FIXME
-// require('codemirror/lib/codemirror.css');
-// require('codemirror/theme/material.css');
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
 
 import {
   AppBar,
