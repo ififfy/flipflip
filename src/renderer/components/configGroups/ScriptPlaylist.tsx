@@ -29,7 +29,6 @@ import { RP } from "../../../common/const";
 import Scene from "../../../common/Scene";
 import SourceIcon from "../library/SourceIcon";
 import CaptionScript from "../../../common/CaptionScript";
-import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

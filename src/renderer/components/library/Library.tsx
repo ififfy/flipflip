@@ -81,6 +81,7 @@ import {
   fs_readFileSync,
   fs_unlinkSync,
   fs_rimrafSync,
+  fs_unlink,
 } from "../../dummy/fs";
 import { fsExtra_move } from "../../dummy/fs-extra";
 
@@ -1681,7 +1682,7 @@ class Library extends React.Component<LibraryProps> {
           fileType == ST.playlist ||
           fileType == ST.list
         ) {
-          unlink(l.url);
+          fs_unlink(l.url, () => {});
         }
       } catch (e) {
         console.error(e);

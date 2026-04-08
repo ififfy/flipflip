@@ -28,7 +28,6 @@ import Tag from "../../../common/Tag";
 import { grey } from "@mui/material/colors";
 import Audio from "../../../common/Audio";
 import SourceIcon from "./SourceIcon";
-import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({
