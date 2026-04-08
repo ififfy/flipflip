@@ -29,8 +29,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 import Config, { CacheSettings } from "../../../common/Config";
 import { getCachePath, urlToPath } from "../../data/utils";
-import { fs_existsSync, fs_rimrafSync } from "../../dummy/fs";
-import { folder_getFolderSize } from "../../dummy/folder";
+import { fs_rimrafSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({
