@@ -59,10 +59,8 @@ import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
 import SceneGridCell from "../../common/SceneGridCell";
 import WeightGroup from "../../common/WeightGroup";
-import { fs_existsSync, fs_mkdirSync, fs_unlink } from "../dummy/fs";
-import { fsExtra_outputFile } from "../dummy/fs-extra";
+import { fs_existsSync, fs_unlink } from "../dummy/fs";
 import { path_sep } from "../dummy/path";
-import { folder_getFolderSize } from "../dummy/folder";
 import AppStorageState from "src/common/AppStorageState";
 import { analyze } from "web-audio-beat-detector";
 type State = AppStorageState;
@@ -346,50 +344,7 @@ export function cacheImage(
     if (fileType == ST.hydrus || fileType == ST.piwigo) return;
 
     if (fileType != ST.local && i.src.startsWith("http")) {
-      const cachePath = getCachePath(null, state.config);
-      fs_mkdirSync(cachePath);
-
-      const maxSize = state.config.caching.maxSize;
-      const sourceCachePath = getCachePath(
-        i.getAttribute("source"),
-        state.config,
-      );
-      const filePath = sourceCachePath + getFileName(i.src);
-      const downloadImage = () => {
-        if (!fs_existsSync(filePath)) {
-          wretch(i.src)
-            .get()
-            .blob((blob) => {
-              const reader = new FileReader();
-              reader.onload = function () {
-                if (reader.readyState == 2) {
-                  const arrayBuffer = reader.result as ArrayBuffer;
-                  const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                  const view = new Uint8Array(arrayBuffer);
-                  for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                    buffer[i] = view[i];
-                  }
-                  fsExtra_outputFile(filePath, buffer);
-                }
-              };
-              reader.readAsArrayBuffer(blob);
-            });
-        }
-      };
-      if (maxSize == 0) {
-        downloadImage();
-      } else {
-        folder_getFolderSize(cachePath, (err: string, size: number) => {
-          if (err) {
-            throw err;
-          }
-
-          const mbSize = size / 1024 / 1024;
-          if (mbSize < maxSize) {
-            downloadImage();
-          }
-        });
-      }
+      window.ipc.cacheImage(state.config, i.src, i.getAttribute("source"))
     }
   }
 }

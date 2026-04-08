@@ -14,6 +14,7 @@ import {
   webFrame,
 } from "electron";
 import { getCachePath, urlToPath } from "../renderer/data/utils";
+import getFolderSize from "get-folder-size";
 
 import {
   createNewWindow,
@@ -50,7 +51,8 @@ import {
 } from "./actions";
 import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
-import { getSourceType } from "../common/utils";
+import { getFileName, getSourceType } from "../common/utils";
+import { outputFile } from "fs-extra";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -482,8 +484,41 @@ function onGetFileSize(ev: IpcMainEvent, path: string) {
   }
 }
 
-function onReadTextFile(ev: IpcMainEvent, path: string) {
+function onReadTextFile(ev: IpcMainInvokeEvent, path: string) {
   return fs.readFileSync(path, "utf-8");
+}
+
+function onCacheImage(ev: IpcMainEvent, config: Config, url: string, source: string) {
+  const cachePath = getCachePath(null, config);
+  fs.mkdirSync(cachePath);
+
+  const maxSize = config.caching.maxSize;
+  const sourceCachePath = getCachePath(source, config);
+  const filePath = sourceCachePath + getFileName(url);
+  const downloadImage = () => {
+    if (!fs.existsSync(filePath)) {
+      wretch(url)
+        .get()
+        .arrayBuffer((arrayBuffer) => {
+          const buffer = Buffer.from(arrayBuffer)
+          outputFile(filePath, buffer);
+        });
+    }
+  };
+  if (maxSize == 0) {
+    downloadImage();
+  } else {
+    getFolderSize(cachePath, (err: string, size: number) => {
+      if (err) {
+        throw err;
+      }
+
+      const mbSize = size / 1024 / 1024;
+      if (mbSize < maxSize) {
+        downloadImage();
+      }
+    });
+  }
 }
 
 // Initialize and release listeners
@@ -535,6 +570,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.clearBrowserCaches, onClearBrowserCaches);
   ipcMain.handle(IPC.getFileSize, onGetFileSize);
   ipcMain.handle(IPC.readTextFile, onReadTextFile);
+  ipcMain.on(IPC.cacheImage, onCacheImage)
 }
 
 export function releaseIpcEvents() {

@@ -214,6 +214,7 @@ declare global {
       clearBrowserCaches: () => void;
       getFileSize: (path: string) => Promise<number>;
       readTextFile: (path: string) => Promise<string>;
+      cacheImage: (config: Config, url: string, source: string) => void
     };
   }
 }
