@@ -36,7 +36,6 @@ import Audio from "../../../common/Audio";
 import Scene from "../../../common/Scene";
 import Tag from "../../../common/Tag";
 import SourceIcon from "../library/SourceIcon";
-import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

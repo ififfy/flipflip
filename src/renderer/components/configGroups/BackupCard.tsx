@@ -493,7 +493,7 @@ class BackupCard extends React.Component<BackupCardProps> {
   onFinishRestore() {
     this.onCloseDialog();
     try {
-      this.props.onRestore(path_join(saveDir, this.state.backup.url));
+      this.props.onRestore(path_join(saveDir, this.state.backup.url)); // FIXME
       this.setState({
         snackbarOpen: true,
         snackbar: "Restore success!",

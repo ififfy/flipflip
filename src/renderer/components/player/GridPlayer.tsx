@@ -2,20 +2,12 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  AppBar,
   Container,
-  IconButton,
   Theme,
-  Toolbar,
-  Tooltip,
-  Typography,
 } from "@mui/material";
 
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
 import SceneGrid from "../../../common/SceneGrid";
 import Config from "../../../common/Config";

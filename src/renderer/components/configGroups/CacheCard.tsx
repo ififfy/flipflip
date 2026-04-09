@@ -68,7 +68,7 @@ class CacheCard extends React.Component<CacheCardProps> {
 
   render() {
     const classes = this.props.classes;
-    const cachePath = getCachePath(null, this.props.config);
+    const cachePath = getCachePath(null, this.props.config); // FIXME
     return (
       <Grid
         container
@@ -244,8 +244,8 @@ class CacheCard extends React.Component<CacheCardProps> {
   }
 
   onFinishClearCache() {
-    const cachePath = getCachePath(null, this.props.config);
-    fs_rimrafSync(cachePath);
+    const cachePath = getCachePath(null, this.props.config); // FIXME
+    fs_rimrafSync(cachePath); // FIXME
     this.setState({ cacheSize: "--" });
     this.calculateCacheSize();
   }

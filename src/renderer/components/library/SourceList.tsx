@@ -602,7 +602,7 @@ class SourceList extends React.Component<SourceListProps> {
         fileType == ST.video ||
         fileType == ST.playlist ||
         fileType == ST.list) &&
-      fs_existsSync(source.url)
+      fs_existsSync(source.url) // FIXME
     ) {
       this.setState({ deleteDialog: source });
     }
@@ -615,13 +615,13 @@ class SourceList extends React.Component<SourceListProps> {
   onFinishDelete() {
     const fileType = getSourceType(this.state.deleteDialog.url);
     if (fileType == ST.local) {
-      fs_rimrafSync(this.state.deleteDialog.url);
+      fs_rimrafSync(this.state.deleteDialog.url); // FIXME
     } else if (
       fileType == ST.video ||
       fileType == ST.playlist ||
       fileType == ST.list
     ) {
-      fs_unlinkSync(this.state.deleteDialog.url);
+      fs_unlinkSync(this.state.deleteDialog.url); // FIXME
     }
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();
@@ -832,16 +832,16 @@ class SourceList extends React.Component<SourceListProps> {
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
         cachePath =
-          getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+          getCachePath(sourceURL, this.props.config) + getFileName(sourceURL); // FIXME
       } else {
-        cachePath = getCachePath(sourceURL, this.props.config);
+        cachePath = getCachePath(sourceURL, this.props.config); // FIXME
       }
       this.setState({ cachePath: cachePath });
     }
   }
 
   onFinishClean() {
-    fs_rimrafSync(this.state.cachePath);
+    fs_rimrafSync(this.state.cachePath); // FIXME
     this.onCloseClean();
   }
 

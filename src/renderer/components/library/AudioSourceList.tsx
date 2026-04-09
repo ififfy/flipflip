@@ -278,7 +278,7 @@ class AudioSourceList extends React.Component<AudioSourceListProps> {
   }
 
   onFinishDelete() {
-    fs_unlinkSync(this.state.deleteDialog.url);
+    fs_unlinkSync(this.state.deleteDialog.url); // FIXME
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();
   }

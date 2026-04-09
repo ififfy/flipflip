@@ -549,16 +549,16 @@ class SourceListItem extends React.Component<SourceListItemProps> {
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
         if (
-          fs_existsSync(
-            getCachePath(sourceURL, this.props.config) + getFileName(sourceURL),
+          fs_existsSync( // FIXME
+            getCachePath(sourceURL, this.props.config) + getFileName(sourceURL), // FIXME
           )
         ) {
-          cachePath = getCachePath(sourceURL, this.props.config);
+          cachePath = getCachePath(sourceURL, this.props.config); // FIXME
         } else {
           window.ipc.showItemInFolder(sourceURL);
         }
       } else {
-        cachePath = getCachePath(sourceURL, this.props.config);
+        cachePath = getCachePath(sourceURL, this.props.config); // FIXME
       }
       if (cachePath) {
         this.openDirectory(cachePath);

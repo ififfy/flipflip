@@ -246,7 +246,7 @@ class AudioEdit extends React.Component<AudioEditProps> {
 
   loadSuggestions() {
     const url = this.state.audio.url;
-    parseFile(url)
+    parseFile(url) // FIXME
       .then((metadata: any) => {
         if (metadata) {
           const newAudio = new Audio(this.state.audio);

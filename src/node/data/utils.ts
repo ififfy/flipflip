@@ -22,6 +22,15 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
   return checksumThumbnailPath;
 }
 
+export function getLocalPath(source: string, config: Config) {
+  return cachePath(source, "local", config); // FIXME
+}
+
+export function getCachePath(source: string, config: Config) {
+  const typeDir = en.get(getSourceType(source)).toLowerCase();
+  return cachePath(source, typeDir, config); // FIXME
+}
+
 function cachePath(source: string, typeDir: string, config: Config) {
   if (config.caching.directory != "") {
     let baseDir = config.caching.directory;

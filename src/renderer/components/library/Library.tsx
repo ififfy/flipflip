@@ -1471,8 +1471,8 @@ class Library extends React.Component<LibraryProps> {
   onFinishMove() {
     for (let source of this.props.library) {
       if (source.offline) {
-        const cachePath = getCachePath(source.url, this.props.config);
-        fs_readdir(cachePath, (error, files) => {
+        const cachePath = getCachePath(source.url, this.props.config); // FIXME
+        fs_readdir(cachePath, (error, files) => { // FIXME
           if (!!error || files.length == 0) {
             this.props.onUpdateLibrary((l) => {
               l.forEach((s, index) => {
@@ -1483,8 +1483,8 @@ class Library extends React.Component<LibraryProps> {
               });
             });
           } else {
-            const localPath = getLocalPath(source.url, this.props.config);
-            fsExtra_move(cachePath, localPath, console.error);
+            const localPath = getLocalPath(source.url, this.props.config); // FIXME
+            fsExtra_move(cachePath, localPath, console.error); // FIXME
             this.props.onUpdateLibrary((l) => {
               l.forEach((s, index) => {
                 if (s.id == source.id) {
@@ -1675,13 +1675,13 @@ class Library extends React.Component<LibraryProps> {
       const fileType = getSourceType(l.url);
       try {
         if (fileType == ST.local) {
-          fs_rimrafSync(l.url);
+          fs_rimrafSync(l.url); // FIXME
         } else if (
           fileType == ST.video ||
           fileType == ST.playlist ||
           fileType == ST.list
         ) {
-          fs_unlink(l.url, () => {});
+          fs_unlink(l.url, () => {}); //FIXME
         }
       } catch (e) {
         console.error(e);
@@ -1702,19 +1702,19 @@ class Library extends React.Component<LibraryProps> {
           const fileType = getSourceType(sourceURL);
           try {
             if (fileType == ST.local) {
-              fs_rimrafSync(sourceURL);
+              fs_rimrafSync(sourceURL); // FIXME
             } else if (
               fileType == ST.video ||
               fileType == ST.playlist ||
               fileType == ST.list
             ) {
-              fs_unlinkSync(sourceURL);
-              fs_rimrafSync(
-                getCachePath(sourceURL, this.props.config) +
+              fs_unlinkSync(sourceURL); // FIXME
+              fs_rimrafSync( // FIXME
+                getCachePath(sourceURL, this.props.config) + // FIXME
                   getFileName(sourceURL),
               );
             } else {
-              fs_rimrafSync(getCachePath(sourceURL, this.props.config));
+              fs_rimrafSync(getCachePath(sourceURL, this.props.config) /* FIXME */); // FIXME
             }
           } catch (e) {
             console.error(e);

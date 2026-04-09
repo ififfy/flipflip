@@ -284,7 +284,7 @@ export function extractMusicMetadata(
       audio.artist = metadata.common.artist;
     }
     if (metadata.common.picture && metadata.common.picture.length > 0) {
-      audio.thumb = generateThumbnailFile(
+      audio.thumb = generateThumbnailFile( // FIXME
         cachePath,
         metadata.common.picture[0].data,
       );
@@ -299,8 +299,8 @@ export function extractMusicMetadata(
   if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
   } else {
-    const data = toArrayBuffer(fs_readFileSync(audio.url));
-    let context = new AudioContext();
+    const data = toArrayBuffer(fs_readFileSync(audio.url)); // FIXME
+    let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
     context.decodeAudioData(data, (buffer) => {
       audio.duration = buffer.duration;
     });
@@ -308,15 +308,11 @@ export function extractMusicMetadata(
 }
 
 export function getLocalPath(source: string, config: Config) {
-  return cachePath(source, "local", config);
+  // dummy, migrated to src/node/data/utils.ts
+  return "";
 }
 
 export function getCachePath(source: string, config: Config) {
-  const typeDir = en.get(getSourceType(source)).toLowerCase();
-  return cachePath(source, typeDir, config);
-}
-
-function cachePath(source: string, typeDir: string, config: Config) {
   // dummy, migrated to src/node/data/utils.ts
   return "";
 }

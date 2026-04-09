@@ -9,10 +9,6 @@ export function fs_existsSync(path: string) {
   return fs.existsSync(path);
 }
 
-export function fs_isDirectory(path: string) {
-  return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
-}
-
 export function fs_unlinkSync(path: string) {
   if (fs.existsSync(path)) {
     fs.unlinkSync(path);
@@ -32,25 +28,11 @@ export function fs_readDirectoryNames(path: string) {
     .map((dirent) => dirent.name);
 }
 
-export function fs_mkdirSync(path: string) {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path);
-  }
-}
-
 export function fs_readdir(
   path: string,
   callback: (error: NodeJS.ErrnoException, files: string[]) => void,
 ) {
   fs.readdir(path, callback);
-}
-
-export function fs_copyFileSync(src: string, dest: string) {
-  fs.copyFileSync(src, dest);
-}
-
-export function fs_renameSync(src: string, dest: string) {
-  fs.renameSync(src, dest);
 }
 
 export function fs_rimrafSync(path: string) {

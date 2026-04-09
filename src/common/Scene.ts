@@ -413,9 +413,9 @@ export default class Scene {
                 a.url.lastIndexOf("."),
               );
             } else {
-              a.url = urlToPath(a.url).replace(/\//g, path_sep());
+              a.url = urlToPath(a.url).replace(/\//g, path_sep()); // FIXME
               a.name = a.url.substring(
-                a.url.lastIndexOf(path_sep()) + 1,
+                a.url.lastIndexOf(path_sep()) + 1, // FIXME
                 a.url.lastIndexOf("."),
               );
             }

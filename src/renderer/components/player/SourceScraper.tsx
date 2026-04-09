@@ -197,10 +197,10 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
     for (let source of this.props.scene.sources) {
       if (source.dirOfSources && getSourceType(source.url) == ST.local) {
         try {
-          const directories = fs_readDirectoryNames(source.url);
+          const directories = fs_readDirectoryNames(source.url); // FIXME
           for (let d of directories) {
             sceneSources.push(
-              new LibrarySource({ url: path_join(source.url, d) }),
+              new LibrarySource({ url: path_join(source.url, d) }), // FIXME
             );
           }
         } catch (e) {
@@ -223,10 +223,10 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       for (let source of this.props.nextScene.sources) {
         if (source.dirOfSources && getSourceType(source.url) == ST.local) {
           try {
-            const directories = fs_readDirectoryNames(source.url);
+            const directories = fs_readDirectoryNames(source.url); // FIXME
             for (let d of directories) {
               nextSceneSources.push(
-                new LibrarySource({ url: path_join(source.url, d) }),
+                new LibrarySource({ url: path_join(source.url, d) }), // FIXME
               );
             }
           } catch (e) {

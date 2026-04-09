@@ -838,7 +838,7 @@ export function playAudio(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep());
+    : source.url.replace(/\//g, path_sep()); // FIXME
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -890,7 +890,7 @@ export function playScript(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep());
+    : source.url.replace(/\//g, path_sep()); // FIXME
   let librarySource = state.scripts.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Script not found in Library");
@@ -929,7 +929,7 @@ export function playSceneFromLibrary(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep());
+    : source.url.replace(/\//g, path_sep()); // FIXME
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips = [];
@@ -1061,7 +1061,7 @@ export function clipVideo(
 ) {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep());
+    : source.url.replace(/\//g, path_sep()); // FIXME
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
@@ -2050,8 +2050,8 @@ export function blacklistFile(
   }
   if (fileToBlacklist != null) {
     const cachePath =
-      getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
-    fs_unlink(cachePath, (err) => {
+      getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist); // FIXME
+    fs_unlink(cachePath, (err) => { // FIXME
       if (err) {
         console.error(err);
       }
@@ -2555,8 +2555,8 @@ export function addSource(
         return;
       }
       let rootDir = args[1];
-      if (!rootDir.endsWith(path_sep())) {
-        rootDir += path_sep();
+      if (!rootDir.endsWith(path_sep())) { // FIXME
+        rootDir += path_sep(); // FIXME
       }
       if (scene != null) {
         return updateScene(state, scene, (s) => {
@@ -2607,7 +2607,7 @@ function getImportURLs(importURL: string, rootDir?: string): string[] {
       }
       if (
         importURLs.includes(fullPath) ||
-        importURLs[u] === path_sep() ||
+        importURLs[u] === path_sep() || // FIXME
         importURLs[u] === ""
       ) {
         // Remove index and push u back
@@ -3039,7 +3039,7 @@ function sortFunction(
 export function downloadSource(state: State, source: LibrarySource): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep());
+    : source.url.replace(/\//g, path_sep()); // FIXME
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips = [];
@@ -3617,7 +3617,7 @@ export function markOffline(getState: () => State, setState: Function) {
       });
       window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
       actionSource.lastCheck = new Date();
-      const exists = fs_existsSync(actionSource.url);
+      const exists = fs_existsSync(actionSource.url); // FIXME
       if (!exists) {
         actionSource.offline = true;
       }
@@ -3679,7 +3679,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
       const maxByteSize = 200000000;
       if (data.byteLength < maxByteSize) {
         const state = getState();
-        let context = new AudioContext();
+        let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
         context.decodeAudioData(
           data,
           (buffer) => {

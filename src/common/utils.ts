@@ -79,7 +79,7 @@ export function getFileName(url: string, extension = true) {
   if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
     sep = "/";
   } else {
-    sep = path_sep();
+    sep = path_sep(); // FIXME
   }
   url = url.substring(url.lastIndexOf(sep) + 1);
   if (url.includes("?")) {
@@ -278,15 +278,15 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/";
       } else {
-        sep = path_sep();
+        sep = path_sep(); // FIXME
       }
       return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
-      if (url.endsWith(path_sep())) {
+      if (url.endsWith(path_sep())) { // FIXME
         url = url.substring(0, url.length - 1);
-        return url.substring(url.lastIndexOf(path_sep()) + 1);
+        return url.substring(url.lastIndexOf(path_sep()) + 1); // FIXME
       } else {
-        return url.substring(url.lastIndexOf(path_sep()) + 1);
+        return url.substring(url.lastIndexOf(path_sep()) + 1); // FIXME
       }
     case ST.video:
     case ST.playlist:
@@ -294,7 +294,7 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/";
       } else {
-        sep = path_sep();
+        sep = path_sep(); // FIXME
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep) + 1);

@@ -593,7 +593,7 @@ class ConfigForm extends React.Component<ConfigFormProps> {
     let errorMessages = "";
     if (
       this.state.config.caching.directory != "" &&
-      !fs_existsSync(this.state.config.caching.directory)
+      !fs_existsSync(this.state.config.caching.directory) // FIXME
     ) {
       errorMessages = "Invalid Cache Directory";
     }

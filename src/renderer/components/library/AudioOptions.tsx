@@ -618,7 +618,7 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
   onReadBPMTag() {
     if (this.state.audio.url && !this.state.loadingTag) {
       this.setState({ loadingTag: true });
-      parseFile(this.state.audio.url)
+      parseFile(this.state.audio.url) // FIXME
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
             this.changeKey("bpm", metadata.common.bpm);
@@ -654,7 +654,7 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
     const detectBPM = (data: ArrayBuffer) => {
       const maxByteSize = 200000000;
       if (data.byteLength < maxByteSize) {
-        let context = new AudioContext();
+        let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
         context.decodeAudioData(
           data,
           (buffer) => {
@@ -687,8 +687,8 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
       this.setState({ loadingBPM: true });
       try {
         const url = this.state.audio.url;
-        if (fs_existsSync(url)) {
-          detectBPM(toArrayBuffer(fs_readFileSync(url)));
+        if (fs_existsSync(url)) { // FIXME
+          detectBPM(toArrayBuffer(fs_readFileSync(url))); // FIXME
         } else {
           wretch(url)
             .get()

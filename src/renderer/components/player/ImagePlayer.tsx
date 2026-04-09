@@ -1,4 +1,3 @@
-import IncomingMessage = Electron.IncomingMessage;
 import * as React from "react";
 import gifInfo from "gif-info";
 
@@ -704,9 +703,9 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
         fileType != ST.local &&
         fileType != ST.playlist
       ) {
-        const sourceCachePath = getCachePath(source, this.props.config);
+        const sourceCachePath = getCachePath(source, this.props.config); // FIXME
         const filePath = sourceCachePath + getFileName(url);
-        const cachedAlready = fs_existsSync(filePath);
+        const cachedAlready = fs_existsSync(filePath); // FIXME
         if (cachedAlready) {
           url = filePath;
         }
@@ -1234,13 +1233,13 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
         try {
           if (url.includes("file://")) {
             processInfo(
-              gifInfo(toArrayBuffer(fs_readFileSync(urlToPath(url)))),
+              gifInfo(toArrayBuffer(fs_readFileSync(urlToPath(url)))), // FIXME gifInfo & fs.readFileSync
             );
           } else {
             wretch(url)
               .get()
               .arrayBuffer((body) => {
-                processInfo(gifInfo(body));
+                processInfo(gifInfo(body)); // FIXME gifInfo
               })
               .catch((err) => {
                 console.error(err);

@@ -1657,14 +1657,14 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
       .timeout(error)
       .internalError(error)
       .arrayBuffer((buffer) => {
-        parseBuffer(Buffer.from(buffer))
+        parseBuffer(Buffer.from(buffer)) // FIXME
           .then((metadata: any) => {
             if (metadata) {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
-                url.lastIndexOf(path_sep()) + 1,
+                url.lastIndexOf(path_sep()) + 1, // FIXME
                 url.lastIndexOf("."),
               );
             }
@@ -1714,21 +1714,21 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
       const url = newSources[index];
       index++;
 
-      if (url.startsWith("http") || fs_existsSync(url)) {
+      if (url.startsWith("http") || fs_existsSync(url)) { // FIXME
         const newAudio = new Audio({
           url: url,
           id: id,
           tags: [],
         });
         id += 1;
-        parseFile(url)
+        parseFile(url) // FIXME
           .then((metadata: any) => {
             if (metadata) {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
-                url.lastIndexOf(path_sep()) + 1,
+                url.lastIndexOf(path_sep()) + 1, // FIXME
                 url.lastIndexOf("."),
               );
             }

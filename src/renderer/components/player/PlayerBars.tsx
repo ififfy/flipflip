@@ -61,7 +61,6 @@ import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../../common/Audio";
 import SceneGrid from "../../../common/SceneGrid";
 import { fs_existsSync, fs_unlink } from "../../dummy/fs";
-import { IpcRendererEvent } from "electron";
 
 const drawerWidth = 340;
 
@@ -1122,7 +1121,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   onDeletePath(path: string) {
-    if (fs_existsSync(path)) {
+    if (fs_existsSync(path)) { // FIXME
       if (this.props.config.generalSettings.confirmFileDeletion) {
         this.setState({ deletePath: path });
       } else {
@@ -1137,7 +1136,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   doDelete(path: string) {
-    fs_unlink(path, (err) => {
+    fs_unlink(path, (err) => { // FIXME
       if (err) {
         this.setState({
           deletePath: null,
@@ -1245,15 +1244,15 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     }
 
     const onBlacklistFile = (
-      ev: IpcRendererEvent,
+      _ev: unknown,
       source: string,
       path: string,
     ) => this.onBlacklistFile(source, path);
-    const onDeletePath = (ev: IpcRendererEvent, path: string) =>
+    const onDeletePath = (_ev: unknown, path: string) =>
       this.onDeletePath(path);
-    const goToTagSource = (ev: IpcRendererEvent, source: string) =>
+    const goToTagSource = (_ev: unknown, source: string) =>
       this.props.goToTagSource(new LibrarySource({ url: source }));
-    const goToClipSource = (ev: IpcRendererEvent, source: string) =>
+    const goToClipSource = (_ev: unknown, source: string) =>
       this.props.goToClipSource(new LibrarySource({ url: source }));
     const showRecentPictureGrid = () => this.props.onRecentPictureGrid();
 
