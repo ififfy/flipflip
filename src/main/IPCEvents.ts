@@ -681,6 +681,13 @@ function deleteSource(sourceURL: string) {
   }
 }
 
+function onFilterNewScriptSources(
+  ev: IpcMainInvokeEvent,
+  newSources: string[],
+) {
+  return newSources.filter((s) => fs.existsSync(s));
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -740,6 +747,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.validateConfig, onValidateConfig);
   ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
   ipcMain.handle(IPC.deleteSource, onDeleteSource);
+  ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
 }
 
 export function releaseIpcEvents() {

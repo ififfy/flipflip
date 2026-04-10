@@ -280,6 +280,7 @@ const IPC = {
   validateConfig: "ipc.validateConfig",
   deleteAllLibrarySources: "ipc.deleteAllLibrarySources",
   deleteSource: "ipc.deleteSource",
+  filterNewScriptSources: "ipc.filterNewScriptSources",
 };
 
 const MO = {

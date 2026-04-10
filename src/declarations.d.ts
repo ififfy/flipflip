@@ -239,6 +239,7 @@ declare global {
       validateConfig: (config: Config) => Promise<string>;
       deleteAllLibrarySources: (sourceURLs: string[]) => Promise<void>;
       deleteSource: (sourceURL: string) => Promise<void>;
+      filterNewScriptSources: (newSources: string[]) => Promise<string[]>;
     };
   }
 }

@@ -267,4 +267,6 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.deleteAllLibrarySources, sourceURLs),
   deleteSource: (sourceURL: string) =>
     ipcRenderer.invoke(IPC.deleteSource, sourceURL),
+  filterNewScriptSources: (newSources: string[]) =>
+    ipcRenderer.invoke(IPC.filterNewScriptSources, newSources),
 });

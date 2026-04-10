@@ -1009,9 +1009,8 @@ class ScriptLibrary extends React.Component<ScriptLibraryProps> {
       id = Math.max(s.id + 1, id);
     });
 
-    for (let url of newSources) {
-      if (fs_existsSync(url)) {
-        // FIXME
+    window.ipc.filterNewScriptSources(newSources).then((filteredSources) => {
+      for (let url of filteredSources) {
         const newText = new CaptionScript({
           url: url,
           id: id,
@@ -1020,11 +1019,11 @@ class ScriptLibrary extends React.Component<ScriptLibraryProps> {
         id += 1;
         originalSources.unshift(newText);
       }
-    }
 
-    this.props.onUpdateLibrary((l) => {
-      l.splice(0, l.length);
-      l.push(...originalSources);
+      this.props.onUpdateLibrary((l) => {
+        l.splice(0, l.length);
+        l.push(...originalSources);
+      });
     });
   }
 
