@@ -251,7 +251,11 @@ class AudioEdit extends React.Component<AudioEditProps> {
       .then((metadata: any) => {
         if (metadata) {
           const newAudio = new Audio(this.state.audio);
-          extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config) /* FIXME */);
+          extractMusicMetadata(
+            newAudio,
+            metadata,
+            getCachePath(null, this.props.config) /* FIXME */,
+          );
           this.setState({ audio: newAudio });
         }
       })

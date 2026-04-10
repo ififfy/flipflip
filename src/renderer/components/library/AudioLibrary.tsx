@@ -1660,7 +1660,11 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
         parseBuffer(Buffer.from(buffer)) // FIXME
           .then((metadata: any) => {
             if (metadata) {
-              extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config)); // FIXME
+              extractMusicMetadata(
+                newAudio,
+                metadata,
+                getCachePath(null, this.props.config),
+              ); // FIXME
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
@@ -1725,7 +1729,11 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
         parseFile(url) // FIXME
           .then((metadata: any) => {
             if (metadata) {
-              extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config) /* FIXME */);
+              extractMusicMetadata(
+                newAudio,
+                metadata,
+                getCachePath(null, this.props.config) /* FIXME */,
+              );
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
