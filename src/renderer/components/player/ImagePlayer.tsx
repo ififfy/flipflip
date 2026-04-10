@@ -3,20 +3,14 @@ import * as React from "react";
 import { CircularProgress, Container, Typography } from "@mui/material";
 
 import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../../common/const";
-import {
-  flatten,
-  getCachePath,
-  getRandomListItem,
-  getRandomNumber,
-} from "../../data/utils";
-import { getFileName, getSourceType, isVideo } from "../../../common/utils";
+import { flatten, getRandomListItem, getRandomNumber } from "../../data/utils";
+import { getSourceType, isVideo } from "../../../common/utils";
 import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";
 import ImageView from "./ImageView";
 import Strobe from "./Strobe";
 import Audio from "../../../common/Audio";
-import { fs_existsSync } from "../../dummy/fs";
 import GifInfo from "../../../common/GifInfo";
 
 interface ImagePlayerProps {

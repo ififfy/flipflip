@@ -76,7 +76,6 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
-import { fs_rimrafSync, fs_unlink } from "../../dummy/fs";
 
 const drawerWidth = 240;
 

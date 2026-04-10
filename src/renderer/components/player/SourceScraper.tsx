@@ -3,17 +3,13 @@ import uuidv4 from "uuid/v4";
 
 import { Dialog, DialogContent } from "@mui/material";
 
-import { flatten, randomizeList } from "../../data/utils";
-import { getSourceType } from "../../../common/utils";
-import { SOF, ST } from "../../../common/const";
+import { flatten } from "../../data/utils";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 import ChildCallbackHack from "./ChildCallbackHack";
 import ImagePlayer from "./ImagePlayer";
-import { fs_readDirectoryNames } from "../../dummy/fs";
-import { path_join } from "../../dummy/path";
 
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {

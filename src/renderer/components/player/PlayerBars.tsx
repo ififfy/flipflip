@@ -60,7 +60,6 @@ import FadeIOCard from "../configGroups/FadeIOCard";
 import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../../common/Audio";
 import SceneGrid from "../../../common/SceneGrid";
-import { fs_existsSync, fs_unlink } from "../../dummy/fs";
 
 const drawerWidth = 340;
 

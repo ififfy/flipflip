@@ -24,7 +24,6 @@ import SceneSelect from "../configGroups/SceneSelect";
 import Scene from "../../../common/Scene";
 import ScriptOptions from "./ScriptOptions";
 import { SP } from "../../../common/const";
-import { fs_unlinkSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({
