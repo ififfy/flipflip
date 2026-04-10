@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { getFileGroup } from "../../common/utils";
+import { getFileGroup, getSourceType } from "../../common/utils";
 import { ST } from "../../common/const";
 import Config from "../../common/Config";
+import en from "../../renderer/data/en";
 
 export function generateThumbnailFile(cachePath: string, data: Buffer): string {
   let checksumThumbnailPath = cachePath;
@@ -23,12 +24,12 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
 }
 
 export function getLocalPath(source: string, config: Config) {
-  return cachePath(source, "local", config); // FIXME
+  return cachePath(source, "local", config);
 }
 
 export function getCachePath(source: string, config: Config) {
   const typeDir = en.get(getSourceType(source)).toLowerCase();
-  return cachePath(source, typeDir, config); // FIXME
+  return cachePath(source, typeDir, config);
 }
 
 function cachePath(source: string, typeDir: string, config: Config) {
