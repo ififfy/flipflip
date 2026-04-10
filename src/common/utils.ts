@@ -282,7 +282,8 @@ export function getFileGroup(url: string) {
       }
       return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
-      if (url.endsWith(path_sep())) { // FIXME
+      if (url.endsWith(path_sep())) {
+        // FIXME
         url = url.substring(0, url.length - 1);
         return url.substring(url.lastIndexOf(path_sep()) + 1); // FIXME
       } else {

@@ -585,7 +585,8 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
               file = audioSplit[0];
               alias = audioSplit[1];
             }
-            if (!file.startsWith("http") && !fs_existsSync(file)) { // FIXME
+            if (!file.startsWith("http") && !fs_existsSync(file)) {
+              // FIXME
               error =
                 "Error: {" +
                 index +

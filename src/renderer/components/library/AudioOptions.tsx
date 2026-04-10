@@ -687,7 +687,8 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
       this.setState({ loadingBPM: true });
       try {
         const url = this.state.audio.url;
-        if (fs_existsSync(url)) { // FIXME
+        if (fs_existsSync(url)) {
+          // FIXME
           detectBPM(toArrayBuffer(fs_readFileSync(url))); // FIXME
         } else {
           wretch(url)

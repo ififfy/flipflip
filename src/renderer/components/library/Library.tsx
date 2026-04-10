@@ -1472,7 +1472,8 @@ class Library extends React.Component<LibraryProps> {
     for (let source of this.props.library) {
       if (source.offline) {
         const cachePath = getCachePath(source.url, this.props.config); // FIXME
-        fs_readdir(cachePath, (error, files) => { // FIXME
+        fs_readdir(cachePath, (error, files) => {
+          // FIXME
           if (!!error || files.length == 0) {
             this.props.onUpdateLibrary((l) => {
               l.forEach((s, index) => {

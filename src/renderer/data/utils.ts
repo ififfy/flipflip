@@ -284,7 +284,8 @@ export function extractMusicMetadata(
       audio.artist = metadata.common.artist;
     }
     if (metadata.common.picture && metadata.common.picture.length > 0) {
-      audio.thumb = generateThumbnailFile( // FIXME
+      audio.thumb = generateThumbnailFile(
+        // FIXME
         cachePath,
         metadata.common.picture[0].data,
       );

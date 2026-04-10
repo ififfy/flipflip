@@ -549,7 +549,8 @@ class SourceListItem extends React.Component<SourceListItemProps> {
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
         if (
-          fs_existsSync( // FIXME
+          fs_existsSync(
+            // FIXME
             getCachePath(sourceURL, this.props.config) + getFileName(sourceURL), // FIXME
           )
         ) {

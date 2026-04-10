@@ -1714,7 +1714,8 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
       const url = newSources[index];
       index++;
 
-      if (url.startsWith("http") || fs_existsSync(url)) { // FIXME
+      if (url.startsWith("http") || fs_existsSync(url)) {
+        // FIXME
         const newAudio = new Audio({
           url: url,
           id: id,

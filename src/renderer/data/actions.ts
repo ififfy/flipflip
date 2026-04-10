@@ -2051,7 +2051,8 @@ export function blacklistFile(
   if (fileToBlacklist != null) {
     const cachePath =
       getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist); // FIXME
-    fs_unlink(cachePath, (err) => { // FIXME
+    fs_unlink(cachePath, (err) => {
+      // FIXME
       if (err) {
         console.error(err);
       }
@@ -2555,7 +2556,8 @@ export function addSource(
         return;
       }
       let rootDir = args[1];
-      if (!rootDir.endsWith(path_sep())) { // FIXME
+      if (!rootDir.endsWith(path_sep())) {
+        // FIXME
         rootDir += path_sep(); // FIXME
       }
       if (scene != null) {

@@ -1010,7 +1010,8 @@ class ScriptLibrary extends React.Component<ScriptLibraryProps> {
     });
 
     for (let url of newSources) {
-      if (fs_existsSync(url)) { // FIXME
+      if (fs_existsSync(url)) {
+        // FIXME
         const newText = new CaptionScript({
           url: url,
           id: id,

@@ -1121,7 +1121,8 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   onDeletePath(path: string) {
-    if (fs_existsSync(path)) { // FIXME
+    if (fs_existsSync(path)) {
+      // FIXME
       if (this.props.config.generalSettings.confirmFileDeletion) {
         this.setState({ deletePath: path });
       } else {
@@ -1136,7 +1137,8 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   doDelete(path: string) {
-    fs_unlink(path, (err) => { // FIXME
+    fs_unlink(path, (err) => {
+      // FIXME
       if (err) {
         this.setState({
           deletePath: null,
@@ -1243,11 +1245,8 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       return;
     }
 
-    const onBlacklistFile = (
-      _ev: unknown,
-      source: string,
-      path: string,
-    ) => this.onBlacklistFile(source, path);
+    const onBlacklistFile = (_ev: unknown, source: string, path: string) =>
+      this.onBlacklistFile(source, path);
     const onDeletePath = (_ev: unknown, path: string) =>
       this.onDeletePath(path);
     const goToTagSource = (_ev: unknown, source: string) =>
