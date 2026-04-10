@@ -77,12 +77,9 @@ import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
 import {
-  fs_readdir,
-  fs_unlinkSync,
   fs_rimrafSync,
   fs_unlink,
 } from "../../dummy/fs";
-import { fsExtra_move } from "../../dummy/fs-extra";
 
 const drawerWidth = 240;
 
