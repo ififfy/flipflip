@@ -247,7 +247,7 @@ class CacheCard extends React.Component<CacheCardProps> {
     window.ipc.clearCache(this.props.config).then(() => {
       this.setState({ cacheSize: "--" });
       this.calculateCacheSize();
-    })
+    });
   }
 
   onResetCacheDir(e: MouseEvent) {
