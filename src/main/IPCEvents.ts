@@ -639,6 +639,18 @@ function onPortablePathExists() {
   return fs.existsSync(portablePath);
 }
 
+// This should only validate data REQUIRED for FlipFlip to work 
+function onValidateConfig(ev: IpcMainInvokeEvent, config: Config) {
+  let errorMessages = "";
+  if (
+    config.caching.directory != "" &&
+    !fs.existsSync(config.caching.directory)
+  ) {
+    errorMessages = "Invalid Cache Directory";
+  }
+  return errorMessages;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -695,6 +707,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.clearCache, onClearCache);
   ipcMain.handle(IPC.libraryMove, onLibraryMove);
   ipcMain.handle(IPC.portablePathExists, onPortablePathExists);
+  ipcMain.handle(IPC.validateConfig, onValidateConfig)
 }
 
 export function releaseIpcEvents() {

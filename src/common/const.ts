@@ -277,6 +277,7 @@ const IPC = {
   clearCache: "ipc.clearCache",
   libraryMove: "ipc.libraryMove",
   portablePathExists: "ipc.portablePathExists",
+  validateConfig: "ipc.validateConfig"
 };
 
 const MO = {

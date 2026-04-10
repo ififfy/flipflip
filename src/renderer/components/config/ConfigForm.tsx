@@ -573,31 +573,15 @@ class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   onConfirmConfig() {
-    if (this.applyConfig()) this.props.goBack();
-  }
-
-  applyConfig(): boolean {
-    const errorMessage = this.validate();
-    if (errorMessage.length == 0) {
-      this.props.onUpdateConfig(this.state.config);
-      return true;
-    } else {
-      console.error(errorMessage);
-      this.setState({ errorSnackOpen: true, errorSnack: errorMessage });
-      return false;
-    }
-  }
-
-  // This should only validate data REQUIRED for FlipFlip to work
-  validate(): string {
-    let errorMessages = "";
-    if (
-      this.state.config.caching.directory != "" &&
-      !fs_existsSync(this.state.config.caching.directory) // FIXME
-    ) {
-      errorMessages = "Invalid Cache Directory";
-    }
-    return errorMessages;
+    window.ipc.validateConfig(this.state.config).then((errorMessage) => {
+      if (errorMessage.length == 0) {
+        this.props.onUpdateConfig(this.state.config);
+        this.props.goBack();
+      } else {
+        console.error(errorMessage);
+        this.setState({ errorSnackOpen: true, errorSnack: errorMessage });
+      }
+    })
   }
 
   onPortableOverride() {

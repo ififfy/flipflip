@@ -261,4 +261,5 @@ contextBridge.exposeInMainWorld("ipc", {
   moveLibrarySource: (sourceURL: string, config: Config) =>
     ipcRenderer.invoke(IPC.libraryMove, sourceURL, config),
   portablePathExists: () => ipcRenderer.invoke(IPC.portablePathExists),
+  validateConfig: (config: Config) => ipcRenderer.invoke(IPC.validateConfig, config)
 });
