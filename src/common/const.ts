@@ -290,6 +290,7 @@ const IPC = {
   shouldShowDeleteDialog: "ipc.shouldShowDeleteDialog",
   getGifInfo: "ipc.getGifInfo",
   getConstants: "ipc.getConstants",
+  fileExists: "ipc.fileExists",
 };
 
 const MO = {

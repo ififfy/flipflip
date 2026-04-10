@@ -25,15 +25,14 @@ import BuildIcon from "@mui/icons-material/Build";
 import DeleteIcon from "@mui/icons-material/Delete";
 import OfflineBoltIcon from "@mui/icons-material/OfflineBolt";
 
-import { getCachePath, getTimestamp, urlToPath } from "../../data/utils";
-import { getFileName, getSourceType } from "../../../common/utils";
+import { getTimestamp } from "../../data/utils";
+import { getSourceType } from "../../../common/utils";
 import { SDT, ST } from "../../../common/const";
 import Tag from "../../../common/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../../common/LibrarySource";
 import Config from "../../../common/Config";
 import { grey } from "@mui/material/colors";
-import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

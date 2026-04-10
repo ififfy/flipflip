@@ -251,10 +251,11 @@ declare global {
       ) => void;
       cleanCache: (cachePath: string) => Promise<void>;
       revealFile: (sourceURL: string, config: Config) => void;
-      finishDelete: (filePath: string) => Promise<void>;
+      finishDelete: (filePath: string) => Promise<string | undefined>;
       getBackupFile: (backupURL: string) => Promise<string>;
       shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
       getGifInfo: (url: string) => Promise<GifInfo | null>;
+      fileExists: (filePath: string) => Promise<boolean>;
     };
   }
 }

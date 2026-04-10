@@ -1,5 +1,4 @@
 import * as React from "react";
-import { fs_existsSync } from "../../dummy/fs";
 
 import {
   Button,

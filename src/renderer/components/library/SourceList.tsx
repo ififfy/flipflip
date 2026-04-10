@@ -34,13 +34,8 @@ import withStyles from "@mui/styles/withStyles";
 
 import FolderIcon from "@mui/icons-material/Folder";
 
-import {
-  arrayMove,
-  getCachePath,
-  getTimestamp,
-  urlToPath,
-} from "../../data/utils";
-import { getFileName, getSourceType } from "../../../common/utils";
+import { arrayMove, getTimestamp, urlToPath } from "../../data/utils";
+import { getSourceType } from "../../../common/utils";
 import { RF, RT, SDT, ST } from "../../../common/const";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
@@ -48,7 +43,6 @@ import SourceListItem from "./SourceListItem";
 import Clip from "../../../common/Clip";
 import en from "../../data/en";
 import Scene from "../../../common/Scene";
-import { fs_existsSync, fs_unlinkSync, fs_rimrafSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

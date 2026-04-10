@@ -793,6 +793,10 @@ function onGetConstants() {
   return value;
 }
 
+function onFileExists(ev: IpcMainInvokeEvent, filePath: string) {
+  return fs.existsSync(filePath)
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -862,6 +866,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
   ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
   ipcMain.handle(IPC.getGifInfo, onGetGifInfo);
+  ipcMain.handle(IPC.fileExists, onFileExists)
 }
 
 export function releaseIpcEvents() {

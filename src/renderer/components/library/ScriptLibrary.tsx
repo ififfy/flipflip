@@ -56,7 +56,6 @@ import LibrarySearch from "./LibrarySearch";
 import CaptionScript from "../../../common/CaptionScript";
 import ScriptSourceList from "./ScriptSourceList";
 import Scene from "../../../common/Scene";
-import { fs_existsSync } from "../../dummy/fs";
 
 const drawerWidth = 240;
 

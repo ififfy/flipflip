@@ -16,7 +16,6 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import { CircularProgress } from "@mui/material";
-import { fs_existsSync } from "../../dummy/fs";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -328,7 +327,7 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
           });
       }
     });
-    this._runningPromise.then((data) => {
+    this._runningPromise.then(async (data) => {
       let error = null;
       let newProgram = new Array<Function>();
       let newTimestamps = new Map<number, Array<Function>>();
@@ -585,17 +584,19 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
               file = audioSplit[0];
               alias = audioSplit[1];
             }
-            if (!file.startsWith("http") && !fs_existsSync(file)) {
-              // FIXME
-              error =
-                "Error: {" +
-                index +
-                "} '" +
-                line +
-                "' - file '" +
-                file +
-                "' does not exist";
-              break;
+            if (!file.startsWith("http")) {
+              const exists = await window.ipc.fileExists(file);
+              if (!exists) {
+                error =
+                  "Error: {" +
+                  index +
+                  "} '" +
+                  line +
+                  "' - file '" +
+                  file +
+                  "' does not exist";
+                break;
+              }
             }
             if (this.state.audios.find((a) => a.alias == alias) != null) {
               error =

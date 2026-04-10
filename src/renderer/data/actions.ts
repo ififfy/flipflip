@@ -58,7 +58,6 @@ import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
 import SceneGridCell from "../../common/SceneGridCell";
 import WeightGroup from "../../common/WeightGroup";
-import { fs_existsSync } from "../dummy/fs";
 import AppStorageState from "src/common/AppStorageState";
 import { analyze } from "web-audio-beat-detector";
 type State = AppStorageState;
@@ -3609,11 +3608,12 @@ export function markOffline(getState: () => State, setState: Function) {
       });
       window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
       actionSource.lastCheck = new Date();
-      const exists = fs_existsSync(actionSource.url); // FIXME
-      if (!exists) {
-        actionSource.offline = true;
-      }
-      setTimeout(offlineLoop, 10);
+      window.ipc.fileExists(actionSource.url).then((exists) => {
+        if (!exists) {
+          actionSource.offline = true;
+        }
+        setTimeout(offlineLoop, 10);
+      });
     }
   };
   // If we don't have an import running
