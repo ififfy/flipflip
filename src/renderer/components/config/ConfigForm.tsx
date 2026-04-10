@@ -581,7 +581,7 @@ class ConfigForm extends React.Component<ConfigFormProps> {
         console.error(errorMessage);
         this.setState({ errorSnackOpen: true, errorSnack: errorMessage });
       }
-    })
+    });
   }
 
   onPortableOverride() {
