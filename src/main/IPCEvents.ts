@@ -751,7 +751,12 @@ function onRevealFile(ev: IpcMainEvent, sourceURL: string, config: Config) {
 }
 
 function onFinishDelete(ev: IpcMainInvokeEvent, filePath: string) {
-  fs.unlinkSync(filePath);
+  try {
+    return fs.unlinkSync(filePath);
+  } catch (err) {
+    console.error(err);
+    return err.message;
+  }
 }
 
 function onGetBackupFile(ev: IpcMainInvokeEvent, backupURL: string) {
@@ -794,7 +799,7 @@ function onGetConstants() {
 }
 
 function onFileExists(ev: IpcMainInvokeEvent, filePath: string) {
-  return fs.existsSync(filePath)
+  return fs.existsSync(filePath);
 }
 
 // Initialize and release listeners
@@ -866,7 +871,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
   ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
   ipcMain.handle(IPC.getGifInfo, onGetGifInfo);
-  ipcMain.handle(IPC.fileExists, onFileExists)
+  ipcMain.handle(IPC.fileExists, onFileExists);
 }
 
 export function releaseIpcEvents() {

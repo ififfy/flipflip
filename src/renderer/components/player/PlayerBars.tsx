@@ -1121,31 +1121,29 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   onDeletePath(path: string) {
-    if (fs_existsSync(path)) {
-      // FIXME
-      if (this.props.config.generalSettings.confirmFileDeletion) {
-        this.setState({ deletePath: path });
+    window.ipc.fileExists(path).then((exists) => {
+      if (exists) {
+        if (this.props.config.generalSettings.confirmFileDeletion) {
+          this.setState({ deletePath: path });
+        } else {
+          this.doDelete(path);
+        }
       } else {
-        this.doDelete(path);
+        this.setState({
+          deletePath: null,
+          deleteError: "This file doesn't exist, cannot delete",
+        });
       }
-    } else {
-      this.setState({
-        deletePath: null,
-        deleteError: "This file doesn't exist, cannot delete",
-      });
-    }
+    });
   }
 
   doDelete(path: string) {
-    fs_unlink(path, (err) => {
-      // FIXME
+    window.ipc.finishDelete(path).then((err) => {
       if (err) {
         this.setState({
           deletePath: null,
-          deleteError:
-            "An error occurred while deleting the file: " + err.message,
+          deleteError: "An error occurred while deleting the file: " + err,
         });
-        console.error(err);
       } else {
         this.props.imagePlayerDeleteHack.fire();
         this.onCloseDialog();
