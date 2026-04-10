@@ -603,6 +603,11 @@ function onDeleteLibrarySource(
   }
 }
 
+function onClearCache(ev: IpcMainEvent, config: Config) {
+  const cachePath = getCachePath(null, config);
+  rimrafSync(cachePath);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -656,6 +661,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getCacheSize, onGetCacheSize);
   ipcMain.on(IPC.scrapeFilesRequest, onScrapeFiles);
   ipcMain.handle(IPC.deleteLibrarySource, onDeleteLibrarySource);
+  ipcMain.handle(IPC.clearCache, onClearCache)
 }
 
 export function releaseIpcEvents() {

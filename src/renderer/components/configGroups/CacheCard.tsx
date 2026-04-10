@@ -244,10 +244,10 @@ class CacheCard extends React.Component<CacheCardProps> {
   }
 
   onFinishClearCache() {
-    const cachePath = getCachePath(null, this.props.config); // FIXME
-    fs_rimrafSync(cachePath); // FIXME
-    this.setState({ cacheSize: "--" });
-    this.calculateCacheSize();
+    window.ipc.clearCache(this.props.config).then(() => {
+      this.setState({ cacheSize: "--" });
+      this.calculateCacheSize();
+    })
   }
 
   onResetCacheDir(e: MouseEvent) {

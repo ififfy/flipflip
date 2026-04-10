@@ -69,7 +69,7 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard {}
+interface Navigator extends NavigatorClipboard { }
 
 declare global {
   interface Window {
@@ -229,8 +229,9 @@ declare global {
         helpers: { next: any; count: number; retries: number; uuid: string },
       ) => void;
       deleteLibrarySource: (sourceURL: string, config: Config) => Promise<void>;
+      clearCache: (config: Config) => Promise<void>
     };
   }
 }
 
-export {};
+export { };

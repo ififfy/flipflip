@@ -257,4 +257,5 @@ contextBridge.exposeInMainWorld("ipc", {
     ),
   deleteLibrarySource: (sourceURL: string, config: Config) =>
     ipcRenderer.invoke(IPC.deleteLibrarySource, sourceURL, config),
+  clearCache: (config: Config) => ipcRenderer.invoke(IPC.clearCache, config)
 });
