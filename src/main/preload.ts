@@ -255,4 +255,6 @@ contextBridge.exposeInMainWorld("ipc", {
       weightFunction,
       helpers,
     ),
+  deleteLibrarySource: (sourceURL: string, config: Config) =>
+    ipcRenderer.invoke(IPC.deleteLibrarySource, sourceURL, config),
 });

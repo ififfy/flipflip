@@ -16,6 +16,7 @@ import {
 import { getCachePath, urlToPath } from "../renderer/data/utils";
 import getFolderSize from "get-folder-size";
 import { Worker } from "worker_threads";
+import { rimrafSync } from "rimraf";
 
 import {
   createNewWindow,
@@ -55,7 +56,6 @@ import PlayerMenu from "./PlayerMenu";
 import { getFileName, getSourceType } from "../common/utils";
 import { outputFile } from "fs-extra";
 import LibrarySource from "src/common/LibrarySource";
-import { error } from "console";
 import path from "path";
 
 // Define functions
@@ -579,6 +579,30 @@ function onScrapeFiles(
   });
 }
 
+function onDeleteLibrarySource(
+  ev: IpcMainInvokeEvent,
+  sourceURL: string,
+  config: Config,
+) {
+  const fileType = getSourceType(sourceURL);
+  try {
+    if (fileType == ST.local) {
+      rimrafSync(sourceURL);
+    } else if (
+      fileType == ST.video ||
+      fileType == ST.playlist ||
+      fileType == ST.list
+    ) {
+      fs.unlinkSync(sourceURL);
+      rimrafSync(getCachePath(sourceURL, config) + getFileName(sourceURL));
+    } else {
+      rimrafSync(getCachePath(sourceURL, config));
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -631,6 +655,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.cacheImage, onCacheImage);
   ipcMain.handle(IPC.getCacheSize, onGetCacheSize);
   ipcMain.on(IPC.scrapeFilesRequest, onScrapeFiles);
+  ipcMain.handle(IPC.deleteLibrarySource, onDeleteLibrarySource);
 }
 
 export function releaseIpcEvents() {

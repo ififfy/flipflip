@@ -1694,31 +1694,12 @@ class Library extends React.Component<LibraryProps> {
   }
 
   onFinishDeleteVisible() {
-    this.props.onUpdateLibrary((l) => {
+    this.props.onUpdateLibrary(async (l) => {
       const displayIDs = this.state.displaySources.map((s) => s.id);
       for (let i = l.length - 1; i >= 0; i--) {
         if (displayIDs.includes(l[i].id)) {
           const sourceURL = l[i].url;
-          const fileType = getSourceType(sourceURL);
-          try {
-            if (fileType == ST.local) {
-              fs_rimrafSync(sourceURL); // FIXME
-            } else if (
-              fileType == ST.video ||
-              fileType == ST.playlist ||
-              fileType == ST.list
-            ) {
-              fs_unlinkSync(sourceURL); // FIXME
-              fs_rimrafSync( // FIXME
-                getCachePath(sourceURL, this.props.config) + // FIXME
-                  getFileName(sourceURL),
-              );
-            } else {
-              fs_rimrafSync(getCachePath(sourceURL, this.props.config) /* FIXME */); // FIXME
-            }
-          } catch (e) {
-            console.error(e);
-          }
+          await window.ipc.deleteLibrarySource(sourceURL, this.props.config);
           l.splice(i, 1);
         }
       }

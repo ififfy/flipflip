@@ -273,6 +273,7 @@ const IPC = {
   getCacheSize: "ipc.getCacheSize",
   scrapeFilesRequest: "ipc.scrapeFilesRequest",
   scrapeFilesResponse: "ipc.scrapeFilesResponse",
+  deleteLibrarySource: "ipc.deleteLibrarySource",
 };
 
 const MO = {

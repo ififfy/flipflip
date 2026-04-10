@@ -228,6 +228,7 @@ declare global {
         weightFunction: string,
         helpers: { next: any; count: number; retries: number; uuid: string },
       ) => void;
+      deleteLibrarySource: (sourceURL: string, config: Config) => Promise<void>;
     };
   }
 }
