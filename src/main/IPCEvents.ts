@@ -783,7 +783,7 @@ function onGetGifInfo(ev: IpcMainInvokeEvent, url: string) {
       wretch(url)
         .get()
         .arrayBuffer((body) => {
-          resolve(gifInfo(body)); // FIXME gifInfo
+          resolve(gifInfo(body));
         })
         .catch((err) => {
           console.error(err);
