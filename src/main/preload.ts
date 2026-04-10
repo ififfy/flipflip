@@ -265,4 +265,6 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.validateConfig, config),
   deleteAllLibrarySources: (sourceURLs: string[]) =>
     ipcRenderer.invoke(IPC.deleteAllLibrarySources, sourceURLs),
+  deleteSource: (sourceURL: string) =>
+    ipcRenderer.invoke(IPC.deleteSource, sourceURL),
 });

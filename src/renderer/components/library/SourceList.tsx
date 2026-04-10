@@ -613,18 +613,10 @@ class SourceList extends React.Component<SourceListProps> {
   }
 
   onFinishDelete() {
-    const fileType = getSourceType(this.state.deleteDialog.url);
-    if (fileType == ST.local) {
-      fs_rimrafSync(this.state.deleteDialog.url); // FIXME
-    } else if (
-      fileType == ST.video ||
-      fileType == ST.playlist ||
-      fileType == ST.list
-    ) {
-      fs_unlinkSync(this.state.deleteDialog.url); // FIXME
-    }
-    this.onRemove(this.state.deleteDialog);
-    this.onCloseDeleteDialog();
+    window.ipc.deleteSource(this.state.deleteDialog.url).then(() => {
+      this.onRemove(this.state.deleteDialog);
+      this.onCloseDeleteDialog();
+    });
   }
 
   onRemove(source: LibrarySource) {

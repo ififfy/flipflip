@@ -656,20 +656,28 @@ function onDeleteAllLibrarySources(
   sourceURLs: string[],
 ) {
   for (const sourceURL of sourceURLs) {
-    const fileType = getSourceType(sourceURL);
-    try {
-      if (fileType == ST.local) {
-        rimrafSync(sourceURL);
-      } else if (
-        fileType == ST.video ||
-        fileType == ST.playlist ||
-        fileType == ST.list
-      ) {
-        fs.unlink(sourceURL, () => {});
-      }
-    } catch (e) {
-      console.error(e);
+    deleteSource(sourceURL);
+  }
+}
+
+function onDeleteSource(ev: IpcMainInvokeEvent, sourceURL: string) {
+  deleteSource(sourceURL);
+}
+
+function deleteSource(sourceURL: string) {
+  const fileType = getSourceType(sourceURL);
+  try {
+    if (fileType == ST.local) {
+      rimrafSync(sourceURL);
+    } else if (
+      fileType == ST.video ||
+      fileType == ST.playlist ||
+      fileType == ST.list
+    ) {
+      fs.unlinkSync(sourceURL);
     }
+  } catch (e) {
+    console.error(e);
   }
 }
 
@@ -731,6 +739,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.portablePathExists, onPortablePathExists);
   ipcMain.handle(IPC.validateConfig, onValidateConfig);
   ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
+  ipcMain.handle(IPC.deleteSource, onDeleteSource);
 }
 
 export function releaseIpcEvents() {

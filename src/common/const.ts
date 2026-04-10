@@ -279,6 +279,7 @@ const IPC = {
   portablePathExists: "ipc.portablePathExists",
   validateConfig: "ipc.validateConfig",
   deleteAllLibrarySources: "ipc.deleteAllLibrarySources",
+  deleteSource: "ipc.deleteSource",
 };
 
 const MO = {
