@@ -507,7 +507,7 @@ class BackupCard extends React.Component<BackupCardProps> {
           snackbarSeverity: SS.error,
         });
       }
-    })
+    });
   }
 
   onCloseDialog() {

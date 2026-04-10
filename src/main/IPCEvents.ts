@@ -750,6 +750,17 @@ function onGetBackupFile(ev: IpcMainInvokeEvent, backupURL: string) {
   return path.join(saveDir, backupURL);
 }
 
+function onShouldShowDeleteDialog(ev: IpcMainInvokeEvent, sourceURL: string) {
+  const fileType = getSourceType(sourceURL);
+  return (
+    (fileType == ST.local ||
+      fileType == ST.video ||
+      fileType == ST.playlist ||
+      fileType == ST.list) &&
+    fs.existsSync(sourceURL)
+  );
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -816,6 +827,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.revealFile, onRevealFile);
   ipcMain.handle(IPC.finishDelete, onFinishDelete);
   ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
+  ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
 }
 
 export function releaseIpcEvents() {

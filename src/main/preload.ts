@@ -290,5 +290,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.revealFile, sourceURL, config),
   finishDelete: (filePath: string) =>
     ipcRenderer.invoke(IPC.finishDelete, filePath),
-  getBackupFile: (backupURL: string) => ipcRenderer.invoke(backupURL),
+  getBackupFile: (backupURL: string) =>
+    ipcRenderer.invoke(IPC.getBackupFile, backupURL),
+  shouldShowDeleteDialog: (sourceURL: string) =>
+    ipcRenderer.invoke(IPC.shouldShowDeleteDialog, sourceURL),
 });

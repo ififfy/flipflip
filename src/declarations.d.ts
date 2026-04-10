@@ -251,6 +251,7 @@ declare global {
       revealFile: (sourceURL: string, config: Config) => void;
       finishDelete: (filePath: string) => Promise<void>;
       getBackupFile: (backupURL: string) => Promise<string>;
+      shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
     };
   }
 }
