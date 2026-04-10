@@ -13,7 +13,12 @@ import {
   powerSaveBlocker,
   webFrame,
 } from "electron";
-import { getCachePath, toArrayBuffer, urlToPath } from "../renderer/data/utils";
+import {
+  getCachePath,
+  randomizeList,
+  toArrayBuffer,
+  urlToPath,
+} from "../renderer/data/utils";
 import getFolderSize from "get-folder-size";
 import { Worker } from "worker_threads";
 import { rimrafSync } from "rimraf";
@@ -34,7 +39,7 @@ import {
   getWindow,
   setProgressBar,
 } from "./WindowManager";
-import { IPC, ST } from "../common/const";
+import { IPC, SOF, ST } from "../common/const";
 import { getBackups, portablePath, saveDir } from "./utils";
 import {
   createNewAppStorage,
@@ -818,6 +823,38 @@ function onGetCachedFileURL(
   return url;
 }
 
+function onGetScraperSources(
+  ev: IpcMainInvokeEvent,
+  sources: LibrarySource[],
+  sourceOrderFunction: string,
+) {
+  const sceneSources = new Array<LibrarySource>();
+  for (const source of sources) {
+    if (source.dirOfSources && getSourceType(source.url) == ST.local) {
+      try {
+        const directories = fs
+          .readdirSync(source.url, { withFileTypes: true })
+          .filter((dirent) => dirent.isDirectory())
+          .map((dirent) => dirent.name);
+        for (let d of directories) {
+          sceneSources.push(
+            new LibrarySource({ url: path.join(source.url, d) }),
+          );
+        }
+      } catch (e) {
+        sceneSources.push(new LibrarySource({ url: source.url }));
+        console.error(e);
+      }
+    } else {
+      sceneSources.push(source);
+    }
+  }
+
+  return sourceOrderFunction == SOF.random
+    ? randomizeList(JSON.parse(JSON.stringify(sceneSources)))
+    : JSON.parse(JSON.stringify(sceneSources));
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -889,6 +926,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getGifInfo, onGetGifInfo);
   ipcMain.handle(IPC.fileExists, onFileExists);
   ipcMain.handle(IPC.getCachedFileURL, onGetCachedFileURL);
+  ipcMain.handle(IPC.getScraperSources, onGetScraperSources);
 }
 
 export function releaseIpcEvents() {

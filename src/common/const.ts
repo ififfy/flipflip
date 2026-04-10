@@ -292,6 +292,7 @@ const IPC = {
   getConstants: "ipc.getConstants",
   fileExists: "ipc.fileExists",
   getCachedFileURL: "ipc.getCachedFileURL",
+  getScraperSources: "ipc.getScraperSources",
 };
 
 const MO = {

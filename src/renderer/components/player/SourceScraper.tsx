@@ -167,7 +167,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
     this.setState({ captcha: null, load: false });
   }
 
-  componentDidMount(restart = false) {
+  async componentDidMount(restart = false) {
     this._isMounted = true;
     // Create an instance of your worker
     const uuid = uuidv4();
@@ -193,58 +193,21 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       newAllPosts = this.state.allPosts;
     }
 
-    let sceneSources = new Array<LibrarySource>();
-    for (let source of this.props.scene.sources) {
-      if (source.dirOfSources && getSourceType(source.url) == ST.local) {
-        try {
-          const directories = fs_readDirectoryNames(source.url); // FIXME
-          for (let d of directories) {
-            sceneSources.push(
-              new LibrarySource({ url: path_join(source.url, d) }), // FIXME
-            );
-          }
-        } catch (e) {
-          sceneSources.push(new LibrarySource({ url: source.url }));
-          console.error(e);
-        }
-      } else {
-        sceneSources.push(source);
-      }
-    }
-
-    const sources =
-      this.props.scene.sourceOrderFunction == SOF.random
-        ? randomizeList(JSON.parse(JSON.stringify(sceneSources)))
-        : JSON.parse(JSON.stringify(sceneSources));
+    const sources = await window.ipc.getScraperSources(
+      this.props.scene.sources,
+      this.props.scene.sourceOrderFunction,
+    );
 
     let nextSources = new Array<LibrarySource>();
     if (this.props.nextScene) {
-      let nextSceneSources = new Array<LibrarySource>();
-      for (let source of this.props.nextScene.sources) {
-        if (source.dirOfSources && getSourceType(source.url) == ST.local) {
-          try {
-            const directories = fs_readDirectoryNames(source.url); // FIXME
-            for (let d of directories) {
-              nextSceneSources.push(
-                new LibrarySource({ url: path_join(source.url, d) }), // FIXME
-              );
-            }
-          } catch (e) {
-            nextSceneSources.push(new LibrarySource({ url: source.url }));
-            console.error(e);
-          }
-        } else {
-          nextSceneSources.push(source);
-        }
-      }
-      nextSources =
-        this.props.nextScene.sourceOrderFunction == SOF.random
-          ? randomizeList(JSON.parse(JSON.stringify(nextSceneSources)))
-          : JSON.parse(JSON.stringify(nextSceneSources));
+      nextSources = await window.ipc.getScraperSources(
+        this.props.nextScene.sources,
+        this.props.nextScene.sourceOrderFunction,
+      );
     }
 
     let sourceLoop = () => {
-      if (!this._isMounted || sceneSources.length == 0 || n >= sources.length)
+      if (!this._isMounted || sources.length == 0 || n >= sources.length)
         return;
 
       const d = sources[n];
@@ -253,7 +216,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       if (this.props.isOverlay) {
         message = ["Loading '" + this.props.scene.name + "'...", message];
       }
-      this.props.setProgress(sceneSources.length, n + 1, message);
+      this.props.setProgress(sources.length, n + 1, message);
 
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
@@ -319,7 +282,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             );
           }
 
-          if (n < sceneSources.length) {
+          if (n < sources.length) {
             const timeout = object?.timeout != null ? object.timeout : 1000;
             window.setTimeout(sourceLoop, timeout);
           } else {

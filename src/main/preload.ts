@@ -297,4 +297,6 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.fileExists, filePath),
   getCachedFileURL: (source: string, url: string, config: Config) =>
     ipcRenderer.invoke(IPC.getCachedFileURL, source, url, config),
+  getScraperSources: (sources: LibrarySource[], sourceOrderFunction: string) =>
+    ipcRenderer.invoke(IPC.getScraperSources, sources, sourceOrderFunction),
 });
