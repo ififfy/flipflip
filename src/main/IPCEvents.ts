@@ -54,9 +54,11 @@ import {
 import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
 import { getFileName, getSourceType } from "../common/utils";
-import { outputFile } from "fs-extra";
+import { move, outputFile } from "fs-extra";
 import LibrarySource from "src/common/LibrarySource";
 import path from "path";
+import { getLocalPath } from "src/node/data/utils";
+import LibraryMoveResult from "src/common/LibraryMoveResult";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -603,9 +605,34 @@ function onDeleteLibrarySource(
   }
 }
 
-function onClearCache(ev: IpcMainEvent, config: Config) {
+function onClearCache(ev: IpcMainInvokeEvent, config: Config) {
   const cachePath = getCachePath(null, config);
   rimrafSync(cachePath);
+}
+
+async function onLibraryMove(
+  ev: IpcMainInvokeEvent,
+  sourceURL: string,
+  config: Config,
+) {
+  let files: string[];
+  const cachePath = getCachePath(sourceURL, config);
+  try {
+    files = await fs.promises.readdir(cachePath);
+  } catch (error) {
+    console.error(error);
+    files = [];
+  }
+
+  let localPath = "";
+  const moved = files.length > 0;
+  if (moved) {
+    localPath = getLocalPath(sourceURL, config);
+    move(cachePath, localPath, console.error);
+  }
+
+  const result: LibraryMoveResult = { moved, count: files.length, localPath };
+  return result;
 }
 
 // Initialize and release listeners
@@ -661,7 +688,8 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getCacheSize, onGetCacheSize);
   ipcMain.on(IPC.scrapeFilesRequest, onScrapeFiles);
   ipcMain.handle(IPC.deleteLibrarySource, onDeleteLibrarySource);
-  ipcMain.handle(IPC.clearCache, onClearCache)
+  ipcMain.handle(IPC.clearCache, onClearCache);
+  ipcMain.handle(IPC.libraryMove, onLibraryMove);
 }
 
 export function releaseIpcEvents() {

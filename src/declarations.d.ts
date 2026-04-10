@@ -5,6 +5,7 @@ import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
 import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
 import { Config } from "./common/Config";
 import LibrarySource from "./common/LibrarySource";
+import LibraryMoveResult from "./common/LibraryMoveResult";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -69,7 +70,7 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard { }
+interface Navigator extends NavigatorClipboard {}
 
 declare global {
   interface Window {
@@ -229,9 +230,13 @@ declare global {
         helpers: { next: any; count: number; retries: number; uuid: string },
       ) => void;
       deleteLibrarySource: (sourceURL: string, config: Config) => Promise<void>;
-      clearCache: (config: Config) => Promise<void>
+      clearCache: (config: Config) => Promise<void>;
+      moveLibrarySource: (
+        sourceURL: string,
+        config: Config,
+      ) => Promise<LibraryMoveResult>;
     };
   }
 }
 
-export { };
+export {};

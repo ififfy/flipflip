@@ -1471,35 +1471,33 @@ class Library extends React.Component<LibraryProps> {
   onFinishMove() {
     for (let source of this.props.library) {
       if (source.offline) {
-        const cachePath = getCachePath(source.url, this.props.config); // FIXME
-        fs_readdir(cachePath, (error, files) => {
-          // FIXME
-          if (!!error || files.length == 0) {
-            this.props.onUpdateLibrary((l) => {
-              l.forEach((s, index) => {
-                if (s.id == source.id) {
-                  l.splice(index, 1);
-                  return;
-                }
+        window.ipc
+          .moveLibrarySource(source.url, this.props.config)
+          .then((result) => {
+            if (result.moved) {
+              this.props.onUpdateLibrary((l) => {
+                l.forEach((s, index) => {
+                  if (s.id == source.id) {
+                    s.url = result.localPath;
+                    s.offline = false;
+                    s.lastCheck = null;
+                    s.count = result.count;
+                    s.countComplete = true;
+                    return;
+                  }
+                });
               });
-            });
-          } else {
-            const localPath = getLocalPath(source.url, this.props.config); // FIXME
-            fsExtra_move(cachePath, localPath, console.error); // FIXME
-            this.props.onUpdateLibrary((l) => {
-              l.forEach((s, index) => {
-                if (s.id == source.id) {
-                  s.url = localPath;
-                  s.offline = false;
-                  s.lastCheck = null;
-                  s.count = files.length;
-                  s.countComplete = true;
-                  return;
-                }
+            } else {
+              this.props.onUpdateLibrary((l) => {
+                l.forEach((s, index) => {
+                  if (s.id == source.id) {
+                    l.splice(index, 1);
+                    return;
+                  }
+                });
               });
-            });
-          }
-        });
+            }
+          });
       }
     }
     this.onCloseMoveDialog();

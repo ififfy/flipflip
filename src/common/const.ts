@@ -274,7 +274,8 @@ const IPC = {
   scrapeFilesRequest: "ipc.scrapeFilesRequest",
   scrapeFilesResponse: "ipc.scrapeFilesResponse",
   deleteLibrarySource: "ipc.deleteLibrarySource",
-  clearCache: "ipc.clearCache"
+  clearCache: "ipc.clearCache",
+  libraryMove: "ipc.libraryMove",
 };
 
 const MO = {
