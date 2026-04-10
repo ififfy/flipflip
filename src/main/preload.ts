@@ -294,4 +294,5 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getBackupFile, backupURL),
   shouldShowDeleteDialog: (sourceURL: string) =>
     ipcRenderer.invoke(IPC.shouldShowDeleteDialog, sourceURL),
+  getGifInfo: (url: string) => ipcRenderer.invoke(IPC.getGifInfo, url)
 });

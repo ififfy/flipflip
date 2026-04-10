@@ -13,10 +13,11 @@ import {
   powerSaveBlocker,
   webFrame,
 } from "electron";
-import { getCachePath, urlToPath } from "../renderer/data/utils";
+import { getCachePath, toArrayBuffer, urlToPath } from "../renderer/data/utils";
 import getFolderSize from "get-folder-size";
 import { Worker } from "worker_threads";
 import { rimrafSync } from "rimraf";
+import gifInfo from "gif-info";
 
 import {
   createNewWindow,
@@ -59,6 +60,7 @@ import LibrarySource from "src/common/LibrarySource";
 import path from "path";
 import { getLocalPath } from "src/node/data/utils";
 import LibraryMoveResult from "src/common/LibraryMoveResult";
+import GifInfo from "src/common/GifInfo";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -761,6 +763,27 @@ function onShouldShowDeleteDialog(ev: IpcMainInvokeEvent, sourceURL: string) {
   );
 }
 
+function onGetGifInfo(ev: IpcMainInvokeEvent, url: string) {
+  return new Promise<GifInfo|null>((resolve) => {
+    // Get gif info. See https://github.com/Prinzhorn/gif-info
+    if (url.includes("file://")) {
+      resolve(
+        gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))),
+      );
+    } else {
+      wretch(url)
+        .get()
+        .arrayBuffer((body) => {
+          resolve(gifInfo(body)); // FIXME gifInfo
+        })
+        .catch((err) => {
+          console.error(err);
+          resolve(null);
+        });
+    }
+  })
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -828,6 +851,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.finishDelete, onFinishDelete);
   ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
   ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
+  ipcMain.handle(IPC.getGifInfo, onGetGifInfo)
 }
 
 export function releaseIpcEvents() {

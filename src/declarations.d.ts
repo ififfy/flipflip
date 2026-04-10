@@ -252,6 +252,7 @@ declare global {
       finishDelete: (filePath: string) => Promise<void>;
       getBackupFile: (backupURL: string) => Promise<string>;
       shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
+      getGifInfo: (url: string) => Promise<GifInfo|null>;
     };
   }
 }

@@ -288,6 +288,7 @@ const IPC = {
   finishDelete: "ipc.finishDelete",
   getBackupFile: "ipc.getBackupFile",
   shouldShowDeleteDialog: "ipc.shouldShowDeleteDialog",
+  getGifInfo: "ipc.getGifInfo"
 };
 
 const MO = {

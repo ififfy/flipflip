@@ -1,5 +1,4 @@
 import * as React from "react";
-import gifInfo from "gif-info";
 
 import { CircularProgress, Container, Typography } from "@mui/material";
 
@@ -9,8 +8,6 @@ import {
   getCachePath,
   getRandomListItem,
   getRandomNumber,
-  toArrayBuffer,
-  urlToPath,
 } from "../../data/utils";
 import { getFileName, getSourceType, isVideo } from "../../../common/utils";
 import Config from "../../../common/Config";
@@ -19,14 +16,8 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import ImageView from "./ImageView";
 import Strobe from "./Strobe";
 import Audio from "../../../common/Audio";
-import { fs_existsSync, fs_readFileSync } from "../../dummy/fs";
-import wretch from "wretch";
-
-class GifInfo {
-  animated: boolean;
-  duration: number;
-  durationChrome: number;
-}
+import { fs_existsSync } from "../../dummy/fs";
+import GifInfo from "src/common/GifInfo";
 
 interface ImagePlayerProps {
   config: Config;
@@ -1229,26 +1220,13 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
           this.props.scene.gifOption != GO.none) &&
         url.includes(".gif")
       ) {
-        // Get gif info. See https://github.com/Prinzhorn/gif-info
-        try {
-          if (url.includes("file://")) {
-            processInfo(
-              gifInfo(toArrayBuffer(fs_readFileSync(urlToPath(url)))), // FIXME gifInfo & fs.readFileSync
-            );
-          } else {
-            wretch(url)
-              .get()
-              .arrayBuffer((body) => {
-                processInfo(gifInfo(body)); // FIXME gifInfo
-              })
-              .catch((err) => {
-                console.error(err);
-                processInfo(null);
-              });
+        window.ipc.getGifInfo(url).then((gifInfo) => {
+          try {
+          processInfo(gifInfo)
+          } catch(e) {
+            console.error(e)
           }
-        } catch (e) {
-          console.error(e);
-        }
+        })
       } else {
         img.src = url;
         window.clearTimeout(this._imgLoadTimeouts[i]);
