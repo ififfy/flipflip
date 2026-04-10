@@ -802,6 +802,22 @@ function onFileExists(ev: IpcMainInvokeEvent, filePath: string) {
   return fs.existsSync(filePath);
 }
 
+function onGetCachedFileURL(
+  ev: IpcMainInvokeEvent,
+  source: string,
+  url: string,
+  config: Config,
+) {
+  const sourceCachePath = getCachePath(source, config);
+  const filePath = sourceCachePath + getFileName(url, path.sep);
+  const cachedAlready = fs.existsSync(filePath);
+  if (cachedAlready) {
+    url = filePath;
+  }
+
+  return url;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -872,6 +888,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
   ipcMain.handle(IPC.getGifInfo, onGetGifInfo);
   ipcMain.handle(IPC.fileExists, onFileExists);
+  ipcMain.handle(IPC.getCachedFileURL, onGetCachedFileURL);
 }
 
 export function releaseIpcEvents() {

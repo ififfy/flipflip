@@ -684,6 +684,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
     }
 
     // Don't bother loading files we've already cached locally
+    let getURL = Promise.resolve(url);
     const fileType = getSourceType(url);
     if (this.props.config.caching.enabled && url.startsWith("http")) {
       if (
@@ -694,546 +695,546 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
         fileType != ST.local &&
         fileType != ST.playlist
       ) {
-        const sourceCachePath = getCachePath(source, this.props.config); // FIXME
-        const filePath =
-          sourceCachePath + getFileName(url, window.constants.pathSep);
-        const cachedAlready = fs_existsSync(filePath); // FIXME
-        if (cachedAlready) {
-          url = filePath;
-        }
+        getURL = window.ipc.getCachedFileURL(source, url, this.props.config);
       }
     }
 
-    if (fileType == ST.nimja) {
-      let iframe = document.createElement("iframe");
-      iframe.setAttribute("source", source);
-      if (!!post) {
-        iframe.setAttribute("post", post);
-      }
-      if (this.props.scene.orderFunction == OF.strict) {
-        iframe.setAttribute("index", urlIndex.toString());
-        iframe.setAttribute("length", sourceLength.toString());
-        if (sourceIndex != null) {
-          iframe.setAttribute("sindex", sourceIndex.toString());
+    getURL.then((url) => {
+      if (fileType == ST.nimja) {
+        let iframe = document.createElement("iframe");
+        iframe.setAttribute("source", source);
+        if (!!post) {
+          iframe.setAttribute("post", post);
         }
-      }
-
-      const successCallback = () => {
-        if (this._imgLoadTimeouts) {
-          window.clearTimeout(this._imgLoadTimeouts[i]);
-        }
-        if (!this._isMounted) return;
-
-        (iframe as any).key = this.state.nextImageID;
-        this.setState({
-          readyToDisplay: this.state.readyToDisplay.concat([iframe]),
-          nextImageID: this.state.nextImageID + 1,
-        });
-        if (this.state.historyPaths.length === 0) {
-          this.advance(false, false);
-        }
-        this.queueRunFetchLoop(i);
-      };
-
-      iframe.oncontextmenu = () => {
-        return false;
-      };
-
-      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
-      iframe.src = url;
-
-      window.clearTimeout(this._imgLoadTimeouts[i]);
-      successCallback();
-    } else if (isVideo(url, false)) {
-      let video = document.createElement("video");
-      video.setAttribute("source", source);
-      if (!!post) {
-        video.setAttribute("post", post);
-      }
-      if (this.props.scene.orderFunction == OF.strict) {
-        video.setAttribute("index", urlIndex.toString());
-        video.setAttribute("length", sourceLength.toString());
-        if (sourceIndex != null) {
-          video.setAttribute("sindex", sourceIndex.toString());
-        }
-      }
-      let subtitleSplit = url.split("|||");
-      if (subtitleSplit.length > 1) {
-        url = subtitleSplit[0];
-        video.setAttribute("subtitles", subtitleSplit[1]);
-      }
-      let clipRegex = /(.*):::(\d+):([\d-]+):::(\d+\.?\d*):(\d+\.?\d*)$/g.exec(
-        url,
-      );
-      if (clipRegex != null) {
-        url = clipRegex[1];
-        video.setAttribute("clip", clipRegex[2]);
-        if (clipRegex[3] != "-") {
-          video.setAttribute("volume", clipRegex[3]);
-        }
-        video.setAttribute("start", clipRegex[4]);
-        video.setAttribute("end", clipRegex[5]);
-      }
-
-      const successCallback = () => {
-        if (this._imgLoadTimeouts) {
-          window.clearTimeout(this._imgLoadTimeouts[i]);
-        }
-        if (!this._isMounted) return;
-        this.props.cache(video);
-
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        if (
-          (this.props.scene.videoOrientation == OT.onlyLandscape &&
-            height > width) ||
-          (this.props.scene.videoOrientation == OT.onlyPortrait &&
-            height < width)
-        ) {
-          errorCallback();
-          return;
+        if (this.props.scene.orderFunction == OF.strict) {
+          iframe.setAttribute("index", urlIndex.toString());
+          iframe.setAttribute("length", sourceLength.toString());
+          if (sourceIndex != null) {
+            iframe.setAttribute("sindex", sourceIndex.toString());
+          }
         }
 
-        if (
-          !video.hasAttribute("start") &&
-          !video.hasAttribute("end") &&
-          (this.props.scene.skipVideoStart > 0 ||
-            this.props.scene.skipVideoEnd > 0) &&
-          video.duration -
-            this.props.scene.skipVideoStart / 1000 -
-            this.props.scene.skipVideoEnd / 1000 >
-            0
-        ) {
-          video.setAttribute(
-            "start",
-            (this.props.scene.skipVideoStart / 1000).toString(),
-          );
-          video.setAttribute(
-            "end",
-            (video.duration - this.props.scene.skipVideoEnd / 1000).toString(),
-          );
+        const successCallback = () => {
+          if (this._imgLoadTimeouts) {
+            window.clearTimeout(this._imgLoadTimeouts[i]);
+          }
+          if (!this._isMounted) return;
+
+          (iframe as any).key = this.state.nextImageID;
+          this.setState({
+            readyToDisplay: this.state.readyToDisplay.concat([iframe]),
+            nextImageID: this.state.nextImageID + 1,
+          });
+          if (this.state.historyPaths.length === 0) {
+            this.advance(false, false);
+          }
+          this.queueRunFetchLoop(i);
+        };
+
+        iframe.oncontextmenu = () => {
+          return false;
+        };
+
+        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+        iframe.src = url;
+
+        window.clearTimeout(this._imgLoadTimeouts[i]);
+        successCallback();
+      } else if (isVideo(url, false)) {
+        let video = document.createElement("video");
+        video.setAttribute("source", source);
+        if (!!post) {
+          video.setAttribute("post", post);
+        }
+        if (this.props.scene.orderFunction == OF.strict) {
+          video.setAttribute("index", urlIndex.toString());
+          video.setAttribute("length", sourceLength.toString());
+          if (sourceIndex != null) {
+            video.setAttribute("sindex", sourceIndex.toString());
+          }
+        }
+        let subtitleSplit = url.split("|||");
+        if (subtitleSplit.length > 1) {
+          url = subtitleSplit[0];
+          video.setAttribute("subtitles", subtitleSplit[1]);
+        }
+        let clipRegex =
+          /(.*):::(\d+):([\d-]+):::(\d+\.?\d*):(\d+\.?\d*)$/g.exec(url);
+        if (clipRegex != null) {
+          url = clipRegex[1];
+          video.setAttribute("clip", clipRegex[2]);
+          if (clipRegex[3] != "-") {
+            video.setAttribute("volume", clipRegex[3]);
+          }
+          video.setAttribute("start", clipRegex[4]);
+          video.setAttribute("end", clipRegex[5]);
         }
 
-        let speed = this.props.scene.videoSpeed;
-        if (this.props.scene.videoRandomSpeed) {
-          speed =
-            Math.floor(
-              Math.random() *
-                (this.props.scene.videoSpeedMax -
-                  this.props.scene.videoSpeedMin +
-                  1),
-            ) + this.props.scene.videoSpeedMin;
-        }
-        video.setAttribute("speed", speed.toString());
+        const successCallback = () => {
+          if (this._imgLoadTimeouts) {
+            window.clearTimeout(this._imgLoadTimeouts[i]);
+          }
+          if (!this._isMounted) return;
+          this.props.cache(video);
 
-        if (video.hasAttribute("start") && video.hasAttribute("end")) {
-          const start = parseFloat(video.getAttribute("start"));
-          const end = parseFloat(video.getAttribute("end"));
+          const width = video.videoWidth;
+          const height = video.videoHeight;
           if (
+            (this.props.scene.videoOrientation == OT.onlyLandscape &&
+              height > width) ||
+            (this.props.scene.videoOrientation == OT.onlyPortrait &&
+              height < width)
+          ) {
+            errorCallback();
+            return;
+          }
+
+          if (
+            !video.hasAttribute("start") &&
+            !video.hasAttribute("end") &&
+            (this.props.scene.skipVideoStart > 0 ||
+              this.props.scene.skipVideoEnd > 0) &&
+            video.duration -
+              this.props.scene.skipVideoStart / 1000 -
+              this.props.scene.skipVideoEnd / 1000 >
+              0
+          ) {
+            video.setAttribute(
+              "start",
+              (this.props.scene.skipVideoStart / 1000).toString(),
+            );
+            video.setAttribute(
+              "end",
+              (
+                video.duration -
+                this.props.scene.skipVideoEnd / 1000
+              ).toString(),
+            );
+          }
+
+          let speed = this.props.scene.videoSpeed;
+          if (this.props.scene.videoRandomSpeed) {
+            speed =
+              Math.floor(
+                Math.random() *
+                  (this.props.scene.videoSpeedMax -
+                    this.props.scene.videoSpeedMin +
+                    1),
+              ) + this.props.scene.videoSpeedMin;
+          }
+          video.setAttribute("speed", speed.toString());
+
+          if (video.hasAttribute("start") && video.hasAttribute("end")) {
+            const start = parseFloat(video.getAttribute("start"));
+            const end = parseFloat(video.getAttribute("end"));
+            if (
+              this.props.scene.randomVideoStart &&
+              (!this.props.scene.continueVideo || !video.currentTime)
+            ) {
+              video.currentTime = start + Math.random() * (end - start);
+            } else if (video.currentTime < start || video.currentTime > end) {
+              video.currentTime = start;
+            }
+          } else if (
             this.props.scene.randomVideoStart &&
             (!this.props.scene.continueVideo || !video.currentTime)
           ) {
-            video.currentTime = start + Math.random() * (end - start);
-          } else if (video.currentTime < start || video.currentTime > end) {
-            video.currentTime = start;
+            video.currentTime = Math.random() * video.duration;
           }
-        } else if (
-          this.props.scene.randomVideoStart &&
-          (!this.props.scene.continueVideo || !video.currentTime)
-        ) {
-          video.currentTime = Math.random() * video.duration;
-        }
 
-        switch (this.props.scene.videoOption) {
-          case VO.full:
-            let duration;
-            if (video.hasAttribute("start") && video.hasAttribute("end")) {
-              const start = video.currentTime
-                ? video.currentTime
-                : parseFloat(video.getAttribute("start"));
-              const end = parseFloat(video.getAttribute("end"));
-              duration = end - start;
-            } else {
-              duration = video.duration - video.currentTime;
-            }
-            duration = (duration * 1000) / (speed / 10);
-            video.setAttribute("duration", duration.toString());
-            break;
-          case VO.part:
-            video.setAttribute(
-              "duration",
-              this.props.scene.videoTimingConstant.toString(),
-            );
-            break;
-          case VO.partr:
-            video.setAttribute(
-              "duration",
-              getRandomNumber(
-                this.props.scene.videoTimingMin,
-                this.props.scene.videoTimingMax,
-              ).toString(),
-            );
-            break;
-          case VO.atLeast:
-            let partDuration;
-            if (video.hasAttribute("start") && video.hasAttribute("end")) {
-              const start = parseFloat(video.getAttribute("start"));
-              const end = parseFloat(video.getAttribute("end"));
-              partDuration = end - start;
-            } else {
-              partDuration = video.duration;
-            }
-            partDuration = (partDuration * 1000) / (speed / 10);
-            let atLeastDuration = 0;
-            do {
-              atLeastDuration += partDuration;
-            } while (atLeastDuration < this.props.scene.videoTimingConstant);
-            video.setAttribute("duration", atLeastDuration.toString());
-            break;
-        }
-
-        (video as any).key = this.state.nextImageID;
-        if (this.props.scene.orderFunction == OF.strict) {
-          const lastIndex = this.state.historyPaths.length
-            ? parseInt(
-                this.state.historyPaths[
-                  this.state.historyPaths.length - 1
-                ].getAttribute("index"),
-              )
-            : -1;
-          let readyToDisplay = this.state.readyToDisplay;
-          let count = 0;
-          while (readyToDisplay.length < urlIndex - lastIndex) {
-            count++;
-            readyToDisplay = readyToDisplay.concat([null]);
-          }
-          readyToDisplay[urlIndex - lastIndex - 1] = video;
-          this.setState({
-            readyToDisplay: readyToDisplay,
-            nextImageID: this.state.nextImageID + 1,
-          });
-        } else {
-          this.setState({
-            readyToDisplay: this.state.readyToDisplay.concat([video]),
-            nextImageID: this.state.nextImageID + 1,
-          });
-        }
-        if (this.state.historyPaths.length === 0) {
-          this.advance(false, false);
-        }
-        this.queueRunFetchLoop(i);
-      };
-
-      const errorCallback = () => {
-        if (this._imgLoadTimeouts) {
-          window.clearTimeout(this._imgLoadTimeouts[i]);
-        }
-        if (!this._isMounted) return;
-        if (
-          this.props.scene.downloadScene ||
-          (this.props.scene.nextSceneAllImages &&
-            this.props.scene.nextSceneID != 0 &&
-            this.props.playNextScene &&
-            video &&
-            video.src)
-        ) {
-          if (!this._playedURLs.includes(video.src)) {
-            this._playedURLs.push(video.src);
-          }
-        }
-        if (this.props.scene.orderFunction == OF.strict) {
-          const lastIndex = this.state.historyPaths.length
-            ? parseInt(
-                this.state.historyPaths[
-                  this.state.historyPaths.length - 1
-                ].getAttribute("index"),
-              )
-            : -1;
-
-          let readyToDisplay = this.state.readyToDisplay;
-          let count = 0;
-          while (readyToDisplay.length < urlIndex - lastIndex) {
-            count++;
-            readyToDisplay = readyToDisplay.concat([null]);
-          }
-          const errImage = new Image();
-          errImage.setAttribute("index", urlIndex.toString());
-          errImage.setAttribute("length", sourceLength.toString());
-          if (sourceIndex != null) {
-            errImage.setAttribute("sindex", sourceIndex.toString());
-          }
-          errImage.src = "src/renderer/icons/flipflip_logo.png";
-          readyToDisplay[urlIndex - lastIndex - 1] = errImage;
-          this.setState({
-            readyToDisplay: readyToDisplay,
-            nextImageID: this.state.nextImageID + 1,
-          });
-        }
-        this.queueRunFetchLoop(i);
-      };
-
-      video.onloadeddata = () => {
-        // images may load immediately, but that messes up the setState()
-        // lifecycle, so always load on the next event loop iteration.
-        // Also, now  we know the image size, so we can finally filter it.
-        if (
-          video.videoWidth < this.props.config.displaySettings.minVideoSize ||
-          video.videoHeight < this.props.config.displaySettings.minVideoSize
-        ) {
-          console.warn(
-            "Video skipped due to minimum width/height: " + video.src,
-          );
-          errorCallback();
-        } else {
-          successCallback();
-        }
-      };
-
-      video.onerror = video.onabort = () => {
-        errorCallback();
-      };
-
-      video.onended = () => {
-        if (this.props.scene.videoOption == VO.full) {
-          window.clearTimeout(this._timeout);
-          this.advance(true, true);
-        } else {
-          video.play();
-        }
-      };
-
-      video.src = url;
-      video.volume = 0;
-      video.preload = "auto";
-
-      window.clearTimeout(this._imgLoadTimeouts[i]);
-      this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 15000);
-
-      video.load();
-    } else {
-      const img = new Image();
-      img.setAttribute("source", source);
-      if (!!post) {
-        img.setAttribute("post", post);
-      }
-      if (this.props.scene.orderFunction == OF.strict) {
-        img.setAttribute("index", urlIndex.toString());
-        img.setAttribute("length", sourceLength.toString());
-        if (sourceIndex != null) {
-          img.setAttribute("sindex", sourceIndex.toString());
-        }
-      }
-
-      const successCallback = () => {
-        if (this._imgLoadTimeouts) {
-          window.clearTimeout(this._imgLoadTimeouts[i]);
-        }
-        if (!this._isMounted) return;
-        this.props.cache(img);
-
-        const width = img.width;
-        const height = img.height;
-        if (
-          (this.props.scene.imageOrientation == OT.onlyLandscape &&
-            height > width) ||
-          (this.props.scene.imageOrientation == OT.onlyPortrait &&
-            height < width)
-        ) {
-          errorCallback();
-          return;
-        }
-
-        (img as any).key = this.state.nextImageID;
-        if (this.props.scene.orderFunction == OF.strict) {
-          const lastIndex = this.state.historyPaths.length
-            ? parseInt(
-                this.state.historyPaths[
-                  this.state.historyPaths.length - 1
-                ].getAttribute("index"),
-              )
-            : -1;
-
-          let readyToDisplay = this.state.readyToDisplay;
-          let count = 0;
-          while (readyToDisplay.length < urlIndex - lastIndex) {
-            count++;
-            readyToDisplay = readyToDisplay.concat([null]);
-          }
-          readyToDisplay[urlIndex - lastIndex - 1] = img;
-          this.setState({
-            readyToDisplay: readyToDisplay,
-            nextImageID: this.state.nextImageID + 1,
-          });
-        } else {
-          this.setState({
-            readyToDisplay: this.state.readyToDisplay.concat([img]),
-            nextImageID: this.state.nextImageID + 1,
-          });
-        }
-        if (this.state.historyPaths.length === 0) {
-          this.advance(false, false);
-        }
-        this.queueRunFetchLoop(i);
-      };
-
-      const errorCallback = () => {
-        if (this._imgLoadTimeouts) {
-          window.clearTimeout(this._imgLoadTimeouts[i]);
-        }
-        if (!this._isMounted) return;
-        if (
-          this.props.scene.downloadScene ||
-          (this.props.scene.nextSceneAllImages &&
-            this.props.scene.nextSceneID != 0 &&
-            this.props.playNextScene &&
-            img &&
-            img.src)
-        ) {
-          if (!this._playedURLs.includes(img.src)) {
-            this._playedURLs.push(img.src);
-          }
-        }
-        if (this.props.scene.orderFunction == OF.strict) {
-          const lastIndex = this.state.historyPaths.length
-            ? parseInt(
-                this.state.historyPaths[
-                  this.state.historyPaths.length - 1
-                ].getAttribute("index"),
-              )
-            : -1;
-
-          let readyToDisplay = this.state.readyToDisplay;
-          let count = 0;
-          while (readyToDisplay.length < urlIndex - lastIndex) {
-            count++;
-            readyToDisplay = readyToDisplay.concat([null]);
-          }
-          const errImage = new Image();
-          errImage.setAttribute("index", urlIndex.toString());
-          errImage.setAttribute("length", sourceLength.toString());
-          if (sourceIndex != null) {
-            errImage.setAttribute("sindex", sourceIndex.toString());
-          }
-          errImage.src = "src/renderer/icons/flipflip_logo.png";
-          readyToDisplay[urlIndex - lastIndex - 1] = errImage;
-          this.setState({
-            readyToDisplay: readyToDisplay,
-            nextImageID: this.state.nextImageID + 1,
-          });
-        }
-        this.queueRunFetchLoop(i);
-      };
-
-      img.onload = () => {
-        // images may load immediately, but that messes up the setState()
-        // lifecycle, so always load on the next event loop iteration.
-        // Also, now  we know the image size, so we can finally filter it.
-        if (
-          img.width < this.props.config.displaySettings.minImageSize ||
-          img.height < this.props.config.displaySettings.minImageSize
-        ) {
-          console.warn("Image skipped due to minimum width/height: " + img.src);
-          errorCallback();
-        } else {
-          successCallback();
-        }
-      };
-
-      img.onerror = img.onabort = () => {
-        errorCallback();
-      };
-
-      const processInfo = (info: GifInfo) => {
-        if (info == null) {
-          this.queueRunFetchLoop(i);
-          return;
-        }
-
-        // If gif is animated and we want to play entire length, store its duration
-        if (info && info.animated) {
-          switch (this.props.scene.gifOption) {
-            case GO.full:
-              img.setAttribute(
+          switch (this.props.scene.videoOption) {
+            case VO.full:
+              let duration;
+              if (video.hasAttribute("start") && video.hasAttribute("end")) {
+                const start = video.currentTime
+                  ? video.currentTime
+                  : parseFloat(video.getAttribute("start"));
+                const end = parseFloat(video.getAttribute("end"));
+                duration = end - start;
+              } else {
+                duration = video.duration - video.currentTime;
+              }
+              duration = (duration * 1000) / (speed / 10);
+              video.setAttribute("duration", duration.toString());
+              break;
+            case VO.part:
+              video.setAttribute(
                 "duration",
-                (!!info.durationChrome
-                  ? info.durationChrome
-                  : info.duration
-                ).toString(),
+                this.props.scene.videoTimingConstant.toString(),
               );
               break;
-            case GO.part:
-              img.setAttribute(
-                "duration",
-                this.props.scene.gifTimingConstant.toString(),
-              );
-              break;
-            case GO.partr:
-              img.setAttribute(
+            case VO.partr:
+              video.setAttribute(
                 "duration",
                 getRandomNumber(
-                  this.props.scene.gifTimingMin,
-                  this.props.scene.gifTimingMax,
+                  this.props.scene.videoTimingMin,
+                  this.props.scene.videoTimingMax,
                 ).toString(),
               );
               break;
-            case GO.atLeast:
-              let duration = 0;
+            case VO.atLeast:
+              let partDuration;
+              if (video.hasAttribute("start") && video.hasAttribute("end")) {
+                const start = parseFloat(video.getAttribute("start"));
+                const end = parseFloat(video.getAttribute("end"));
+                partDuration = end - start;
+              } else {
+                partDuration = video.duration;
+              }
+              partDuration = (partDuration * 1000) / (speed / 10);
+              let atLeastDuration = 0;
               do {
-                duration += !!info.durationChrome
-                  ? info.durationChrome
-                  : info.duration;
-                if (duration == 0) {
-                  break;
-                }
-              } while (duration < this.props.scene.gifTimingConstant);
-              img.setAttribute("duration", duration.toString());
+                atLeastDuration += partDuration;
+              } while (atLeastDuration < this.props.scene.videoTimingConstant);
+              video.setAttribute("duration", atLeastDuration.toString());
               break;
           }
-        }
 
-        // Exclude non-animated gifs from gifs
-        if (
-          this.props.scene.imageTypeFilter == IF.animated &&
-          info &&
-          !info.animated
-        ) {
-          this.queueRunFetchLoop(i);
-          return;
-          // Exclude animated gifs from stills
-        } else if (
-          this.props.scene.imageTypeFilter == IF.stills &&
-          info &&
-          info.animated
-        ) {
-          this.queueRunFetchLoop(i);
-          return;
-        }
-
-        img.src = url;
-        window.clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
-      };
-
-      // Get gifinfo if we need for imageFilter or playing full gif
-      if (
-        (this.props.scene.imageTypeFilter == IF.animated ||
-          this.props.scene.imageTypeFilter == IF.stills ||
-          this.props.scene.gifOption != GO.none) &&
-        url.includes(".gif")
-      ) {
-        window.ipc.getGifInfo(url).then((gifInfo) => {
-          try {
-            processInfo(gifInfo);
-          } catch (e) {
-            console.error(e);
+          (video as any).key = this.state.nextImageID;
+          if (this.props.scene.orderFunction == OF.strict) {
+            const lastIndex = this.state.historyPaths.length
+              ? parseInt(
+                  this.state.historyPaths[
+                    this.state.historyPaths.length - 1
+                  ].getAttribute("index"),
+                )
+              : -1;
+            let readyToDisplay = this.state.readyToDisplay;
+            let count = 0;
+            while (readyToDisplay.length < urlIndex - lastIndex) {
+              count++;
+              readyToDisplay = readyToDisplay.concat([null]);
+            }
+            readyToDisplay[urlIndex - lastIndex - 1] = video;
+            this.setState({
+              readyToDisplay: readyToDisplay,
+              nextImageID: this.state.nextImageID + 1,
+            });
+          } else {
+            this.setState({
+              readyToDisplay: this.state.readyToDisplay.concat([video]),
+              nextImageID: this.state.nextImageID + 1,
+            });
           }
-        });
-      } else {
-        img.src = url;
+          if (this.state.historyPaths.length === 0) {
+            this.advance(false, false);
+          }
+          this.queueRunFetchLoop(i);
+        };
+
+        const errorCallback = () => {
+          if (this._imgLoadTimeouts) {
+            window.clearTimeout(this._imgLoadTimeouts[i]);
+          }
+          if (!this._isMounted) return;
+          if (
+            this.props.scene.downloadScene ||
+            (this.props.scene.nextSceneAllImages &&
+              this.props.scene.nextSceneID != 0 &&
+              this.props.playNextScene &&
+              video &&
+              video.src)
+          ) {
+            if (!this._playedURLs.includes(video.src)) {
+              this._playedURLs.push(video.src);
+            }
+          }
+          if (this.props.scene.orderFunction == OF.strict) {
+            const lastIndex = this.state.historyPaths.length
+              ? parseInt(
+                  this.state.historyPaths[
+                    this.state.historyPaths.length - 1
+                  ].getAttribute("index"),
+                )
+              : -1;
+
+            let readyToDisplay = this.state.readyToDisplay;
+            let count = 0;
+            while (readyToDisplay.length < urlIndex - lastIndex) {
+              count++;
+              readyToDisplay = readyToDisplay.concat([null]);
+            }
+            const errImage = new Image();
+            errImage.setAttribute("index", urlIndex.toString());
+            errImage.setAttribute("length", sourceLength.toString());
+            if (sourceIndex != null) {
+              errImage.setAttribute("sindex", sourceIndex.toString());
+            }
+            errImage.src = "src/renderer/icons/flipflip_logo.png";
+            readyToDisplay[urlIndex - lastIndex - 1] = errImage;
+            this.setState({
+              readyToDisplay: readyToDisplay,
+              nextImageID: this.state.nextImageID + 1,
+            });
+          }
+          this.queueRunFetchLoop(i);
+        };
+
+        video.onloadeddata = () => {
+          // images may load immediately, but that messes up the setState()
+          // lifecycle, so always load on the next event loop iteration.
+          // Also, now  we know the image size, so we can finally filter it.
+          if (
+            video.videoWidth < this.props.config.displaySettings.minVideoSize ||
+            video.videoHeight < this.props.config.displaySettings.minVideoSize
+          ) {
+            console.warn(
+              "Video skipped due to minimum width/height: " + video.src,
+            );
+            errorCallback();
+          } else {
+            successCallback();
+          }
+        };
+
+        video.onerror = video.onabort = () => {
+          errorCallback();
+        };
+
+        video.onended = () => {
+          if (this.props.scene.videoOption == VO.full) {
+            window.clearTimeout(this._timeout);
+            this.advance(true, true);
+          } else {
+            video.play();
+          }
+        };
+
+        video.src = url;
+        video.volume = 0;
+        video.preload = "auto";
+
         window.clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
+        this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 15000);
+
+        video.load();
+      } else {
+        const img = new Image();
+        img.setAttribute("source", source);
+        if (!!post) {
+          img.setAttribute("post", post);
+        }
+        if (this.props.scene.orderFunction == OF.strict) {
+          img.setAttribute("index", urlIndex.toString());
+          img.setAttribute("length", sourceLength.toString());
+          if (sourceIndex != null) {
+            img.setAttribute("sindex", sourceIndex.toString());
+          }
+        }
+
+        const successCallback = () => {
+          if (this._imgLoadTimeouts) {
+            window.clearTimeout(this._imgLoadTimeouts[i]);
+          }
+          if (!this._isMounted) return;
+          this.props.cache(img);
+
+          const width = img.width;
+          const height = img.height;
+          if (
+            (this.props.scene.imageOrientation == OT.onlyLandscape &&
+              height > width) ||
+            (this.props.scene.imageOrientation == OT.onlyPortrait &&
+              height < width)
+          ) {
+            errorCallback();
+            return;
+          }
+
+          (img as any).key = this.state.nextImageID;
+          if (this.props.scene.orderFunction == OF.strict) {
+            const lastIndex = this.state.historyPaths.length
+              ? parseInt(
+                  this.state.historyPaths[
+                    this.state.historyPaths.length - 1
+                  ].getAttribute("index"),
+                )
+              : -1;
+
+            let readyToDisplay = this.state.readyToDisplay;
+            let count = 0;
+            while (readyToDisplay.length < urlIndex - lastIndex) {
+              count++;
+              readyToDisplay = readyToDisplay.concat([null]);
+            }
+            readyToDisplay[urlIndex - lastIndex - 1] = img;
+            this.setState({
+              readyToDisplay: readyToDisplay,
+              nextImageID: this.state.nextImageID + 1,
+            });
+          } else {
+            this.setState({
+              readyToDisplay: this.state.readyToDisplay.concat([img]),
+              nextImageID: this.state.nextImageID + 1,
+            });
+          }
+          if (this.state.historyPaths.length === 0) {
+            this.advance(false, false);
+          }
+          this.queueRunFetchLoop(i);
+        };
+
+        const errorCallback = () => {
+          if (this._imgLoadTimeouts) {
+            window.clearTimeout(this._imgLoadTimeouts[i]);
+          }
+          if (!this._isMounted) return;
+          if (
+            this.props.scene.downloadScene ||
+            (this.props.scene.nextSceneAllImages &&
+              this.props.scene.nextSceneID != 0 &&
+              this.props.playNextScene &&
+              img &&
+              img.src)
+          ) {
+            if (!this._playedURLs.includes(img.src)) {
+              this._playedURLs.push(img.src);
+            }
+          }
+          if (this.props.scene.orderFunction == OF.strict) {
+            const lastIndex = this.state.historyPaths.length
+              ? parseInt(
+                  this.state.historyPaths[
+                    this.state.historyPaths.length - 1
+                  ].getAttribute("index"),
+                )
+              : -1;
+
+            let readyToDisplay = this.state.readyToDisplay;
+            let count = 0;
+            while (readyToDisplay.length < urlIndex - lastIndex) {
+              count++;
+              readyToDisplay = readyToDisplay.concat([null]);
+            }
+            const errImage = new Image();
+            errImage.setAttribute("index", urlIndex.toString());
+            errImage.setAttribute("length", sourceLength.toString());
+            if (sourceIndex != null) {
+              errImage.setAttribute("sindex", sourceIndex.toString());
+            }
+            errImage.src = "src/renderer/icons/flipflip_logo.png";
+            readyToDisplay[urlIndex - lastIndex - 1] = errImage;
+            this.setState({
+              readyToDisplay: readyToDisplay,
+              nextImageID: this.state.nextImageID + 1,
+            });
+          }
+          this.queueRunFetchLoop(i);
+        };
+
+        img.onload = () => {
+          // images may load immediately, but that messes up the setState()
+          // lifecycle, so always load on the next event loop iteration.
+          // Also, now  we know the image size, so we can finally filter it.
+          if (
+            img.width < this.props.config.displaySettings.minImageSize ||
+            img.height < this.props.config.displaySettings.minImageSize
+          ) {
+            console.warn(
+              "Image skipped due to minimum width/height: " + img.src,
+            );
+            errorCallback();
+          } else {
+            successCallback();
+          }
+        };
+
+        img.onerror = img.onabort = () => {
+          errorCallback();
+        };
+
+        const processInfo = (info: GifInfo) => {
+          if (info == null) {
+            this.queueRunFetchLoop(i);
+            return;
+          }
+
+          // If gif is animated and we want to play entire length, store its duration
+          if (info && info.animated) {
+            switch (this.props.scene.gifOption) {
+              case GO.full:
+                img.setAttribute(
+                  "duration",
+                  (!!info.durationChrome
+                    ? info.durationChrome
+                    : info.duration
+                  ).toString(),
+                );
+                break;
+              case GO.part:
+                img.setAttribute(
+                  "duration",
+                  this.props.scene.gifTimingConstant.toString(),
+                );
+                break;
+              case GO.partr:
+                img.setAttribute(
+                  "duration",
+                  getRandomNumber(
+                    this.props.scene.gifTimingMin,
+                    this.props.scene.gifTimingMax,
+                  ).toString(),
+                );
+                break;
+              case GO.atLeast:
+                let duration = 0;
+                do {
+                  duration += !!info.durationChrome
+                    ? info.durationChrome
+                    : info.duration;
+                  if (duration == 0) {
+                    break;
+                  }
+                } while (duration < this.props.scene.gifTimingConstant);
+                img.setAttribute("duration", duration.toString());
+                break;
+            }
+          }
+
+          // Exclude non-animated gifs from gifs
+          if (
+            this.props.scene.imageTypeFilter == IF.animated &&
+            info &&
+            !info.animated
+          ) {
+            this.queueRunFetchLoop(i);
+            return;
+            // Exclude animated gifs from stills
+          } else if (
+            this.props.scene.imageTypeFilter == IF.stills &&
+            info &&
+            info.animated
+          ) {
+            this.queueRunFetchLoop(i);
+            return;
+          }
+
+          img.src = url;
+          window.clearTimeout(this._imgLoadTimeouts[i]);
+          this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
+        };
+
+        // Get gifinfo if we need for imageFilter or playing full gif
+        if (
+          (this.props.scene.imageTypeFilter == IF.animated ||
+            this.props.scene.imageTypeFilter == IF.stills ||
+            this.props.scene.gifOption != GO.none) &&
+          url.includes(".gif")
+        ) {
+          window.ipc.getGifInfo(url).then((gifInfo) => {
+            try {
+              processInfo(gifInfo);
+            } catch (e) {
+              console.error(e);
+            }
+          });
+        } else {
+          img.src = url;
+          window.clearTimeout(this._imgLoadTimeouts[i]);
+          this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
+        }
       }
-    }
+    });
   }
 
   _strictCheckCount = 0;

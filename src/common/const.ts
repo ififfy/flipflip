@@ -291,6 +291,7 @@ const IPC = {
   getGifInfo: "ipc.getGifInfo",
   getConstants: "ipc.getConstants",
   fileExists: "ipc.fileExists",
+  getCachedFileURL: "ipc.getCachedFileURL",
 };
 
 const MO = {

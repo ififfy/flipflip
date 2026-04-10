@@ -71,7 +71,7 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard {}
+interface Navigator extends NavigatorClipboard { }
 
 declare global {
   interface Window {
@@ -256,8 +256,9 @@ declare global {
       shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
       getGifInfo: (url: string) => Promise<GifInfo | null>;
       fileExists: (filePath: string) => Promise<boolean>;
+      getCachedFileURL: (source: string, url: string, config: Config) => Promise<string>
     };
   }
 }
 
-export {};
+export { };

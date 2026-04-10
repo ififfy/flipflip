@@ -295,4 +295,6 @@ contextBridge.exposeInMainWorld("ipc", {
   getGifInfo: (url: string) => ipcRenderer.invoke(IPC.getGifInfo, url),
   fileExists: (filePath: string) =>
     ipcRenderer.invoke(IPC.fileExists, filePath),
+  getCachedFileURL: (source: string, url: string, config: Config) =>
+    ipcRenderer.invoke(IPC.getCachedFileURL, source, url, config),
 });
