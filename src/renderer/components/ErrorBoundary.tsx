@@ -304,7 +304,7 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
   onFinishRestore() {
     this.onCloseDialog();
     try {
-      this.props.onRestore(path_join(saveDir, this.state.backup.url)); // FIXME
+      this.props.onRestore(path_join(saveDir, this.state.backup.url)); // FIXME path.join and saveDir
       this.clearError();
     } catch (e) {
       console.error(e);
