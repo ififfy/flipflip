@@ -236,7 +236,8 @@ declare global {
         config: Config,
       ) => Promise<LibraryMoveResult>;
       portablePathExists: () => Promise<boolean>;
-      validateConfig: (config: Config) => Promise<string>
+      validateConfig: (config: Config) => Promise<string>;
+      deleteAllLibrarySources: (sourceURLs: string[]) => Promise<void>;
     };
   }
 }

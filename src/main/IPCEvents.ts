@@ -639,7 +639,7 @@ function onPortablePathExists() {
   return fs.existsSync(portablePath);
 }
 
-// This should only validate data REQUIRED for FlipFlip to work 
+// This should only validate data REQUIRED for FlipFlip to work
 function onValidateConfig(ev: IpcMainInvokeEvent, config: Config) {
   let errorMessages = "";
   if (
@@ -649,6 +649,28 @@ function onValidateConfig(ev: IpcMainInvokeEvent, config: Config) {
     errorMessages = "Invalid Cache Directory";
   }
   return errorMessages;
+}
+
+function onDeleteAllLibrarySources(
+  ev: IpcMainInvokeEvent,
+  sourceURLs: string[],
+) {
+  for (const sourceURL of sourceURLs) {
+    const fileType = getSourceType(sourceURL);
+    try {
+      if (fileType == ST.local) {
+        rimrafSync(sourceURL);
+      } else if (
+        fileType == ST.video ||
+        fileType == ST.playlist ||
+        fileType == ST.list
+      ) {
+        fs.unlink(sourceURL, () => {});
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 // Initialize and release listeners
@@ -707,7 +729,8 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.clearCache, onClearCache);
   ipcMain.handle(IPC.libraryMove, onLibraryMove);
   ipcMain.handle(IPC.portablePathExists, onPortablePathExists);
-  ipcMain.handle(IPC.validateConfig, onValidateConfig)
+  ipcMain.handle(IPC.validateConfig, onValidateConfig);
+  ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
 }
 
 export function releaseIpcEvents() {

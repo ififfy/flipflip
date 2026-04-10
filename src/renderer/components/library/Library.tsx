@@ -1664,26 +1664,13 @@ class Library extends React.Component<LibraryProps> {
   }
 
   onFinishDeleteAll() {
-    for (let l of this.props.library) {
-      const fileType = getSourceType(l.url);
-      try {
-        if (fileType == ST.local) {
-          fs_rimrafSync(l.url); // FIXME
-        } else if (
-          fileType == ST.video ||
-          fileType == ST.playlist ||
-          fileType == ST.list
-        ) {
-          fs_unlink(l.url, () => {}); //FIXME
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    this.props.onUpdateLibrary((l) => {
-      l.splice(0, l.length);
+    const sourceURLs = this.props.library.map((l) => l.url);
+    window.ipc.deleteAllLibrarySources(sourceURLs).then(() => {
+      this.props.onUpdateLibrary((l) => {
+        l.splice(0, l.length);
+      });
+      this.onCloseDialog();
     });
-    this.onCloseDialog();
   }
 
   onFinishDeleteVisible() {
