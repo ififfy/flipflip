@@ -291,7 +291,7 @@ export default class Meta extends React.Component {
 
               {this.isRoute("audios") && (
                 <AudioLibrary
-                  cachePath={getCachePath(null, this.state.config) /* FIXME */}
+                  config={this.state.config}
                   filters={this.state.audioFilters}
                   library={this.state.audios}
                   progressCurrent={this.state.progressCurrent}

@@ -19,8 +19,9 @@ import withStyles from "@mui/styles/withStyles";
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { extractMusicMetadata, generateThumbnailFile } from "../../data/utils";
+import { extractMusicMetadata, getCachePath } from "../../data/utils";
 import Audio from "../../../common/Audio";
+import Config from "../../../common/Config";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -71,7 +72,7 @@ const styles = (theme: Theme) =>
 interface AudioEditProps {
   classes: any;
   audio: Audio;
-  cachePath: string;
+  config: Config;
   title: string;
   allowSuggestion?: boolean;
   onCancel(): void;
@@ -239,7 +240,7 @@ class AudioEdit extends React.Component<AudioEditProps> {
     // iResult = iResult.filter((i) => isImage(i, true));
     // if (iResult.length > 0) {
     //   const newAudio = this.state.audio;
-    //   newAudio.thumb = generateThumbnailFile(this.props.cachePath, fs_readFileSync(iResult[0]));
+    //   newAudio.thumb = generateThumbnailFile(getCachePath(null, this.state.config) /* FIXME */, fs_readFileSync(iResult[0]));
     //   this.setState({audio: newAudio});
     // }
   }
@@ -250,7 +251,7 @@ class AudioEdit extends React.Component<AudioEditProps> {
       .then((metadata: any) => {
         if (metadata) {
           const newAudio = new Audio(this.state.audio);
-          extractMusicMetadata(newAudio, metadata, this.props.cachePath);
+          extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config) /* FIXME */);
           this.setState({ audio: newAudio });
         }
       })

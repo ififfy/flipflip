@@ -23,7 +23,7 @@ import Playlist from "../../../common/Playlist";
 import AudioSourceListItem from "./AudioSourceListItem";
 import AudioEdit from "./AudioEdit";
 import AudioOptions from "./AudioOptions";
-import { fs_unlinkSync } from "../../dummy/fs";
+import Config from "../../../common/Config";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -53,7 +53,7 @@ const styles = (theme: Theme) =>
 
 interface AudioSourceListProps {
   classes: any;
-  cachePath: string;
+  config: Config;
   isSelect: boolean;
   selected: Array<string>;
   showHelp: boolean;
@@ -215,7 +215,7 @@ class AudioSourceList extends React.Component<AudioSourceListProps> {
         {this.state.sourceEdit != null && (
           <AudioEdit
             audio={this.state.sourceEdit}
-            cachePath={this.props.cachePath}
+            config={this.props.config}
             title={"Edit song info"}
             allowSuggestion
             onCancel={this.onCloseSourceEditDialog.bind(this)}
