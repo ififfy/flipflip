@@ -826,8 +826,9 @@ class SourceList extends React.Component<SourceListProps> {
   }
 
   onFinishClean() {
-    fs_rimrafSync(this.state.cachePath); // FIXME
-    this.onCloseClean();
+    window.ipc.cleanCache(this.state.cachePath).then(() => {
+      this.onCloseClean();
+    });
   }
 
   onCloseClean() {

@@ -282,4 +282,6 @@ contextBridge.exposeInMainWorld("ipc", {
       sourceURL,
       config,
     ),
+  cleanCache: (cachePath: string) =>
+    ipcRenderer.invoke(IPC.cleanCache, cachePath),
 });

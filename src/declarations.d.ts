@@ -246,6 +246,7 @@ declare global {
         sourceURL: string,
         config: Config,
       ) => void;
+      cleanCache: (cachePath: string) => Promise<void>;
     };
   }
 }

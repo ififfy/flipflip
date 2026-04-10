@@ -718,6 +718,10 @@ function onDeleteBlacklistedFile(
   });
 }
 
+function onCleanCache(ev: IpcMainInvokeEvent, cachePath: string) {
+  rimrafSync(cachePath);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -780,6 +784,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
   ipcMain.handle(IPC.getCachePath, onGetCachePath);
   ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
+  ipcMain.handle(IPC.cleanCache, onCleanCache);
 }
 
 export function releaseIpcEvents() {
