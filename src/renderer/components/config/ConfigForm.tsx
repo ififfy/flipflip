@@ -585,7 +585,7 @@ class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   onPortableOverride() {
-    this.onRestore(portablePath); // FIXME
+    this.onRestore(window.ipc.portablePath());
   }
 
   onRestore(backupFile: string) {

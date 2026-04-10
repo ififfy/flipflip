@@ -81,6 +81,7 @@ declare global {
     };
     ipc: {
       platform: () => string;
+      portablePath: () => string;
       newWindow: () => void;
       isFirstWindow: () => Promise<boolean>;
       setProgressBar: (progress: number) => void;
