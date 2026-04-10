@@ -694,9 +694,9 @@ function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string) {
   if (fileType != ST.local) {
     if (fileType == ST.video || fileType == ST.playlist) {
       cachePath =
-        getCachePath(sourceURL, this.props.config) + getFileName(sourceURL); // FIXME
+        getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
     } else {
-      cachePath = getCachePath(sourceURL, this.props.config); // FIXME
+      cachePath = getCachePath(sourceURL, this.props.config);
     }
   }
 
