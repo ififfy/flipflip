@@ -62,8 +62,8 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SortIcon from "@mui/icons-material/Sort";
 
 import { AF, LT, MO, PR, SF, SP, ST } from "../../../common/const";
-import { filterSource, getCachePath, getLocalPath } from "../../data/utils";
-import { getFileName, getSourceType } from "../../../common/utils";
+import { filterSource } from "../../data/utils";
+import { getSourceType } from "../../../common/utils";
 import en from "../../data/en";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
@@ -76,10 +76,7 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
-import {
-  fs_rimrafSync,
-  fs_unlink,
-} from "../../dummy/fs";
+import { fs_rimrafSync, fs_unlink } from "../../dummy/fs";
 
 const drawerWidth = 240;
 
