@@ -180,10 +180,13 @@ export default class PlayerBoolCard2 extends React.Component<PlayerBoolCard2Prop
   onTogglePortable(e: MouseEvent) {
     const input = e.target as HTMLInputElement;
     const checked = input.checked;
-    if (checked && fs_existsSync(portablePath)) {
-      // FIXME fs.exists and portablePath
-      // Ask whether to keep local or keep portable
-      this.onToggleDialog();
+    if (checked) {
+      window.ipc.portablePathExists().then((exists) => {
+        if (exists) {
+          // Ask whether to keep local or keep portable
+          this.onToggleDialog();
+        }
+      });
     }
     this.changeKey("portableMode", checked);
   }

@@ -235,6 +235,7 @@ declare global {
         sourceURL: string,
         config: Config,
       ) => Promise<LibraryMoveResult>;
+      portablePathExists: () => Promise<boolean>;
     };
   }
 }

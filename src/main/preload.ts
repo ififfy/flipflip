@@ -260,4 +260,5 @@ contextBridge.exposeInMainWorld("ipc", {
   clearCache: (config: Config) => ipcRenderer.invoke(IPC.clearCache, config),
   moveLibrarySource: (sourceURL: string, config: Config) =>
     ipcRenderer.invoke(IPC.libraryMove, sourceURL, config),
+  portablePathExists: () => ipcRenderer.invoke(IPC.portablePathExists),
 });

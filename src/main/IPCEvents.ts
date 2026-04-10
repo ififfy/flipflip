@@ -34,7 +34,7 @@ import {
   setProgressBar,
 } from "./WindowManager";
 import { IPC, ST } from "../common/const";
-import { getBackups } from "./utils";
+import { getBackups, portablePath } from "./utils";
 import {
   createNewAppStorage,
   saveAppStorage,
@@ -635,6 +635,10 @@ async function onLibraryMove(
   return result;
 }
 
+function onPortablePathExists() {
+  return fs.existsSync(portablePath);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -690,6 +694,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.deleteLibrarySource, onDeleteLibrarySource);
   ipcMain.handle(IPC.clearCache, onClearCache);
   ipcMain.handle(IPC.libraryMove, onLibraryMove);
+  ipcMain.handle(IPC.portablePathExists, onPortablePathExists);
 }
 
 export function releaseIpcEvents() {
