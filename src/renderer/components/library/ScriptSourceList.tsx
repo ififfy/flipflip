@@ -331,9 +331,10 @@ class ScriptSourceList extends React.Component<ScriptSourceListProps> {
   }
 
   onFinishDelete() {
-    fs_unlinkSync(this.state.deleteDialog.url); // FIXME
-    this.onRemove(this.state.deleteDialog);
-    this.onCloseDeleteDialog();
+    window.ipc.finishDelete(this.state.deleteDialog.url).then(() => {
+      this.onRemove(this.state.deleteDialog);
+      this.onCloseDeleteDialog();
+    });
   }
 
   onRemove(source: CaptionScript) {

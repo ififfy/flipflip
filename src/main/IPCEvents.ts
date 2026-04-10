@@ -742,6 +742,10 @@ function onRevealFile(ev: IpcMainEvent, sourceURL: string, config: Config) {
   }
 }
 
+function onFinishDelete(ev: IpcMainInvokeEvent, filePath: string) {
+  fs.unlinkSync(filePath);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -806,6 +810,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
   ipcMain.handle(IPC.cleanCache, onCleanCache);
   ipcMain.on(IPC.revealFile, onRevealFile);
+  ipcMain.handle(IPC.finishDelete, onFinishDelete);
 }
 
 export function releaseIpcEvents() {
