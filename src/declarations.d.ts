@@ -249,6 +249,7 @@ declare global {
       cleanCache: (cachePath: string) => Promise<void>;
       revealFile: (sourceURL: string, config: Config) => void;
       finishDelete: (filePath: string) => Promise<void>;
+      getBackupFile: (backupURL: string) => Promise<string>;
     };
   }
 }

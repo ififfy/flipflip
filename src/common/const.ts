@@ -286,6 +286,7 @@ const IPC = {
   cleanCache: "ipc.cleanCache",
   revealFile: "ipc.revealFile",
   finishDelete: "ipc.finishDelete",
+  getBackupFile: "ipc.getBackupFile",
 };
 
 const MO = {

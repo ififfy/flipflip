@@ -34,7 +34,7 @@ import {
   setProgressBar,
 } from "./WindowManager";
 import { IPC, ST } from "../common/const";
-import { getBackups, portablePath } from "./utils";
+import { getBackups, portablePath, saveDir } from "./utils";
 import {
   createNewAppStorage,
   saveAppStorage,
@@ -746,6 +746,10 @@ function onFinishDelete(ev: IpcMainInvokeEvent, filePath: string) {
   fs.unlinkSync(filePath);
 }
 
+function onGetBackupFile(ev: IpcMainInvokeEvent, backupURL: string) {
+  return path.join(saveDir, backupURL);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -811,6 +815,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.cleanCache, onCleanCache);
   ipcMain.on(IPC.revealFile, onRevealFile);
   ipcMain.handle(IPC.finishDelete, onFinishDelete);
+  ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
 }
 
 export function releaseIpcEvents() {
