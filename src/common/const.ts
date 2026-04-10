@@ -284,6 +284,7 @@ const IPC = {
   getCachePath: "ipc.getCachePath",
   deleteBlacklistedFile: "ipc.deleteBlacklistedFile",
   cleanCache: "ipc.cleanCache",
+  revealFile: "ipc.revealFile",
 };
 
 const MO = {

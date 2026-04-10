@@ -545,25 +545,7 @@ class SourceListItem extends React.Component<SourceListItemProps> {
         this.props.onDownload(this.props.source);
       }
     } else if (!e.shiftKey && e.ctrlKey && !e.altKey) {
-      const fileType = getSourceType(sourceURL);
-      let cachePath;
-      if (fileType == ST.video || fileType == ST.playlist) {
-        if (
-          fs_existsSync(
-            // FIXME
-            getCachePath(sourceURL, this.props.config) + getFileName(sourceURL), // FIXME
-          )
-        ) {
-          cachePath = getCachePath(sourceURL, this.props.config); // FIXME
-        } else {
-          window.ipc.showItemInFolder(sourceURL);
-        }
-      } else {
-        cachePath = getCachePath(sourceURL, this.props.config); // FIXME
-      }
-      if (cachePath) {
-        this.openDirectory(cachePath);
-      }
+      window.ipc.revealFile(sourceURL, this.props.config);
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
       try {
@@ -600,14 +582,6 @@ class SourceListItem extends React.Component<SourceListItemProps> {
 
   onEndEdit() {
     this.props.onEndEdit(this.state.urlInput);
-  }
-
-  openDirectory(cachePath: string) {
-    if (window.ipc.platform() === "win32") {
-      this.openExternalURL(cachePath);
-    } else {
-      this.openExternalURL(urlToPath(cachePath));
-    }
   }
 
   openExternalURL(url: string) {

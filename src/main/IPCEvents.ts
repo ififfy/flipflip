@@ -722,6 +722,26 @@ function onCleanCache(ev: IpcMainInvokeEvent, cachePath: string) {
   rimrafSync(cachePath);
 }
 
+function onRevealFile(ev: IpcMainEvent, sourceURL: string, config: Config) {
+  const fileType = getSourceType(sourceURL);
+  let cachePath;
+  if (fileType == ST.video || fileType == ST.playlist) {
+    if (
+      fs.existsSync(getCachePath(sourceURL, config) + getFileName(sourceURL))
+    ) {
+      cachePath = getCachePath(sourceURL, config);
+    } else {
+      shell.showItemInFolder(sourceURL);
+    }
+  } else {
+    cachePath = getCachePath(sourceURL, config);
+  }
+  if (cachePath) {
+    const url = process.platform === "win32" ? cachePath : urlToPath(cachePath);
+    shell.openExternal(url);
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -785,6 +805,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getCachePath, onGetCachePath);
   ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
   ipcMain.handle(IPC.cleanCache, onCleanCache);
+  ipcMain.on(IPC.revealFile, onRevealFile);
 }
 
 export function releaseIpcEvents() {
