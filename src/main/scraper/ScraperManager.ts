@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import wretch from "wretch";
 import fileUrl from "file-url";
 import recursiveReaddir from "recursive-readdir";
@@ -350,7 +351,8 @@ if (sourceType == ST.local) {
     pm,
   );
 } else if (sourceType == ST.video) {
-  const cachePath = getCachePath(source.url, config) + getFileName(source.url);
+  const cachePath =
+    getCachePath(source.url, config) + getFileName(source.url, path.sep);
   loadVideo(
     pm,
     allURLs,
@@ -363,7 +365,8 @@ if (sourceType == ST.local) {
     config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
   );
 } else if (sourceType == ST.playlist) {
-  const cachePath = getCachePath(source.url, config) + getFileName(source.url);
+  const cachePath =
+    getCachePath(source.url, config) + getFileName(source.url, path.sep);
   loadPlaylist(
     pm,
     allURLs,

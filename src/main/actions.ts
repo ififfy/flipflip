@@ -118,7 +118,7 @@ export function restoreFromBackup(backupFile: string): AppStorageState {
     openTab: data.openTab ? data.openTab : 0,
     displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
-    scenes: data.scenes.map((s: any) => new Scene(s)),
+    scenes: data.scenes.map((s: any) => new Scene(path.sep, s)),
     sceneGroups: data.sceneGroups
       ? data.sceneGroups.map((g: any) => new SceneGroup(g))
       : Array<SceneGroup>(),

@@ -1,11 +1,9 @@
-// import fs from "fs";
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { IPC } from "../common/const";
 import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
 import LibrarySource from "../common/LibrarySource";
-import { portablePath } from "./utils";
 // import { parseFile } from "music-metadata";
 
 // FIXME these are just dummys
@@ -24,7 +22,7 @@ contextBridge.exposeInMainWorld("files", {
 
 contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
-  portablePath: () => portablePath,
+  getConstants: () => ipcRenderer.invoke(IPC.getConstants),
   newWindow: () => ipcRenderer.send(IPC.newWindow),
   isFirstWindow: () => ipcRenderer.invoke(IPC.isFirstWindow),
   setProgressBar: (progress: number) =>
@@ -294,5 +292,5 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getBackupFile, backupURL),
   shouldShowDeleteDialog: (sourceURL: string) =>
     ipcRenderer.invoke(IPC.shouldShowDeleteDialog, sourceURL),
-  getGifInfo: (url: string) => ipcRenderer.invoke(IPC.getGifInfo, url)
+  getGifInfo: (url: string) => ipcRenderer.invoke(IPC.getGifInfo, url),
 });

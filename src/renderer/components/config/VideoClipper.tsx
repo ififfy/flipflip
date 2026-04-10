@@ -219,7 +219,7 @@ class VideoClipper extends React.Component<VideoClipperProps> {
     super(props);
 
     this.state = {
-      scene: new Scene(),
+      scene: new Scene(window.constants.pathSep),
       video: null as HTMLVideoElement,
       empty: false,
       isEditing: null as Clip,

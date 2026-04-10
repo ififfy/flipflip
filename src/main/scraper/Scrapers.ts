@@ -1,3 +1,4 @@
+import path from "path";
 import wretch from "wretch";
 import { JSDOM } from "jsdom";
 import { DOMParser } from "xmldom";
@@ -34,9 +35,9 @@ export const processAllURLs = (
         source.url,
         sourceURLs.concat(
           data.filter((u: string) => {
-            const fileName = getFileName(u);
+            const fileName = getFileName(u, path.sep);
             const found = sourceURLs
-              .map((u: string) => getFileName(u))
+              .map((u: string) => getFileName(u, path.sep))
               .includes(fileName);
             return !found;
           }),
@@ -44,9 +45,9 @@ export const processAllURLs = (
       );
     } else {
       for (let d of data.filter((u: string) => {
-        const fileName = getFileName(u);
+        const fileName = getFileName(u, path.sep);
         const found = Array.from(newAllURLs.keys())
-          .map((u: string) => getFileName(u))
+          .map((u: string) => getFileName(u, path.sep))
           .includes(fileName);
         return !found;
       })) {
@@ -459,14 +460,14 @@ export const loadReddit = (
         default:
         case RF.hot:
           reddit
-            .getSubreddit(getFileGroup(url))
+            .getSubreddit(getFileGroup(url, path.sep))
             .getHot({ after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
           break;
         case RF.new:
           reddit
-            .getSubreddit(getFileGroup(url))
+            .getSubreddit(getFileGroup(url, path.sep))
             .getNew({ after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
@@ -474,21 +475,21 @@ export const loadReddit = (
         case RF.top:
           const time = source.redditTime == null ? RT.day : source.redditTime;
           reddit
-            .getSubreddit(getFileGroup(url))
+            .getSubreddit(getFileGroup(url, path.sep))
             .getTop({ time: time, after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
           break;
         case RF.controversial:
           reddit
-            .getSubreddit(getFileGroup(url))
+            .getSubreddit(getFileGroup(url, path.sep))
             .getControversial({ after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
           break;
         case RF.rising:
           reddit
-            .getSubreddit(getFileGroup(url))
+            .getSubreddit(getFileGroup(url, path.sep))
             .getRising({ after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
@@ -496,7 +497,7 @@ export const loadReddit = (
       }
     } else if (url.includes("/saved")) {
       reddit
-        .getUser(getFileGroup(url))
+        .getUser(getFileGroup(url, path.sep))
         .getSavedContent({ after: helpers.next })
         .then((submissionListing: any) => {
           if (submissionListing.length > 0) {
@@ -581,7 +582,7 @@ export const loadReddit = (
         });
     } else if (url.includes("/user/") || url.includes("/u/")) {
       reddit
-        .getUser(getFileGroup(url))
+        .getUser(getFileGroup(url, path.sep))
         .getSubmissions({ after: helpers.next })
         .then((submissionListing: any) => {
           if (submissionListing.length > 0) {
@@ -738,7 +739,7 @@ export const loadRedGifs = (
   }
 
   if (url.includes("/users/")) {
-    apiURL += "users/" + getFileGroup(url) + "/search?";
+    apiURL += "users/" + getFileGroup(url, path.sep) + "/search?";
     if (!order) {
       order = "recent";
     }
@@ -954,7 +955,7 @@ export const loadImageFap = (
   const url = source.url;
   if (url.includes("/gallery/") || url.includes("/pictures/")) {
     let images = Array<string>();
-    const gid = getFileGroup(url);
+    const gid = getFileGroup(url, path.sep);
     const baseGalleryURL = "https://www.imagefap.com/gallery/" + gid;
     loadImageFapGallery(
       baseGalleryURL + "?gid=" + gid + "&view=0",
@@ -997,7 +998,7 @@ export const loadImageFap = (
             helpers.count = source.count;
             captcha =
               "https://www.imagefap.com/gallery/" +
-              getFileGroup(url) +
+              getFileGroup(url, path.sep) +
               "?view=2";
             pm({ warning: source.url + " - blocked due to captcha" });
           }
@@ -1040,7 +1041,7 @@ export const loadImageFap = (
             helpers.count = source.count;
             captcha =
               "https://www.imagefap.com/gallery/" +
-              getFileGroup(url) +
+              getFileGroup(url, path.sep) +
               "?view=0";
             images = allURLs.get(url);
             pm({ warning: source.url + " - blocked due to captcha" });
@@ -1197,9 +1198,9 @@ export const loadSexCom = (
   });
   /*let requestURL;
   if (url.includes("/user/")) {
-    requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+    requestURL = "https://www.sex.com/user/" + getFileGroup(url, path.sep) + "?page=" + (helpers.next + 1);
   } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
-    requestURL = "https://www.sex.com/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+    requestURL = "https://www.sex.com/" + getFileGroup(url, path.sep) + "?page=" + (helpers.next + 1);
   }
   wretch(requestURL)
     .get()
@@ -1327,7 +1328,7 @@ export const loadImgur = (
   const timeout = 3000;
   const url = source.url;
   imgur
-    .getAlbumInfo(getFileGroup(url))
+    .getAlbumInfo(getFileGroup(url, path.sep))
     .then((json: any) => {
       const images = json.images.map((i: any) => i.link);
       helpers.next = null;
@@ -1367,7 +1368,7 @@ export const loadDeviantArt = (
   const url = source.url;
   wretch(
     "https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" +
-      getFileGroup(url) +
+      getFileGroup(url, path.sep) +
       "+sort%3Atime+meta%3Aall" +
       (helpers.next != 0 ? "&offset=" + helpers.next : ""),
   )
@@ -2285,7 +2286,7 @@ export const loadLuscious = (
   const timeout = 5000;
   const url = source.url;
   if (url.includes("albums")) {
-    const name = getFileGroup(url);
+    const name = getFileGroup(url, path.sep);
     const id = name.substring(name.indexOf("_") + 1, name.length);
     wretch(
       "https://members.luscious.net/graphql/nobatch/?operationName=AlbumListOwnPictures",
@@ -2388,7 +2389,7 @@ export const loadLuscious = (
         }),
       );
   } else {
-    const id = getFileGroup(url);
+    const id = getFileGroup(url, path.sep);
     if (helpers.next == 0) {
       helpers.next = [0, 0, 0];
     }
@@ -3097,7 +3098,7 @@ async function convertURL(
   // If this is imgur album, return album images
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    let json = await imgur.getAlbumInfo(getFileGroup(url));
+    let json = await imgur.getAlbumInfo(getFileGroup(url, path.sep));
     if (json) {
       return json.data.images.map((i: any) => i.link);
     }

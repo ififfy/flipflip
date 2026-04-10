@@ -23,7 +23,6 @@ import Audio from "./Audio";
 import Overlay from "./Overlay";
 import WeightGroup from "./WeightGroup";
 import CaptionScript from "./CaptionScript";
-import { path_sep } from "../renderer/dummy/path";
 
 export default class Scene {
   id: number = 0;
@@ -296,7 +295,7 @@ export default class Scene {
   countBorderColor: string;
   rotatePortrait: boolean;
 
-  constructor(init?: Partial<Scene>) {
+  constructor(pathSep: string, init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
 
@@ -413,9 +412,9 @@ export default class Scene {
                 a.url.lastIndexOf("."),
               );
             } else {
-              a.url = urlToPath(a.url).replace(/\//g, path_sep()); // FIXME
+              a.url = urlToPath(a.url).replace(/\//g, pathSep);
               a.name = a.url.substring(
-                a.url.lastIndexOf(path_sep()) + 1, // FIXME
+                a.url.lastIndexOf(pathSep) + 1,
                 a.url.lastIndexOf("."),
               );
             }

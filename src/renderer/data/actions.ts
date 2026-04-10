@@ -5,7 +5,6 @@ import {
   applyEffects,
   areWeightsValid,
   filterSource,
-  getCachePath,
   getEffects,
   getRandomIndex,
   randomizeList,
@@ -59,8 +58,7 @@ import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
 import SceneGridCell from "../../common/SceneGridCell";
 import WeightGroup from "../../common/WeightGroup";
-import { fs_existsSync, fs_unlink } from "../dummy/fs";
-import { path_sep } from "../dummy/path";
+import { fs_existsSync } from "../dummy/fs";
 import AppStorageState from "src/common/AppStorageState";
 import { analyze } from "web-audio-beat-detector";
 type State = AppStorageState;
@@ -433,7 +431,7 @@ export function addScene(state: State): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  let scene = new Scene({
+  let scene = new Scene(window.constants.pathSep, {
     id: id,
     name: "New scene",
     sources: new Array<LibrarySource>(),
@@ -795,7 +793,7 @@ export function playGrid(state: State, grid: SceneGrid): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const tempScene = new Scene({
+  const tempScene = new Scene(window.constants.pathSep, {
     id: id,
     name: grid.name,
     overlayEnabled: true,
@@ -838,7 +836,7 @@ export function playAudio(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep()); // FIXME
+    : source.url.replace(/\//g, window.constants.pathSep);
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -850,7 +848,7 @@ export function playAudio(
   const startIndex = displayed.indexOf(
     displayed.find((a) => a.url == source.url),
   );
-  const tempScene = new Scene({
+  const tempScene = new Scene(window.constants.pathSep, {
     id: id,
     name: "audio_scene_temp",
     libraryID: librarySource.id,
@@ -890,7 +888,7 @@ export function playScript(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep()); // FIXME
+    : source.url.replace(/\//g, window.constants.pathSep);
   let librarySource = state.scripts.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Script not found in Library");
@@ -929,7 +927,7 @@ export function playSceneFromLibrary(
 ): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep()); // FIXME
+    : source.url.replace(/\//g, window.constants.pathSep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips = [];
@@ -938,7 +936,7 @@ export function playSceneFromLibrary(
       id = Math.max(s.id + 1, id);
     });
     const sourceType = getSourceType(source.url);
-    let tempScene = new Scene({
+    let tempScene = new Scene(window.constants.pathSep, {
       id: id,
       name: "library_scene_temp",
       sources: [librarySource],
@@ -986,7 +984,7 @@ export function playSceneFromLibrary(
       id = Math.max(s.id + 1, id);
     });
     const sourceType = getSourceType(source.url);
-    let tempScene = new Scene({
+    let tempScene = new Scene(window.constants.pathSep, {
       id: id,
       name: "library_scene_temp",
       sources: [source],
@@ -1061,7 +1059,7 @@ export function clipVideo(
 ) {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep()); // FIXME
+    : source.url.replace(/\//g, window.constants.pathSep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
@@ -1206,7 +1204,7 @@ export function addGenerator(state: State): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  let scene = new Scene({
+  let scene = new Scene(window.constants.pathSep, {
     id: id,
     name: "New Generator",
     sources: new Array<LibrarySource>(),
@@ -2549,9 +2547,8 @@ export function addSource(
         return;
       }
       let rootDir = args[1];
-      if (!rootDir.endsWith(path_sep())) {
-        // FIXME
-        rootDir += path_sep(); // FIXME
+      if (!rootDir.endsWith(window.constants.pathSep)) {
+        rootDir += window.constants.pathSep;
       }
       if (scene != null) {
         return updateScene(state, scene, (s) => {
@@ -2602,7 +2599,7 @@ function getImportURLs(importURL: string, rootDir?: string): string[] {
       }
       if (
         importURLs.includes(fullPath) ||
-        importURLs[u] === path_sep() || // FIXME
+        importURLs[u] === window.constants.pathSep ||
         importURLs[u] === ""
       ) {
         // Remove index and push u back
@@ -2828,8 +2825,8 @@ function scriptSortFunction(
     let aValue: any, bValue: any;
     switch (algorithm) {
       case SF.alpha:
-        aValue = getFileName(a.url).toLowerCase();
-        bValue = getFileName(b.url).toLowerCase();
+        aValue = getFileName(a.url, window.constants.pathSep).toLowerCase();
+        bValue = getFileName(b.url, window.constants.pathSep).toLowerCase();
         break;
       case SF.alphaFull:
         aValue = a.url.toLowerCase();
@@ -2874,8 +2871,8 @@ export function sortSources(
   const getName = (a: LibrarySource) => {
     const sourceType = getSourceType(a.url);
     return sourceType == ST.video || sourceType == ST.playlist
-      ? getFileName(a.url).toLowerCase()
-      : getFileGroup(a.url).toLowerCase();
+      ? getFileName(a.url, window.constants.pathSep).toLowerCase()
+      : getFileGroup(a.url, window.constants.pathSep).toLowerCase();
   };
   const getFullName = (a: LibrarySource) => {
     return a.url.toLowerCase();
@@ -3034,7 +3031,7 @@ function sortFunction(
 export function downloadSource(state: State, source: LibrarySource): Object {
   const sourceURL = source.url.startsWith("http")
     ? source.url
-    : source.url.replace(/\//g, path_sep()); // FIXME
+    : source.url.replace(/\//g, window.constants.pathSep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips = [];
@@ -3042,7 +3039,7 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    let tempScene = new Scene({
+    let tempScene = new Scene(window.constants.pathSep, {
       id: id,
       name: "download_scene_temp",
       sources: [librarySource],
@@ -3082,7 +3079,7 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    let tempScene = new Scene({
+    let tempScene = new Scene(window.constants.pathSep, {
       id: id,
       name: "download_scene_temp",
       sources: [source],
@@ -3218,7 +3215,7 @@ export function importScene(
   let audios = Array<Audio>();
   let scripts = Array<CaptionScript>();
 
-  const scene = new Scene(importScenes[0]);
+  const scene = new Scene(window.constants.pathSep, importScenes[0]);
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -3284,7 +3281,7 @@ export function importScene(
         }
         newGrids = newGrids.concat([grid]);
       } else {
-        const scene = new Scene(importScenes[i]);
+        const scene = new Scene(window.constants.pathSep, importScenes[i]);
         if (!newSceneMap.has(scene.id)) {
           newSceneMap.set(scene.id, id++);
         }

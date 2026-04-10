@@ -56,11 +56,12 @@ import Config from "../common/Config";
 import PlayerMenu from "./PlayerMenu";
 import { getFileName, getSourceType } from "../common/utils";
 import { move, outputFile } from "fs-extra";
-import LibrarySource from "src/common/LibrarySource";
+import LibrarySource from "../common/LibrarySource";
 import path from "path";
-import { getLocalPath } from "src/node/data/utils";
-import LibraryMoveResult from "src/common/LibraryMoveResult";
-import GifInfo from "src/common/GifInfo";
+import { getLocalPath } from "../node/data/utils";
+import LibraryMoveResult from "../common/LibraryMoveResult";
+import GifInfo from "../common/GifInfo";
+import { Constants } from "../common/constants";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -507,7 +508,7 @@ function onCacheImage(
 
   const maxSize = config.caching.maxSize;
   const sourceCachePath = getCachePath(source, config);
-  const filePath = sourceCachePath + getFileName(url);
+  const filePath = sourceCachePath + getFileName(url, path.sep);
   const downloadImage = () => {
     if (!fs.existsSync(filePath)) {
       wretch(url)
@@ -598,7 +599,9 @@ function onDeleteLibrarySource(
       fileType == ST.list
     ) {
       fs.unlinkSync(sourceURL);
-      rimrafSync(getCachePath(sourceURL, config) + getFileName(sourceURL));
+      rimrafSync(
+        getCachePath(sourceURL, config) + getFileName(sourceURL, path.sep),
+      );
     } else {
       rimrafSync(getCachePath(sourceURL, config));
     }
@@ -696,7 +699,8 @@ function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string) {
   if (fileType != ST.local) {
     if (fileType == ST.video || fileType == ST.playlist) {
       cachePath =
-        getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+        getCachePath(sourceURL, this.props.config) +
+        getFileName(sourceURL, path.sep);
     } else {
       cachePath = getCachePath(sourceURL, this.props.config);
     }
@@ -712,7 +716,7 @@ function onDeleteBlacklistedFile(
   config: Config,
 ) {
   const cachePath =
-    getCachePath(sourceURL, config) + getFileName(fileToBlacklist);
+    getCachePath(sourceURL, config) + getFileName(fileToBlacklist, path.sep);
   fs.unlink(cachePath, (err) => {
     if (err) {
       console.error(err);
@@ -729,7 +733,9 @@ function onRevealFile(ev: IpcMainEvent, sourceURL: string, config: Config) {
   let cachePath;
   if (fileType == ST.video || fileType == ST.playlist) {
     if (
-      fs.existsSync(getCachePath(sourceURL, config) + getFileName(sourceURL))
+      fs.existsSync(
+        getCachePath(sourceURL, config) + getFileName(sourceURL, path.sep),
+      )
     ) {
       cachePath = getCachePath(sourceURL, config);
     } else {
@@ -764,12 +770,10 @@ function onShouldShowDeleteDialog(ev: IpcMainInvokeEvent, sourceURL: string) {
 }
 
 function onGetGifInfo(ev: IpcMainInvokeEvent, url: string) {
-  return new Promise<GifInfo|null>((resolve) => {
+  return new Promise<GifInfo | null>((resolve) => {
     // Get gif info. See https://github.com/Prinzhorn/gif-info
     if (url.includes("file://")) {
-      resolve(
-        gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))),
-      );
+      resolve(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
     } else {
       wretch(url)
         .get()
@@ -781,7 +785,12 @@ function onGetGifInfo(ev: IpcMainInvokeEvent, url: string) {
           resolve(null);
         });
     }
-  })
+  });
+}
+
+function onGetConstants() {
+  const value: Constants = { pathSep: path.sep, portablePath };
+  return value;
 }
 
 // Initialize and release listeners
@@ -793,6 +802,7 @@ export function initializeIpcEvents() {
 
   initialized = true;
   ipcMain.on(IPC.newWindow, onRequestCreateNewWindow);
+  ipcMain.handle(IPC.getConstants, onGetConstants);
   ipcMain.handle(IPC.isFirstWindow, onRequestIsFirstWindow);
   ipcMain.handle(IPC.getBackups, onRequestBackups);
   ipcMain.handle(IPC.getAppStorage, onRequestAppStorage);
@@ -851,7 +861,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.finishDelete, onFinishDelete);
   ipcMain.handle(IPC.getBackupFile, onGetBackupFile);
   ipcMain.handle(IPC.shouldShowDeleteDialog, onShouldShowDeleteDialog);
-  ipcMain.handle(IPC.getGifInfo, onGetGifInfo)
+  ipcMain.handle(IPC.getGifInfo, onGetGifInfo);
 }
 
 export function releaseIpcEvents() {

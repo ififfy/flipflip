@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { getBackups, portablePath, saveDir, savePath } from "../utils";
 import { cleanBackups } from "../actions";
 import { Route } from "../../common/Route";
@@ -178,7 +179,7 @@ export default class AppStorage {
           // Convert and add old scenes
           const newScenes = Array<Scene>();
           for (let oldScene of data.scenes) {
-            const newScene = new Scene(oldScene);
+            const newScene = new Scene(path.sep, oldScene);
             let sourceID = 0;
             const newSources = Array<LibrarySource>();
             for (let oldDirectory of oldScene.directories) {
@@ -212,7 +213,7 @@ export default class AppStorage {
             openTab: 0,
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
-            scenes: data.scenes.map((s: any) => new Scene(s)),
+            scenes: data.scenes.map((s: any) => new Scene(path.sep, s)),
             sceneGroups: Array<SceneGroup>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
@@ -407,7 +408,7 @@ export default class AppStorage {
             openTab: data.openTab,
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
-            scenes: data.scenes.map((s: any) => new Scene(s)),
+            scenes: data.scenes.map((s: any) => new Scene(path.sep, s)),
             sceneGroups: data.sceneGroups
               ? data.sceneGroups.map((g: any) => new SceneGroup(g))
               : [],
@@ -467,7 +468,7 @@ export default class AppStorage {
             openTab: data.openTab,
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
-            scenes: data.scenes.map((s: any) => new Scene(s)),
+            scenes: data.scenes.map((s: any) => new Scene(path.sep, s)),
             sceneGroups: data.sceneGroups
               ? data.sceneGroups.map((g: any) => new SceneGroup(g))
               : [],

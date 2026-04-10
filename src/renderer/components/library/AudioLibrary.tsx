@@ -81,7 +81,6 @@ import PlaylistSelect from "../configGroups/PlaylistSelect";
 import PlaylistList from "./PlaylistList";
 import AudioEdit from "./AudioEdit";
 import { fs_existsSync } from "../../dummy/fs";
-import { path_sep } from "../../dummy/path";
 
 const drawerWidth = 240;
 
@@ -1664,7 +1663,7 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
-                url.lastIndexOf(path_sep()) + 1, // FIXME
+                url.lastIndexOf(window.constants.pathSep) + 1,
                 url.lastIndexOf("."),
               );
             }
@@ -1729,7 +1728,7 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(
-                url.lastIndexOf(path_sep()) + 1, // FIXME
+                url.lastIndexOf(window.constants.pathSep) + 1,
                 url.lastIndexOf("."),
               );
             }

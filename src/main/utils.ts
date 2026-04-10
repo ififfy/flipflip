@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { app } from "electron";
 import Backup from "../common/Backup";
+
 export const saveDir = path.join(app.getPath("appData"), "flipflip");
 export const savePath = path.join(saveDir, "data.json");
 export const portablePath = path.join(

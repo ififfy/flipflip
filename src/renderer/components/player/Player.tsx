@@ -283,7 +283,7 @@ export default class Player extends React.Component<PlayerProps> {
         );
         watermarkText = watermarkText.replace(
           "{source_name}",
-          getFileGroup(img.getAttribute("source")),
+          getFileGroup(img.getAttribute("source"), window.constants.pathSep),
         );
         if (img.hasAttribute("post")) {
           watermarkText = watermarkText.replace(
@@ -299,7 +299,7 @@ export default class Player extends React.Component<PlayerProps> {
         );
         watermarkText = watermarkText.replace(
           "{file_name}",
-          decodeURIComponent(getFileName(img.src)),
+          decodeURIComponent(getFileName(img.src, window.constants.pathSep)),
         );
       } else {
         watermarkText = watermarkText.replace(/\s*\{source_url\}\s*/g, "");
@@ -315,7 +315,7 @@ export default class Player extends React.Component<PlayerProps> {
         );
         watermarkText = watermarkText.replace(
           "{audio_name}",
-          getFileName(this.state.currentAudio.url),
+          getFileName(this.state.currentAudio.url, window.constants.pathSep),
         );
         if (this.state.currentAudio.name) {
           watermarkText = watermarkText.replace(

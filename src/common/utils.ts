@@ -1,4 +1,3 @@
-import { path_sep } from "../renderer/dummy/path";
 import { ST } from "./const";
 
 export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
@@ -74,12 +73,12 @@ export function isAudio(path: string, strict: boolean): boolean {
   return false;
 }
 
-export function getFileName(url: string, extension = true) {
+export function getFileName(url: string, pathSep: string, extension = true) {
   let sep;
   if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
     sep = "/";
   } else {
-    sep = path_sep(); // FIXME
+    sep = pathSep;
   }
   url = url.substring(url.lastIndexOf(sep) + 1);
   if (url.includes("?")) {
@@ -157,7 +156,7 @@ export function getSourceType(url: string): string {
   }
 }
 
-export function getFileGroup(url: string) {
+export function getFileGroup(url: string, pathSep: string) {
   let sep;
   switch (getSourceType(url)) {
     case ST.tumblr:
@@ -278,16 +277,15 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/";
       } else {
-        sep = path_sep(); // FIXME
+        sep = pathSep;
       }
       return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
-      if (url.endsWith(path_sep())) {
-        // FIXME
+      if (url.endsWith(pathSep)) {
         url = url.substring(0, url.length - 1);
-        return url.substring(url.lastIndexOf(path_sep()) + 1); // FIXME
+        return url.substring(url.lastIndexOf(pathSep) + 1);
       } else {
-        return url.substring(url.lastIndexOf(path_sep()) + 1); // FIXME
+        return url.substring(url.lastIndexOf(pathSep) + 1);
       }
     case ST.video:
     case ST.playlist:
@@ -295,7 +293,7 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/";
       } else {
-        sep = path_sep(); // FIXME
+        sep = pathSep;
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep) + 1);

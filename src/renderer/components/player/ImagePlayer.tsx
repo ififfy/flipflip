@@ -17,7 +17,7 @@ import ImageView from "./ImageView";
 import Strobe from "./Strobe";
 import Audio from "../../../common/Audio";
 import { fs_existsSync } from "../../dummy/fs";
-import GifInfo from "src/common/GifInfo";
+import GifInfo from "../../../common/GifInfo";
 
 interface ImagePlayerProps {
   config: Config;
@@ -695,7 +695,8 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
         fileType != ST.playlist
       ) {
         const sourceCachePath = getCachePath(source, this.props.config); // FIXME
-        const filePath = sourceCachePath + getFileName(url);
+        const filePath =
+          sourceCachePath + getFileName(url, window.constants.pathSep);
         const cachedAlready = fs_existsSync(filePath); // FIXME
         if (cachedAlready) {
           url = filePath;
@@ -1222,11 +1223,11 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
       ) {
         window.ipc.getGifInfo(url).then((gifInfo) => {
           try {
-          processInfo(gifInfo)
-          } catch(e) {
-            console.error(e)
+            processInfo(gifInfo);
+          } catch (e) {
+            console.error(e);
           }
-        })
+        });
       } else {
         img.src = url;
         window.clearTimeout(this._imgLoadTimeouts[i]);

@@ -288,7 +288,8 @@ const IPC = {
   finishDelete: "ipc.finishDelete",
   getBackupFile: "ipc.getBackupFile",
   shouldShowDeleteDialog: "ipc.shouldShowDeleteDialog",
-  getGifInfo: "ipc.getGifInfo"
+  getGifInfo: "ipc.getGifInfo",
+  getConstants: "ipc.getConstants",
 };
 
 const MO = {

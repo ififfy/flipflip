@@ -6,6 +6,7 @@ import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
 import { Config } from "./common/Config";
 import LibrarySource from "./common/LibrarySource";
 import LibraryMoveResult from "./common/LibraryMoveResult";
+import { Constants } from "./common/constants";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -74,6 +75,7 @@ interface Navigator extends NavigatorClipboard {}
 
 declare global {
   interface Window {
+    constants: Constants;
     files: {
       existsSync: (path: string) => boolean;
       readFileSync: (path: string) => Buffer;
@@ -81,7 +83,7 @@ declare global {
     };
     ipc: {
       platform: () => string;
-      portablePath: () => string;
+      getConstants(): Promise<Constants>;
       newWindow: () => void;
       isFirstWindow: () => Promise<boolean>;
       setProgressBar: (progress: number) => void;
@@ -252,7 +254,7 @@ declare global {
       finishDelete: (filePath: string) => Promise<void>;
       getBackupFile: (backupURL: string) => Promise<string>;
       shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
-      getGifInfo: (url: string) => Promise<GifInfo|null>;
+      getGifInfo: (url: string) => Promise<GifInfo | null>;
     };
   }
 }

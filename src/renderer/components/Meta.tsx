@@ -65,6 +65,9 @@ export default class Meta extends React.Component {
   }
 
   componentDidMount() {
+    window.ipc
+      .getConstants()
+      .then((constants) => (window.constants = constants));
     window.ipc.getAppStorage().then((result) => {
       this.setState(result);
       setInterval(this.queueSave.bind(this), 500);
@@ -144,7 +147,7 @@ export default class Meta extends React.Component {
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
   render() {
-    if (this.state == null) {
+    if (!window.constants || this.state == null) {
       return null;
     }
 

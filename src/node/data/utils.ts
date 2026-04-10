@@ -5,6 +5,7 @@ import { getFileGroup, getSourceType } from "../../common/utils";
 import { ST } from "../../common/const";
 import Config from "../../common/Config";
 import en from "../../renderer/data/en";
+import { saveDir } from "../../main/utils";
 
 export function generateThumbnailFile(cachePath: string, data: Buffer): string {
   let checksumThumbnailPath = cachePath;
@@ -40,7 +41,13 @@ function cachePath(source: string, typeDir: string, config: Config) {
     }
     if (source) {
       if (source != ST.video && source != ST.playlist) {
-        return baseDir + typeDir + path.sep + getFileGroup(source) + path.sep;
+        return (
+          baseDir +
+          typeDir +
+          path.sep +
+          getFileGroup(source, path.sep) +
+          path.sep
+        );
       } else {
         return baseDir + typeDir + path.sep;
       }
@@ -57,7 +64,7 @@ function cachePath(source: string, typeDir: string, config: Config) {
           path.sep +
           typeDir +
           path.sep +
-          getFileGroup(source) +
+          getFileGroup(source, path.sep) +
           path.sep
         );
       } else {
