@@ -240,6 +240,7 @@ declare global {
       deleteAllLibrarySources: (sourceURLs: string[]) => Promise<void>;
       deleteSource: (sourceURL: string) => Promise<void>;
       filterNewScriptSources: (newSources: string[]) => Promise<string[]>;
+      getCachePath: (sourceURL: string) => Promise<string>;
     };
   }
 }

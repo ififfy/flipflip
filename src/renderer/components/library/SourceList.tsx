@@ -818,18 +818,11 @@ class SourceList extends React.Component<SourceListProps> {
   }
 
   onClean(source: LibrarySource) {
-    const sourceURL = source.url;
-    const fileType = getSourceType(sourceURL);
-    if (fileType != ST.local) {
-      let cachePath;
-      if (fileType == ST.video || fileType == ST.playlist) {
-        cachePath =
-          getCachePath(sourceURL, this.props.config) + getFileName(sourceURL); // FIXME
-      } else {
-        cachePath = getCachePath(sourceURL, this.props.config); // FIXME
+    window.ipc.getCachePath(source.url).then((cachePath) => {
+      if (cachePath.length > 0) {
+        this.setState({ cachePath });
       }
-      this.setState({ cachePath: cachePath });
-    }
+    });
   }
 
   onFinishClean() {

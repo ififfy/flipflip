@@ -688,6 +688,21 @@ function onFilterNewScriptSources(
   return newSources.filter((s) => fs.existsSync(s));
 }
 
+function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string) {
+  let cachePath = "";
+  const fileType = getSourceType(sourceURL);
+  if (fileType != ST.local) {
+    if (fileType == ST.video || fileType == ST.playlist) {
+      cachePath =
+        getCachePath(sourceURL, this.props.config) + getFileName(sourceURL); // FIXME
+    } else {
+      cachePath = getCachePath(sourceURL, this.props.config); // FIXME
+    }
+  }
+
+  return cachePath;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -748,6 +763,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
   ipcMain.handle(IPC.deleteSource, onDeleteSource);
   ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
+  ipcMain.handle(IPC.getCachePath, onGetCachePath);
 }
 
 export function releaseIpcEvents() {

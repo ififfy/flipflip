@@ -281,6 +281,7 @@ const IPC = {
   deleteAllLibrarySources: "ipc.deleteAllLibrarySources",
   deleteSource: "ipc.deleteSource",
   filterNewScriptSources: "ipc.filterNewScriptSources",
+  getCachePath: "ipc.getCachePath",
 };
 
 const MO = {
