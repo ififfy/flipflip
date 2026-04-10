@@ -703,6 +703,21 @@ function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string) {
   return cachePath;
 }
 
+function onDeleteBlacklistedFile(
+  ev: IpcMainEvent,
+  fileToBlacklist: string,
+  sourceURL: string,
+  config: Config,
+) {
+  const cachePath =
+    getCachePath(sourceURL, config) + getFileName(fileToBlacklist);
+  fs.unlink(cachePath, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -764,6 +779,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.deleteSource, onDeleteSource);
   ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
   ipcMain.handle(IPC.getCachePath, onGetCachePath);
+  ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
 }
 
 export function releaseIpcEvents() {

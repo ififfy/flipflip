@@ -282,6 +282,7 @@ const IPC = {
   deleteSource: "ipc.deleteSource",
   filterNewScriptSources: "ipc.filterNewScriptSources",
   getCachePath: "ipc.getCachePath",
+  deleteBlacklistedFile: "ipc.deleteBlacklistedFile",
 };
 
 const MO = {

@@ -2049,14 +2049,7 @@ export function blacklistFile(
     }
   }
   if (fileToBlacklist != null) {
-    const cachePath =
-      getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist); // FIXME
-    fs_unlink(cachePath, (err) => {
-      // FIXME
-      if (err) {
-        console.error(err);
-      }
-    });
+    window.ipc.deleteBlacklistedFile(fileToBlacklist, sourceURL, state.config);
   }
   return { library: newLibrary, scenes: newScenes };
 }
