@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 
 import { GeneralSettings } from "../../../common/Config";
-import { portablePath } from "../../data/utils";
 
 interface PlayerBoolCard2Props {
   generalSettings: GeneralSettings;

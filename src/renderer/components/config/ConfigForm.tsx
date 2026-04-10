@@ -56,8 +56,6 @@ import Tag from "../../../common/Tag";
 import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";
-import { portablePath } from "../../data/utils";
-import { fs_existsSync } from "../../dummy/fs";
 
 const drawerWidth = 240;
 

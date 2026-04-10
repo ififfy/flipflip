@@ -32,10 +32,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SaveIcon from "@mui/icons-material/Save";
 
-import { convertFromEpoch, saveDir } from "../../data/utils";
+import { convertFromEpoch } from "../../data/utils";
 import { MO, SS } from "../../../common/const";
 import { GeneralSettings } from "../../../common/Config";
-import { path_join } from "../../dummy/path";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -492,21 +491,23 @@ class BackupCard extends React.Component<BackupCardProps> {
 
   onFinishRestore() {
     this.onCloseDialog();
-    try {
-      this.props.onRestore(path_join(saveDir, this.state.backup.url)); // FIXME path.join and saveDir
-      this.setState({
-        snackbarOpen: true,
-        snackbar: "Restore success!",
-        snackbarSeverity: SS.success,
-      });
-    } catch (e) {
-      console.error(e);
-      this.setState({
-        snackbarOpen: true,
-        snackbar: "Error: " + e,
-        snackbarSeverity: SS.error,
-      });
-    }
+    window.ipc.getBackupFile(this.state.backup.url).then((backupFile) => {
+      try {
+        this.props.onRestore(backupFile);
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Restore success!",
+          snackbarSeverity: SS.success,
+        });
+      } catch (e) {
+        console.error(e);
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Error: " + e,
+          snackbarSeverity: SS.error,
+        });
+      }
+    })
   }
 
   onCloseDialog() {

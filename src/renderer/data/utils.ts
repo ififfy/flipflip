@@ -31,10 +31,6 @@ import Scene from "../../common/Scene";
 import Clip from "../../common/Clip";
 import { fs_readFileSync } from "../dummy/fs";
 
-// dummy, migrated to src/node/data/utils.ts
-export const saveDir = "";
-export const portablePath = "portable-data.json";
-
 export function flatten(array: Array<any>) {
   let values;
   try {
