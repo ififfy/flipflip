@@ -2043,7 +2043,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, allPosts: Map<s
       timeout: timeout,
     }, resolve))
     .text((html) => {
-      let imageEls = domino.createWindow(html).document.querySelectorAll("#gdt > .gdtm > div > a");
+      let imageEls = domino.createWindow(html).document.querySelectorAll("#gdt > a");
       if (imageEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
