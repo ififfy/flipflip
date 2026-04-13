@@ -38,12 +38,10 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import { green, red } from "@mui/material/colors";
 
-import { toArrayBuffer } from "../../data/utils";
 import { RP, TF } from "../../../common/const";
 import en from "../../data/en";
 import Audio from "../../../common/Audio";
 import AudioControl from "../player/AudioControl";
-import { fs_existsSync, fs_readFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

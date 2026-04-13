@@ -10,7 +10,6 @@ import { parseBuffer, parseFile } from "music-metadata";
 import { getFileGroup, getSourceType } from "src/common/utils";
 import { ST } from "../common/const";
 import en from "../renderer/data/en";
-import { toArrayBuffer } from "../renderer/data/utils";
 
 export const saveDir = path.join(app.getPath("appData"), "flipflip");
 export const savePath = path.join(saveDir, "data.json");
@@ -18,6 +17,15 @@ export const portablePath = path.join(
   path.dirname(app.getAppPath()),
   "data.json",
 );
+
+export function toArrayBuffer(buf: Buffer) {
+  let ab = new ArrayBuffer(buf.length);
+  let view = new Uint8Array(ab);
+  for (let j = 0; j < buf.length; ++j) {
+    view[j] = buf[j];
+  }
+  return ab;
+}
 
 export function getBackups(): Array<Backup> {
   const files = fs.readdirSync(saveDir);

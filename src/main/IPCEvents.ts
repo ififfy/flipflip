@@ -15,7 +15,6 @@ import {
 } from "electron";
 import {
   randomizeList,
-  toArrayBuffer,
   urlToPath,
 } from "../renderer/data/utils";
 import getFolderSize from "get-folder-size";
@@ -49,6 +48,7 @@ import {
   getCachePath,
   extractMusicMetadata,
   parseMusicMetadata,
+  toArrayBuffer,
 } from "./utils";
 import {
   createNewAppStorage,
