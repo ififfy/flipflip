@@ -147,8 +147,8 @@ async function onOpenScript(ev: IpcMainEvent) {
   return await openScript(ev.sender.id);
 }
 
-async function onSaveScriptAs(ev: IpcMainEvent, script: string) {
-  return await saveScriptAs(ev.sender.id, script);
+async function onSaveScriptAs(ev: IpcMainEvent, script: string, defaultPath: string) {
+  return await saveScriptAs(ev.sender.id, script, defaultPath);
 }
 
 function onSaveScript(ev: IpcMainEvent, url: string, script: string) {

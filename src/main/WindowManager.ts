@@ -299,7 +299,11 @@ export async function openScript(windowId: number) {
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
 }
 
-export async function saveScriptAs(windowId: number, script: string) {
+export async function saveScriptAs(
+  windowId: number,
+  script: string,
+  defaultPath: string,
+) {
   const window = currentWindows.get(windowId);
   if (window == null) {
     return undefined;
@@ -307,7 +311,7 @@ export async function saveScriptAs(windowId: number, script: string) {
 
   const result = await dialog.showSaveDialog(window, {
     filters: [{ name: "Text Document", extensions: ["txt"] }],
-    defaultPath: this.state.captionScript.url,
+    defaultPath,
   });
 
   if (result.canceled) {

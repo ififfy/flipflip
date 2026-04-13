@@ -53,8 +53,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.openScripts, shiftKey),
   openSubtitle: () => ipcRenderer.invoke(IPC.openSubtitle),
   openScript: () => ipcRenderer.invoke(IPC.openScript),
-  saveScriptAs: (script: string) =>
-    ipcRenderer.invoke(IPC.saveScriptAs, script),
+  saveScriptAs: (script: string, defaultPath: string) =>
+    ipcRenderer.invoke(IPC.saveScriptAs, script, defaultPath),
   saveScript: (url: string, script: string) =>
     ipcRenderer.invoke(IPC.saveScript, url, script),
   getFonts: () => ipcRenderer.invoke(IPC.getFonts),

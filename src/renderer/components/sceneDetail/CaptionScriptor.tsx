@@ -1325,7 +1325,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
   onSaveAs(callback?: () => void) {
     this.onCloseDialog();
     window.ipc
-      .saveScriptAs(this.state.captionScript.script)
+      .saveScriptAs(this.state.captionScript.script, this.state.captionScript.url)
       .then((filePath) => {
         if (filePath == null) {
           return;
