@@ -253,14 +253,7 @@ function onSetFullScreen(ev: IpcMainEvent, fullScreen: boolean) {
   PlayerMenu.setFullScreen(fullScreen);
 }
 
-function onCopyImageToClipboard(ev: IpcMainEvent, sourceURL: string) {
-  let url = sourceURL;
-  if (!url) {
-    url =
-      this.props.historyPaths[
-        this.props.historyPaths.length - 1 + this.props.historyOffset
-      ].src;
-  }
+function onCopyImageToClipboard(ev: IpcMainEvent, url: string) {
   const isFile = url.startsWith("file://");
   const path = urlToPath(url);
   const imagePath = isFile ? path : url;

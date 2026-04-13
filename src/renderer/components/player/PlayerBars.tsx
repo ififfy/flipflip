@@ -1402,7 +1402,15 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   }
 
   copyImageToClipboard(sourceURL: string) {
-    window.ipc.copyImageToClipboard(sourceURL);
+    let url = sourceURL;
+    if (!url) {
+      url =
+        this.props.historyPaths[
+          this.props.historyPaths.length - 1 + this.props.historyOffset
+        ].src;
+    }
+
+    window.ipc.copyImageToClipboard(url);
   }
 
   /* Menu and hotkey options DON'T DELETE */
