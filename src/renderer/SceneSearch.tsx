@@ -7,7 +7,7 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
-import Scene from "./data/Scene";
+import Scene from "../common/Scene";
 
 const styles = (theme: Theme) =>
   createStyles({

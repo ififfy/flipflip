@@ -1,7 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import { parseBuffer, parseFile } from "music-metadata";
-import wretch from "wretch";
 
 import {
   AppBar,

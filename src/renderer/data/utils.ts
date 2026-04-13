@@ -23,7 +23,6 @@ import {
   WF,
 } from "../../common/const";
 import en from "../../common/en";
-import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import Audio from "../../common/Audio";
 import WeightGroup from "../../common/WeightGroup";

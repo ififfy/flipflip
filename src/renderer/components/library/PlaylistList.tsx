@@ -7,7 +7,6 @@ import {
   CardMedia,
   Grid,
   Theme,
-  Tooltip,
   Typography,
 } from "@mui/material";
 

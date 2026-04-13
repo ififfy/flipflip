@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import { parseFile } from "music-metadata";
 
 import {
   Button,

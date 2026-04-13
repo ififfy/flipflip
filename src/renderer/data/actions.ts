@@ -57,7 +57,7 @@ import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
 import SceneGridCell from "../../common/SceneGridCell";
 import WeightGroup from "../../common/WeightGroup";
-import AppStorageState from "src/common/AppStorageState";
+import AppStorageState from "../../common/AppStorageState";
 import { analyze } from "web-audio-beat-detector";
 type State = AppStorageState;
 

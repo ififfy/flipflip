@@ -35,7 +35,7 @@ import {
   setProgressBar,
   openImage,
 } from "./WindowManager";
-import { IPC, SOF, ST } from "../common/const";
+import { IPC, ST } from "../common/const";
 import {
   getBackups,
   portablePath,

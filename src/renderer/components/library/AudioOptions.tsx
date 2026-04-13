@@ -1,8 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
 import { analyze } from "web-audio-beat-detector";
-import { parseFile } from "music-metadata";
-import wretch from "wretch";
 
 import {
   Button,

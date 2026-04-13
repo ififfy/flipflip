@@ -1,4 +1,4 @@
-import AppStorageState from "src/common/AppStorageState";
+import AppStorageState from "../../common/AppStorageState";
 import AppStorage from "./AppStorage";
 
 // Current storage list

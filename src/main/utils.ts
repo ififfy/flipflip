@@ -7,7 +7,7 @@ import Backup from "../common/Backup";
 import Audio from "../common/Audio";
 import Config from "../common/Config";
 import { parseBuffer, parseFile } from "music-metadata";
-import { getFileGroup, getSourceType } from "src/common/utils";
+import { getFileGroup, getSourceType } from "../common/utils";
 import { ST } from "../common/const";
 import en from "../common/en";
 
