@@ -1,4 +1,4 @@
-import { urlToPath } from "../renderer/data/utils";
+import { urlToPath } from "./utils";
 import {
   BT,
   EA,
@@ -295,7 +295,7 @@ export default class Scene {
   countBorderColor: string;
   rotatePortrait: boolean;
 
-  constructor(pathSep: string, init?: Partial<Scene>) {
+  constructor(pathSep: string, platform: string, init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
 
@@ -412,7 +412,7 @@ export default class Scene {
                 a.url.lastIndexOf("."),
               );
             } else {
-              a.url = urlToPath(a.url).replace(/\//g, pathSep);
+              a.url = urlToPath(a.url, platform).replace(/\//g, pathSep);
               a.name = a.url.substring(
                 a.url.lastIndexOf(pathSep) + 1,
                 a.url.lastIndexOf("."),

@@ -39,8 +39,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 import { PT, ST } from "../../../common/const";
-import { urlToPath } from "../../data/utils";
-import { getSourceType } from "../../../common/utils";
+import { getSourceType, urlToPath } from "../../../common/utils";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
 import Scene from "../../../common/Scene";
@@ -1436,7 +1435,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
         ];
       const url = img.src;
       const isFile = url.startsWith("file://");
-      const path = urlToPath(url);
+      const path = urlToPath(url, window.ipc.platform());
       if (isFile) {
         this.onDeletePath(path);
       }
@@ -1452,7 +1451,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     const source = img.getAttribute("source");
     const url = img.src;
     const isFile = url.startsWith("file://");
-    const path = urlToPath(url);
+    const path = urlToPath(url, window.ipc.platform());
     const type = getSourceType(source);
     if (
       (!isFile && type != ST.video && type != ST.playlist) ||

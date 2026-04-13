@@ -13,10 +13,7 @@ import {
   powerSaveBlocker,
   webFrame,
 } from "electron";
-import {
-  randomizeList,
-  urlToPath,
-} from "../renderer/data/utils";
+import { urlToPath } from "../common/utils";
 import getFolderSize from "get-folder-size";
 import { Worker } from "worker_threads";
 import { rimrafSync } from "rimraf";
@@ -269,7 +266,7 @@ function onSetFullScreen(ev: IpcMainEvent, fullScreen: boolean) {
 
 function onCopyImageToClipboard(ev: IpcMainEvent, url: string) {
   const isFile = url.startsWith("file://");
-  const path = urlToPath(url);
+  const path = urlToPath(url, process.platform);
   const imagePath = isFile ? path : url;
   if (
     imagePath.toLocaleLowerCase().endsWith(".png") ||
@@ -313,10 +310,10 @@ function onShowPlayerContextMenu(
   let contextMenu = new Menu();
   const literalSource = source;
   if (/^https?:\/\//g.exec(source) == null) {
-    source = urlToPath(fileUrl(source));
+    source = urlToPath(fileUrl(source), process.platform);
   }
   const isFile = url.startsWith("file://");
-  const path = urlToPath(url);
+  const path = urlToPath(url, process.platform);
   const type = getSourceType(source);
   contextMenu.append(
     new MenuItem({
@@ -766,7 +763,10 @@ function onRevealFile(ev: IpcMainEvent, sourceURL: string, config: Config) {
     cachePath = getCachePath(sourceURL, config);
   }
   if (cachePath) {
-    const url = process.platform === "win32" ? cachePath : urlToPath(cachePath);
+    const url =
+      process.platform === "win32"
+        ? cachePath
+        : urlToPath(cachePath, process.platform);
     shell.openExternal(url);
   }
 }
@@ -799,7 +799,11 @@ function onGetGifInfo(ev: IpcMainInvokeEvent, url: string) {
   return new Promise<GifInfo | null>((resolve) => {
     // Get gif info. See https://github.com/Prinzhorn/gif-info
     if (url.includes("file://")) {
-      resolve(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
+      resolve(
+        gifInfo(
+          toArrayBuffer(fs.readFileSync(urlToPath(url, process.platform))),
+        ),
+      );
     } else {
       wretch(url)
         .get()

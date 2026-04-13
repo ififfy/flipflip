@@ -23,7 +23,7 @@ import withStyles from "@mui/styles/withStyles";
 import BuildIcon from "@mui/icons-material/Build";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { urlToPath } from "../../data/utils";
+import { urlToPath } from "../../../common/utils";
 import Tag from "../../../common/Tag";
 import SourceIcon from "./SourceIcon";
 import CaptionScript from "../../../common/CaptionScript";
@@ -340,10 +340,11 @@ class ScriptSourceListItem extends React.Component<ScriptSourceListItemProps> {
   }
 
   openDirectory(cachePath: string) {
-    if (window.ipc.platform() === "win32") {
+    const platform = window.ipc.platform();
+    if (platform === "win32") {
       this.openExternalURL(cachePath);
     } else {
-      this.openExternalURL(urlToPath(cachePath));
+      this.openExternalURL(urlToPath(cachePath, platform));
     }
   }
 

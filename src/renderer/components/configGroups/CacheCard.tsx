@@ -28,7 +28,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 import Config, { CacheSettings } from "../../../common/Config";
-import { urlToPath } from "../../data/utils";
+import { urlToPath } from "../../../common/utils";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -314,10 +314,11 @@ class CacheCard extends React.Component<CacheCardProps> {
   }
 
   openDirectory() {
-    if (window.ipc.platform() === "win32") {
+    const platform = window.ipc.platform();
+    if (platform === "win32") {
       this.openExternalURL(this.state.cachePath);
     } else {
-      this.openExternalURL(urlToPath(this.state.cachePath));
+      this.openExternalURL(urlToPath(this.state.cachePath, platform));
     }
   }
 

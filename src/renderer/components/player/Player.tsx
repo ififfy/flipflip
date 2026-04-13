@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 
 import { SL, WC } from "../../../common/const";
-import { getRandomListItem, urlToPath } from "../../data/utils";
-import { getFileGroup, getFileName } from "../../../common/utils";
+import { getRandomListItem } from "../../data/utils";
+import { getFileGroup, getFileName, urlToPath } from "../../../common/utils";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import Config from "../../../common/Config";
@@ -295,7 +295,9 @@ export default class Player extends React.Component<PlayerProps> {
         }
         watermarkText = watermarkText.replace(
           "{file_url}",
-          img.src.startsWith("file") ? urlToPath(img.src) : img.src,
+          img.src.startsWith("file")
+            ? urlToPath(img.src, window.ipc.platform())
+            : img.src,
         );
         watermarkText = watermarkText.replace(
           "{file_name}",

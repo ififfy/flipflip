@@ -271,15 +271,6 @@ export function htmlEntities(str: string): string {
     .replace(/\\n/g, "<br/>");
 }
 
-export function urlToPath(url: string): string {
-  const path = new URL(url).pathname;
-  if (window.ipc.platform() === "win32") {
-    return decodeURIComponent(path.substring(1, path.length));
-  } else {
-    return decodeURIComponent(path);
-  }
-}
-
 export function arrayMove(arr: any[], old_index: number, new_index: number) {
   if (new_index >= arr.length) {
     let k = new_index - arr.length + 1;

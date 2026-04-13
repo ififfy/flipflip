@@ -34,8 +34,8 @@ import withStyles from "@mui/styles/withStyles";
 
 import FolderIcon from "@mui/icons-material/Folder";
 
-import { arrayMove, getTimestamp, urlToPath } from "../../data/utils";
-import { getSourceType } from "../../../common/utils";
+import { arrayMove, getTimestamp } from "../../data/utils";
+import { getSourceType, urlToPath } from "../../../common/utils";
 import { RF, RT, SDT, ST } from "../../../common/const";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
@@ -827,10 +827,11 @@ class SourceList extends React.Component<SourceListProps> {
   }
 
   openDirectory(cachePath: string) {
-    if (window.ipc.platform() === "win32") {
+    const platform = window.ipc.platform();
+    if (platform === "win32") {
       this.openExternalURL(cachePath);
     } else {
-      this.openExternalURL(urlToPath(cachePath));
+      this.openExternalURL(urlToPath(cachePath, platform));
     }
   }
 

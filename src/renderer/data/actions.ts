@@ -429,7 +429,7 @@ export function addScene(state: State): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  let scene = new Scene(window.constants.pathSep, {
+  let scene = new Scene(window.constants.pathSep, window.ipc.platform(), {
     id: id,
     name: "New scene",
     sources: new Array<LibrarySource>(),
@@ -791,7 +791,7 @@ export function playGrid(state: State, grid: SceneGrid): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const tempScene = new Scene(window.constants.pathSep, {
+  const tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
     id: id,
     name: grid.name,
     overlayEnabled: true,
@@ -846,7 +846,7 @@ export function playAudio(
   const startIndex = displayed.indexOf(
     displayed.find((a) => a.url == source.url),
   );
-  const tempScene = new Scene(window.constants.pathSep, {
+  const tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
     id: id,
     name: "audio_scene_temp",
     libraryID: librarySource.id,
@@ -934,7 +934,7 @@ export function playSceneFromLibrary(
       id = Math.max(s.id + 1, id);
     });
     const sourceType = getSourceType(source.url);
-    let tempScene = new Scene(window.constants.pathSep, {
+    let tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
       id: id,
       name: "library_scene_temp",
       sources: [librarySource],
@@ -982,7 +982,7 @@ export function playSceneFromLibrary(
       id = Math.max(s.id + 1, id);
     });
     const sourceType = getSourceType(source.url);
-    let tempScene = new Scene(window.constants.pathSep, {
+    let tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
       id: id,
       name: "library_scene_temp",
       sources: [source],
@@ -1202,7 +1202,7 @@ export function addGenerator(state: State): Object {
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  let scene = new Scene(window.constants.pathSep, {
+  let scene = new Scene(window.constants.pathSep, window.ipc.platform(), {
     id: id,
     name: "New Generator",
     sources: new Array<LibrarySource>(),
@@ -3037,7 +3037,7 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    let tempScene = new Scene(window.constants.pathSep, {
+    let tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
       id: id,
       name: "download_scene_temp",
       sources: [librarySource],
@@ -3077,7 +3077,7 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    let tempScene = new Scene(window.constants.pathSep, {
+    let tempScene = new Scene(window.constants.pathSep, window.ipc.platform(), {
       id: id,
       name: "download_scene_temp",
       sources: [source],
@@ -3213,7 +3213,11 @@ export function importScene(
   let audios = Array<Audio>();
   let scripts = Array<CaptionScript>();
 
-  const scene = new Scene(window.constants.pathSep, importScenes[0]);
+  const scene = new Scene(
+    window.constants.pathSep,
+    window.ipc.platform(),
+    importScenes[0],
+  );
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -3279,7 +3283,11 @@ export function importScene(
         }
         newGrids = newGrids.concat([grid]);
       } else {
-        const scene = new Scene(window.constants.pathSep, importScenes[i]);
+        const scene = new Scene(
+          window.constants.pathSep,
+          window.ipc.platform(),
+          importScenes[i],
+        );
         if (!newSceneMap.has(scene.id)) {
           newSceneMap.set(scene.id, id++);
         }

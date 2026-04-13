@@ -6,7 +6,8 @@ import recursiveReaddir from "recursive-readdir";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import { IF, ST } from "../../common/const";
-import { getCachePath, urlToPath } from "../../renderer/data/utils";
+import { urlToPath } from "../../common/utils";
+import { getCachePath } from "../utils";
 import {
   filterPathsToJustPlayable,
   loadBDSMlr,
@@ -91,7 +92,7 @@ const loadLocalDirectory = (
         sources = sources.filter(
           (url: string) =>
             !source.blacklist.includes(url) &&
-            !source.blacklist.includes(urlToPath(url)),
+            !source.blacklist.includes(urlToPath(url, process.platform)),
         );
       }
       allURLs = processAllURLs(sources, allURLs, source, weight, helpers);

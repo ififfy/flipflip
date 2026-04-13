@@ -322,3 +322,12 @@ export function getFileGroup(url: string, pathSep: string) {
       return "piwigo";
   }
 }
+
+export function urlToPath(url: string, platform: string): string {
+  const path = new URL(url).pathname;
+  if (platform === "win32") {
+    return decodeURIComponent(path.substring(1, path.length));
+  } else {
+    return decodeURIComponent(path);
+  }
+}
