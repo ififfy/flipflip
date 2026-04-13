@@ -147,7 +147,11 @@ async function onOpenScript(ev: IpcMainEvent) {
   return await openScript(ev.sender.id);
 }
 
-async function onSaveScriptAs(ev: IpcMainEvent, script: string, defaultPath: string) {
+async function onSaveScriptAs(
+  ev: IpcMainEvent,
+  script: string,
+  defaultPath: string,
+) {
   return await saveScriptAs(ev.sender.id, script, defaultPath);
 }
 
@@ -693,14 +697,17 @@ function onFilterNewScriptSources(
   return newSources.filter((s) => fs.existsSync(s));
 }
 
-function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string, config: Config) {
+function onGetCachePath(
+  ev: IpcMainInvokeEvent,
+  sourceURL: string,
+  config: Config,
+) {
   let cachePath = "";
   const fileType = getSourceType(sourceURL);
   if (fileType != ST.local) {
     if (fileType == ST.video || fileType == ST.playlist) {
       cachePath =
-        getCachePath(sourceURL, config) +
-        getFileName(sourceURL, path.sep);
+        getCachePath(sourceURL, config) + getFileName(sourceURL, path.sep);
     } else {
       cachePath = getCachePath(sourceURL, config);
     }
