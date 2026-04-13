@@ -3668,57 +3668,38 @@ export function detectBPMs(getState: () => State, setState: Function) {
     };
 
     const detectBPM = (data: ArrayBuffer) => {
-      const maxByteSize = 200000000;
-      if (data.byteLength < maxByteSize) {
-        const state = getState();
-        let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
-        context.decodeAudioData(
-          data,
-          (buffer) => {
-            analyze(buffer)
-              .then((tempo: number) => {
-                audio.bpm = Number.parseFloat(tempo.toFixed(2));
-                state.progressCurrent = offset + 1;
-                setState({ progressCurrent: state.progressCurrent });
-                window.ipc.setProgressBar(
-                  state.progressCurrent / state.progressTotal,
-                );
-                setTimeout(detectBPMLoop, 100);
-              })
-              .catch((e: any) => {
-                bpmError(e);
-              });
-          },
-          (e) => {
-            bpmError(e);
-          },
-        );
-      } else {
-        console.error("'" + audio.url + "' is too large to decode");
-      }
+      const state = getState();
+      let context = new AudioContext();
+      context.decodeAudioData(
+        data,
+        (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              audio.bpm = Number.parseFloat(tempo.toFixed(2));
+              state.progressCurrent = offset + 1;
+              setState({ progressCurrent: state.progressCurrent });
+              window.ipc.setProgressBar(
+                state.progressCurrent / state.progressTotal,
+              );
+              setTimeout(detectBPMLoop, 100);
+            })
+            .catch((e: any) => {
+              bpmError(e);
+            });
+        },
+        (e) => {
+          bpmError(e);
+        },
+      );
     };
 
-    try {
-      const url = audio.url;
-      // FIXME
-      // have to use IPC for file operations
-      // maybe you can create a file url (file://path/to/file.mp3)
-      // pass that to an audio element and load the file that way?
-      if (window.files.existsSync(url)) {
-        detectBPM(toArrayBuffer(window.files.readFileSync(url)));
+    window.ipc.getAudioBuffer(audio.url).then((response) => {
+      if (response.arrayBuffer != null) {
+        detectBPM(response.arrayBuffer);
       } else {
-        wretch(url)
-          .get()
-          .arrayBuffer((body) => {
-            detectBPM(body);
-          })
-          .catch((e) => {
-            bpmError(e);
-          });
+        bpmError(response.error);
       }
-    } catch (e) {
-      bpmError(e);
-    }
+    });
   };
 
   const detectBPMLoop = () => {
