@@ -68,7 +68,7 @@ import { red } from "@mui/material/colors";
 
 import { isAudio } from "../../../common/utils";
 import { AF, ASF, ALT, MO, SP, PR } from "../../../common/const";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Audio from "../../../common/Audio";
 import Playlist from "../../../common/Playlist";
 import Tag from "../../../common/Tag";

@@ -36,7 +36,7 @@ import withStyles from "@mui/styles/withStyles";
 
 import Config, { RemoteSettings } from "../../../common/Config";
 import { MO, SS, ST } from "../../../common/const";
-import en from "../../data/en";
+import en from "../../../common/en";
 import SourceIcon from "../library/SourceIcon";
 
 const styles = (theme: Theme) =>

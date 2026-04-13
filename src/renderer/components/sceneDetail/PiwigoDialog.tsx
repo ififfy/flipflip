@@ -39,7 +39,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 import { AF, PW, PWS } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
-import en from "../../data/en";
+import en from "../../../common/en";
 
 const styles = (theme: Theme) =>
   createStyles({

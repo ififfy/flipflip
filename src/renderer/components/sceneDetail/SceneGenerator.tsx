@@ -40,7 +40,7 @@ import NotInterestedIcon from "@mui/icons-material/NotInterested";
 
 import { SDGT, TT } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Scene from "../../../common/Scene";
 import Tag from "../../../common/Tag";
 import WeightGroup from "../../../common/WeightGroup";

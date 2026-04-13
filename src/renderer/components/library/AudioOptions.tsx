@@ -39,7 +39,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { green, red } from "@mui/material/colors";
 
 import { RP, TF } from "../../../common/const";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Audio from "../../../common/Audio";
 import AudioControl from "../player/AudioControl";
 

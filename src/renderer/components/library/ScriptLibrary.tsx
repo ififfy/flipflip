@@ -50,7 +50,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SortIcon from "@mui/icons-material/Sort";
 
 import { AF, MO, SF, SP, SLT } from "../../../common/const";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Tag from "../../../common/Tag";
 import LibrarySearch from "./LibrarySearch";
 import CaptionScript from "../../../common/CaptionScript";

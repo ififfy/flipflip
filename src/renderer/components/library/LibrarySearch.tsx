@@ -9,7 +9,7 @@ import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
 import { getSourceType } from "../../../common/utils";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Audio from "../../../common/Audio";
 import LibrarySource from "../../../common/LibrarySource";
 import Tag from "../../../common/Tag";

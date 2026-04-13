@@ -64,7 +64,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import { AF, LT, MO, PR, SF, SP, ST } from "../../../common/const";
 import { filterSource } from "../../data/utils";
 import { getSourceType } from "../../../common/utils";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
 import Scene from "../../../common/Scene";

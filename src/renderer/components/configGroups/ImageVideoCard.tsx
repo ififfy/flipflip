@@ -30,7 +30,7 @@ import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { GO, IF, OF, OT, SDT, SOF, VO, WF } from "../../../common/const";
 import { SceneSettings } from "../../../common/Config";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Scene from "../../../common/Scene";
 
 const styles = (theme: Theme) =>

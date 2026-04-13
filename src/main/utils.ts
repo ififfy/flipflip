@@ -9,7 +9,7 @@ import Config from "../common/Config";
 import { parseBuffer, parseFile } from "music-metadata";
 import { getFileGroup, getSourceType } from "src/common/utils";
 import { ST } from "../common/const";
-import en from "../renderer/data/en";
+import en from "../common/en";
 
 export const saveDir = path.join(app.getPath("appData"), "flipflip");
 export const savePath = path.join(saveDir, "data.json");

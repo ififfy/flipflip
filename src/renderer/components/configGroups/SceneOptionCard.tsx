@@ -37,7 +37,7 @@ import ListIcon from "@mui/icons-material/List";
 import { BT, IT, SDT, TF } from "../../../common/const";
 import { SceneSettings } from "../../../common/Config";
 import SceneSelect from "./SceneSelect";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Overlay from "../../../common/Overlay";
 import Scene from "../../../common/Scene";
 import ColorPicker from "../config/ColorPicker";

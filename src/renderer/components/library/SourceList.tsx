@@ -41,7 +41,7 @@ import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
 import SourceListItem from "./SourceListItem";
 import Clip from "../../../common/Clip";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Scene from "../../../common/Scene";
 
 const styles = (theme: Theme) =>

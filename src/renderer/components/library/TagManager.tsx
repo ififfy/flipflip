@@ -41,7 +41,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import { MO, SF } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
 import { removeDuplicatesBy } from "../../../common/utils";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Scene from "../../../common/Scene";
 import Tag from "../../../common/Tag";
 import Jiggle from "../../animations/Jiggle";

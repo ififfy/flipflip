@@ -69,7 +69,7 @@ import SystemUpdateIcon from "@mui/icons-material/SystemUpdate";
 
 import { arrayMove, getRandomListItem } from "../data/utils";
 import { MO, SF, SG, SPT } from "../../common/const";
-import en from "../data/en";
+import en from "../../common/en";
 import Config from "../../common/Config";
 import Scene from "../../common/Scene";
 import SceneGroup from "../../common/SceneGroup";

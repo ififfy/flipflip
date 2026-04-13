@@ -26,7 +26,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import { EA, SC, SL, TF } from "../../../common/const";
 import { SceneSettings } from "../../../common/Config";
-import en from "../../data/en";
+import en from "../../../common/en";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 import ColorPicker from "../config/ColorPicker";
