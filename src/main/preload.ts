@@ -296,8 +296,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.fileExists, filePath),
   getCachedFileURL: (source: string, url: string, config: Config) =>
     ipcRenderer.invoke(IPC.getCachedFileURL, source, url, config),
-  getScraperSources: (sources: LibrarySource[], sourceOrderFunction: string) =>
-    ipcRenderer.invoke(IPC.getScraperSources, sources, sourceOrderFunction),
+  getScraperSources: (sources: LibrarySource[]) =>
+    ipcRenderer.invoke(IPC.getScraperSources, sources),
   getAudioThumbnail: (config: Config) =>
     ipcRenderer.invoke(IPC.getAudioThumbnail, config),
   addAudioSource: (url: string, id: number, config: Config) =>

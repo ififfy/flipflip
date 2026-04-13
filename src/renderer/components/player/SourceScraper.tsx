@@ -3,8 +3,9 @@ import uuidv4 from "uuid/v4";
 
 import { Dialog, DialogContent } from "@mui/material";
 
-import { flatten } from "../../data/utils";
+import { flatten, randomizeList } from "../../data/utils";
 import Config from "../../../common/Config";
+import { SOF } from "../../../common/const";
 import LibrarySource from "../../../common/LibrarySource";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
@@ -189,17 +190,19 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
       newAllPosts = this.state.allPosts;
     }
 
-    const sources = await window.ipc.getScraperSources(
-      this.props.scene.sources,
-      this.props.scene.sourceOrderFunction,
-    );
+    let sources = await window.ipc.getScraperSources(this.props.scene.sources);
+    if (this.props.scene.sourceOrderFunction === SOF.random) {
+      sources = randomizeList(sources);
+    }
 
     let nextSources = new Array<LibrarySource>();
     if (this.props.nextScene) {
       nextSources = await window.ipc.getScraperSources(
         this.props.nextScene.sources,
-        this.props.nextScene.sourceOrderFunction,
       );
+      if (this.props.nextScene.sourceOrderFunction === SOF.random) {
+        nextSources = randomizeList(nextSources);
+      }
     }
 
     let sourceLoop = () => {

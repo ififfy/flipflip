@@ -267,10 +267,7 @@ declare global {
         url: string,
         config: Config,
       ) => Promise<string>;
-      getScraperSources: (
-        sources: LibrarySource[],
-        sourceOrderFunction: string,
-      ) => Promise<LibrarySource[]>;
+      getScraperSources: (sources: LibrarySource[]) => Promise<LibrarySource[]>;
       getAudioThumbnail: (config: Config) => Promise<string | undefined>;
       addAudioSource: (
         url: string,

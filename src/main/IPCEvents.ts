@@ -839,11 +839,7 @@ function onGetCachedFileURL(
   return url;
 }
 
-function onGetScraperSources(
-  ev: IpcMainInvokeEvent,
-  sources: LibrarySource[],
-  sourceOrderFunction: string,
-) {
+function onGetScraperSources(ev: IpcMainInvokeEvent, sources: LibrarySource[]) {
   const sceneSources = new Array<LibrarySource>();
   for (const source of sources) {
     if (source.dirOfSources && getSourceType(source.url) == ST.local) {
@@ -866,9 +862,7 @@ function onGetScraperSources(
     }
   }
 
-  return sourceOrderFunction == SOF.random
-    ? randomizeList(JSON.parse(JSON.stringify(sceneSources)))
-    : JSON.parse(JSON.stringify(sceneSources));
+  return JSON.parse(JSON.stringify(sceneSources));
 }
 
 async function onGetAudioThumbnail(ev: IpcMainInvokeEvent, config: Config) {
