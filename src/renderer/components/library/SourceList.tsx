@@ -807,11 +807,13 @@ class SourceList extends React.Component<SourceListProps> {
   }
 
   onClean(source: LibrarySource) {
-    window.ipc.getSourceCachePath(source.url, this.props.config).then((cachePath) => {
-      if (cachePath.length > 0) {
-        this.setState({ cachePath });
-      }
-    });
+    window.ipc
+      .getSourceCachePath(source.url, this.props.config)
+      .then((cachePath) => {
+        if (cachePath.length > 0) {
+          this.setState({ cachePath });
+        }
+      });
   }
 
   onFinishClean() {

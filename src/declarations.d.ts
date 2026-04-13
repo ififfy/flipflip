@@ -249,7 +249,10 @@ declare global {
       deleteSource: (sourceURL: string) => Promise<void>;
       filterNewScriptSources: (newSources: string[]) => Promise<string[]>;
       getCachePath: (config: Config) => Promise<string>;
-      getSourceCachePath: (sourceURL: string, config: Config) => Promise<string>;
+      getSourceCachePath: (
+        sourceURL: string,
+        config: Config,
+      ) => Promise<string>;
       deleteBlacklistedFile: (
         fileToBlacklist: string,
         sourceURL: string,
