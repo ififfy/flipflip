@@ -80,7 +80,6 @@ import AudioAlbumList from "./AudioAlbumList";
 import PlaylistSelect from "../configGroups/PlaylistSelect";
 import PlaylistList from "./PlaylistList";
 import AudioEdit from "./AudioEdit";
-import { fs_existsSync } from "../../dummy/fs";
 import Config from "../../../common/Config";
 
 const drawerWidth = 240;
@@ -1718,39 +1717,14 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
       const url = newSources[index];
       index++;
 
-      if (url.startsWith("http") || fs_existsSync(url)) {
-        // FIXME
-        const newAudio = new Audio({
-          url: url,
-          id: id,
-          tags: [],
-        });
-        id += 1;
-        parseFile(url) // FIXME
-          .then((metadata: any) => {
-            if (metadata) {
-              extractMusicMetadata(
-                newAudio,
-                metadata,
-                getCachePath(null, this.props.config) /* FIXME */,
-              );
-            }
-            if (!newAudio.name) {
-              newAudio.name = url.substring(
-                url.lastIndexOf(window.constants.pathSep) + 1,
-                url.lastIndexOf("."),
-              );
-            }
-            originalSources.unshift(newAudio);
-            addSourceLoop();
-          })
-          .catch((err: any) => {
-            console.error("Error reading metadata:", err.message);
-            addSourceLoop();
-          });
-      } else {
+      window.ipc.addAudioSource(url, id, this.props.config).then((newAudio) => {
+        if (newAudio != null) {
+          id += 1;
+          originalSources.unshift(newAudio);
+        }
+
         addSourceLoop();
-      }
+      });
     };
 
     addSourceLoop();

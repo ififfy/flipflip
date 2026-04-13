@@ -295,6 +295,7 @@ const IPC = {
   getCachedFileURL: "ipc.getCachedFileURL",
   getScraperSources: "ipc.getScraperSources",
   getAudioThumbnail: "ipc.getAudioThumbnail",
+  addAudioSource: "ipc.addAudioSource",
 };
 
 const MO = {

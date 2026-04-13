@@ -40,7 +40,16 @@ import {
   openImage,
 } from "./WindowManager";
 import { IPC, SOF, ST } from "../common/const";
-import { getBackups, portablePath, saveDir } from "./utils";
+import {
+  extractMusicMetadataFromFile,
+  getBackups,
+  portablePath,
+  saveDir,
+  generateThumbnailFile,
+  extractMusicMetadataFromURL,
+  getLocalPath, 
+  getCachePath,
+} from "./utils";
 import {
   createNewAppStorage,
   saveAppStorage,
@@ -63,14 +72,10 @@ import { getFileName, getSourceType } from "../common/utils";
 import { move, outputFile } from "fs-extra";
 import LibrarySource from "../common/LibrarySource";
 import path from "path";
-import {
-  getLocalPath,
-  getCachePath,
-  generateThumbnailFile,
-} from "../node/data/utils";
 import LibraryMoveResult from "../common/LibraryMoveResult";
 import GifInfo from "../common/GifInfo";
 import { Constants } from "../common/constants";
+import Audio from "../common/Audio";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -877,6 +882,42 @@ async function onGetAudioThumbnail(ev: IpcMainInvokeEvent, config: Config) {
   );
 }
 
+async function onAddAudioSource(
+  ev: IpcMainInvokeEvent,
+  url: string,
+  id: number,
+  config: Config,
+) {
+  if (!url.startsWith("http") && !fs.existsSync(url)) {
+    return undefined;
+  }
+
+  let newAudio = new Audio({
+    url: url,
+    id: id,
+    tags: [],
+  });
+
+  if (url.startsWith("http")) {
+    newAudio = await extractMusicMetadataFromURL(newAudio, config);
+  } else {
+    newAudio = await extractMusicMetadataFromFile(newAudio, config);
+  }
+
+  if (newAudio == null) {
+    return undefined;
+  }
+
+  if (!newAudio.name) {
+    newAudio.name = url.substring(
+      url.lastIndexOf(path.sep) + 1,
+      url.lastIndexOf("."),
+    );
+  }
+
+  return newAudio;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -951,6 +992,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getCachedFileURL, onGetCachedFileURL);
   ipcMain.handle(IPC.getScraperSources, onGetScraperSources);
   ipcMain.handle(IPC.getAudioThumbnail, onGetAudioThumbnail);
+  ipcMain.handle(IPC.addAudioSource, onAddAudioSource);
 }
 
 export function releaseIpcEvents() {

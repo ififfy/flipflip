@@ -1,5 +1,6 @@
 import { IAudioMetadata } from "music-metadata";
 import AppStorageState from "./common/AppStorageState";
+import Audio from "./common/Audio";
 import Backup from "./common/Backup";
 import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
 import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
@@ -275,6 +276,11 @@ declare global {
         sourceOrderFunction: string,
       ) => Promise<LibrarySource[]>;
       getAudioThumbnail: (config: Config) => Promise<string | undefined>;
+      addAudioSource: (
+        url: string,
+        id: number,
+        config: Config,
+      ) => Promise<Audio | undefined>;
     };
   }
 }
