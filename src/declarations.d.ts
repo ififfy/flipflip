@@ -8,6 +8,7 @@ import { Config } from "./common/Config";
 import LibrarySource from "./common/LibrarySource";
 import LibraryMoveResult from "./common/LibraryMoveResult";
 import { Constants } from "./common/constants";
+import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -291,6 +292,7 @@ declare global {
         config: Config,
       ) => Promise<Audio | undefined>;
       getAudioBPMMetadata: (url: string) => Promise<number>;
+      getAudioBuffer: (url: string) => Promise<GetAudioBufferResponse>;
     };
   }
 }

@@ -677,26 +677,14 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
 
     if (this.state.audio.url && !this.state.loadingBPM) {
       this.setState({ loadingBPM: true });
-      try {
-        const url = this.state.audio.url;
-        if (fs_existsSync(url)) {
-          // FIXME
-          detectBPM(toArrayBuffer(fs_readFileSync(url))); // FIXME
-        } else {
-          wretch(url)
-            .get()
-            .arrayBuffer((body) => {
-              detectBPM(body);
-            })
-            .catch((err) => {
-              console.error(err);
-              bpmError();
-            });
+      window.ipc.getAudioBuffer(this.state.audio.url).then((response) => {
+        if (response.arrayBuffer != null) {
+          detectBPM(response.arrayBuffer);
+        } else if (response.error != null) {
+          console.error(response.error);
+          bpmError();
         }
-      } catch (e) {
-        console.error(e);
-        bpmError();
-      }
+      });
     }
   }
 }

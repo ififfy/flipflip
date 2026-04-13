@@ -323,4 +323,5 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getAudioMetadata, audio, config),
   getAudioBPMMetadata: (url: string) =>
     ipcRenderer.invoke(IPC.getAudioBPMMetadata, url),
+  getAudioBuffer: (url: string) => ipcRenderer.invoke(IPC.getAudioBuffer, url),
 });

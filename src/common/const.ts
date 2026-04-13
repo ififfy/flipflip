@@ -299,6 +299,7 @@ const IPC = {
   getAudioMetadata: "ipc.getAudioMetadata",
   getAudioBPMMetadata: "ipc.getAudioBPMMetadata",
   addAudioURL: "ipc.addAudioURL",
+  getAudioBuffer: "ipc.getAudioBuffer",
 };
 
 const MO = {

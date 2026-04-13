@@ -76,6 +76,7 @@ import LibraryMoveResult from "../common/LibraryMoveResult";
 import GifInfo from "../common/GifInfo";
 import { Constants } from "../common/constants";
 import Audio from "../common/Audio";
+import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -956,6 +957,46 @@ async function onGetAudioBPMMetadata(ev: IpcMainInvokeEvent, url: string) {
   }
 }
 
+async function onGetAudioBuffer(
+  ev: IpcMainInvokeEvent,
+  url: string,
+): Promise<GetAudioBufferResponse> {
+  const maxByteSize = 200000000;
+  const error = `'${url}' is too large to decode`;
+  if (fs.existsSync(url)) {
+    const size = fs.statSync(url).size;
+    if (size >= maxByteSize) {
+      return { error };
+    }
+
+    const buffer = fs.readFileSync(url);
+    const arrayBuffer = toArrayBuffer(buffer);
+    return { arrayBuffer };
+  } else {
+    try {
+      const { headers } = await wretch(url).head().res();
+      const length = headers.get("content-length");
+      const size = length != null ? Number(length) : 0;
+      if (size >= maxByteSize) {
+        return { error };
+      }
+    } catch (err) {
+      // not all servers implement head requests
+    }
+
+    try {
+      const arrayBuffer = await wretch(url).get().arrayBuffer();
+      if (arrayBuffer.byteLength >= maxByteSize) {
+        return { error };
+      }
+
+      return { arrayBuffer };
+    } catch (err) {
+      return { error: err.message };
+    }
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1034,6 +1075,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioMetadata, onGetAudioMetadata);
   ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
   ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
+  ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
 }
 
 export function releaseIpcEvents() {
