@@ -66,7 +66,6 @@ import SortIcon from "@mui/icons-material/Sort";
 
 import { red } from "@mui/material/colors";
 
-import { extractMusicMetadata, getCachePath } from "../../data/utils";
 import { isAudio } from "../../../common/utils";
 import { AF, ASF, ALT, MO, SP, PR } from "../../../common/const";
 import en from "../../data/en";

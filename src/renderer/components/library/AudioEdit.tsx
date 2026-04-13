@@ -19,7 +19,6 @@ import withStyles from "@mui/styles/withStyles";
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { extractMusicMetadata, getCachePath } from "../../data/utils";
 import Audio from "../../../common/Audio";
 import Config from "../../../common/Config";
 

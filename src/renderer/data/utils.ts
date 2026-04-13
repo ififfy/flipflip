@@ -257,11 +257,6 @@ export function getTimestampValue(value: string): number {
   }
 }
 
-export function getCachePath(source: string, config: Config) {
-  // dummy, migrated to src/node/data/utils.ts
-  return "";
-}
-
 export function htmlEntities(str: string): string {
   return String(str)
     .replace(/&/g, "&amp;")
