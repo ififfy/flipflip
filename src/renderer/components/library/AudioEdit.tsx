@@ -233,7 +233,6 @@ class AudioEdit extends React.Component<AudioEditProps> {
   }
 
   loadThumb() {
-    // FIXME
     window.ipc.getAudioThumbnail(this.props.config).then((thumb) => {
       if (thumb != null) {
         const newAudio = this.state.audio;

@@ -14,7 +14,6 @@ import {
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
 import { SP } from "../../common/const";
-import { getCachePath } from "../data/utils";
 import * as actions from "../data/actions";
 import ErrorBoundary from "./ErrorBoundary";
 import ScenePicker from "./ScenePicker";

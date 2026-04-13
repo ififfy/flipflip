@@ -28,7 +28,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 import Config, { CacheSettings } from "../../../common/Config";
-import { getCachePath, urlToPath } from "../../data/utils";
+import { urlToPath } from "../../data/utils";
 
 const styles = (theme: Theme) =>
   createStyles({
