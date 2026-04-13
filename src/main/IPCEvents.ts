@@ -37,6 +37,7 @@ import {
   saveScriptAs,
   getWindow,
   setProgressBar,
+  openImage,
 } from "./WindowManager";
 import { IPC, SOF, ST } from "../common/const";
 import { getBackups, portablePath, saveDir } from "./utils";
@@ -62,7 +63,11 @@ import { getFileName, getSourceType } from "../common/utils";
 import { move, outputFile } from "fs-extra";
 import LibrarySource from "../common/LibrarySource";
 import path from "path";
-import { getLocalPath, getCachePath } from "../node/data/utils";
+import {
+  getLocalPath,
+  getCachePath,
+  generateThumbnailFile,
+} from "../node/data/utils";
 import LibraryMoveResult from "../common/LibraryMoveResult";
 import GifInfo from "../common/GifInfo";
 import { Constants } from "../common/constants";
@@ -860,6 +865,18 @@ function onGetScraperSources(
     : JSON.parse(JSON.stringify(sceneSources));
 }
 
+async function onGetAudioThumbnail(ev: IpcMainInvokeEvent, config: Config) {
+  const imagePath = await openImage(ev.sender.id);
+  if (imagePath == null) {
+    return imagePath;
+  }
+
+  return generateThumbnailFile(
+    getCachePath(null, config),
+    fs.readFileSync(imagePath),
+  );
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -933,6 +950,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.fileExists, onFileExists);
   ipcMain.handle(IPC.getCachedFileURL, onGetCachedFileURL);
   ipcMain.handle(IPC.getScraperSources, onGetScraperSources);
+  ipcMain.handle(IPC.getAudioThumbnail, onGetAudioThumbnail);
 }
 
 export function releaseIpcEvents() {

@@ -7,6 +7,7 @@ import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
 import { getFilesRecursively } from "./utils";
 import { isText, isAudio, isVideo, isVideoPlaylist } from "../common/utils";
+import { isImage } from "./scraper/Scrapers";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();
@@ -113,6 +114,27 @@ export async function saveExport(
   }
 
   fs.writeFileSync(result.filePath, json);
+}
+
+export async function openImage(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return undefined;
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [
+      { name: "All Files (*.*)", extensions: ["*"] },
+      {
+        name: "Image files",
+        extensions: ["gif", "png", "jpeg", "jpg", "webp", "tiff", "svg"],
+      },
+    ],
+    properties: ["openFile"],
+  });
+
+  const imagePaths = result.filePaths.filter((i) => isImage(i, true));
+  return imagePaths.length > 0 ? imagePaths[0] : undefined;
 }
 
 export async function openImport(windowId: number) {

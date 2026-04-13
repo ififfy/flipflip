@@ -274,6 +274,7 @@ declare global {
         sources: LibrarySource[],
         sourceOrderFunction: string,
       ) => Promise<LibrarySource[]>;
+      getAudioThumbnail: (config: Config) => Promise<string | undefined>;
     };
   }
 }

@@ -234,15 +234,13 @@ class AudioEdit extends React.Component<AudioEditProps> {
 
   loadThumb() {
     // FIXME
-    // let iResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-    //   {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Image files', extensions: ["gif", "png", "jpeg", "jpg", "webp", "tiff", "svg"]}], properties: ['openFile']});
-    // if (!iResult) return;
-    // iResult = iResult.filter((i) => isImage(i, true));
-    // if (iResult.length > 0) {
-    //   const newAudio = this.state.audio;
-    //   newAudio.thumb = generateThumbnailFile(getCachePath(null, this.state.config) /* FIXME */, fs_readFileSync(iResult[0]));
-    //   this.setState({audio: newAudio});
-    // }
+    window.ipc.getAudioThumbnail(this.props.config).then((thumb) => {
+      if (thumb != null) {
+        const newAudio = this.state.audio;
+        newAudio.thumb = thumb;
+        this.setState({ audio: newAudio });
+      }
+    });
   }
 
   loadSuggestions() {
