@@ -78,11 +78,6 @@ interface Navigator extends NavigatorClipboard {}
 declare global {
   interface Window {
     constants: Constants;
-    files: {
-      existsSync: (path: string) => boolean;
-      readFileSync: (path: string) => Buffer;
-      parseAudioFile: (path: string) => Promise<IAudioMetadata>;
-    };
     ipc: {
       platform: () => string;
       getConstants(): Promise<Constants>;

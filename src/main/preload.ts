@@ -5,21 +5,6 @@ import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
 import LibrarySource from "../common/LibrarySource";
 import Audio from "../common/Audio";
-// import { parseFile } from "music-metadata";
-
-// FIXME these are just dummys
-contextBridge.exposeInMainWorld("files", {
-  existsSync: (path: string) => true,
-  readFileSync: (path: string) => "text",
-  parseAudioFile: (path: string) => Promise.resolve({}),
-});
-
-// FIXME
-// contextBridge.exposeInMainWorld("files", {
-//   existsSync: (path: string) => fs.existsSync(path),
-//   readFileSync: (path: string) => fs.readFileSync(path),
-//   parseAudioFile: (path: string) => parseFile(path),
-// });
 
 contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
