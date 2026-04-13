@@ -64,39 +64,15 @@ export function getFilesRecursively(filePath: string): string[] {
   return files.concat(getFiles(filePath));
 }
 
-export async function extractMusicMetadataFromFile(
-  audio: Audio,
-  config: Config,
-) {
-  try {
-    const metadata = await parseFile(audio.url);
-    if (metadata) {
-      extractMusicMetadata(audio, metadata, getCachePath(null, config));
-    }
-
-    return audio;
-  } catch (err) {
-    console.error("Error reading metadata:", err.message);
-    return undefined;
+export async function parseMusicMetadata(url: string) {
+  if (url.startsWith("http")) {
+    const arrayBuffer = await wretch(url).get().arrayBuffer();
+    return await parseBuffer(Buffer.from(arrayBuffer));
+  } else if (fs.existsSync(url)) {
+    return await parseFile(url);
   }
-}
 
-export async function extractMusicMetadataFromURL(
-  audio: Audio,
-  config: Config,
-) {
-  try {
-    const arrayBuffer = await wretch(audio.url).get().arrayBuffer();
-    const metadata = await parseBuffer(Buffer.from(arrayBuffer));
-    if (metadata) {
-      extractMusicMetadata(audio, metadata, getCachePath(null, config));
-    }
-
-    return audio;
-  } catch (err) {
-    console.error("Error reading metadata:", err.message);
-    return undefined;
-  }
+  return undefined
 }
 
 export function extractMusicMetadata(
@@ -104,6 +80,9 @@ export function extractMusicMetadata(
   metadata: any,
   cachePath: string,
 ) {
+  if (!metadata) {
+    return;
+  }
   if (metadata.common) {
     if (metadata.common.title) {
       audio.name = metadata.common.title;

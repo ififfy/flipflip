@@ -285,6 +285,7 @@ declare global {
         audio: Audio,
         config: Config,
       ) => Promise<Audio | undefined>;
+      getAudioBPMMetadata: (url: string) => Promise<number>;
     };
   }
 }

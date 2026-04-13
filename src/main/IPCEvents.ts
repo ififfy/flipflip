@@ -41,14 +41,14 @@ import {
 } from "./WindowManager";
 import { IPC, SOF, ST } from "../common/const";
 import {
-  extractMusicMetadataFromFile,
   getBackups,
   portablePath,
   saveDir,
   generateThumbnailFile,
-  extractMusicMetadataFromURL,
   getLocalPath,
   getCachePath,
+  extractMusicMetadata,
+  parseMusicMetadata,
 } from "./utils";
 import {
   createNewAppStorage,
@@ -922,11 +922,24 @@ async function getAudioMetadata(audio: Audio, config: Config) {
     return undefined;
   }
 
-  const newAudio = new Audio(audio);
-  if (newAudio.url.startsWith("http")) {
-    return await extractMusicMetadataFromURL(newAudio, config);
-  } else {
-    return await extractMusicMetadataFromFile(newAudio, config);
+  try {
+    const newAudio = new Audio(audio);
+    const metadata = await parseMusicMetadata(newAudio.url);
+    extractMusicMetadata(newAudio, metadata, getCachePath(null, config));
+    return newAudio;
+  } catch (err) {
+    console.error("Error reading metadata:", err.message);
+    return undefined;
+  }
+}
+
+async function onGetAudioBPMMetadata(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    const metadata = await parseMusicMetadata(url);
+    return metadata?.common?.bpm ?? -1;
+  } catch (err) {
+    console.error("Error reading metadata:", err.message);
+    return -1;
   }
 }
 
@@ -1006,6 +1019,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioThumbnail, onGetAudioThumbnail);
   ipcMain.handle(IPC.addAudioSource, onAddAudioSource);
   ipcMain.handle(IPC.getAudioMetadata, onGetAudioMetadata);
+  ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
 }
 
 export function releaseIpcEvents() {

@@ -618,28 +618,20 @@ class AudioOptions extends React.Component<AudioOptionsProps> {
   onReadBPMTag() {
     if (this.state.audio.url && !this.state.loadingTag) {
       this.setState({ loadingTag: true });
-      parseFile(this.state.audio.url) // FIXME
-        .then((metadata: any) => {
-          if (metadata && metadata.common && metadata.common.bpm) {
-            this.changeKey("bpm", metadata.common.bpm);
-            this.setState({ loadingTag: false, successTag: true });
-            setTimeout(() => {
-              this.setState({ successTag: false });
-            }, 3000);
-          } else {
-            this.setState({ loadingTag: false, errorTag: true });
-            setTimeout(() => {
-              this.setState({ errorTag: false });
-            }, 3000);
-          }
-        })
-        .catch((err: any) => {
-          console.error("Error reading metadata:", err.message);
+      window.ipc.getAudioBPMMetadata(this.state.audio.url).then((bpm) => {
+        if (bpm != -1) {
+          this.changeKey("bpm", bpm);
+          this.setState({ loadingTag: false, successTag: true });
+          setTimeout(() => {
+            this.setState({ successTag: false });
+          }, 3000);
+        } else {
           this.setState({ loadingTag: false, errorTag: true });
           setTimeout(() => {
             this.setState({ errorTag: false });
           }, 3000);
-        });
+        }
+      });
     }
   }
 
