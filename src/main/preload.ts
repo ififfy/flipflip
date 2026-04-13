@@ -269,8 +269,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.deleteSource, sourceURL),
   filterNewScriptSources: (newSources: string[]) =>
     ipcRenderer.invoke(IPC.filterNewScriptSources, newSources),
-  getCachePath: (sourceURL: string) =>
-    ipcRenderer.invoke(IPC.getCachePath, sourceURL),
+  getCachePath: (sourceURL: string, config: Config) =>
+    ipcRenderer.invoke(IPC.getCachePath, sourceURL, config),
   deleteBlacklistedFile: (
     fileToBlacklist: string,
     sourceURL: string,

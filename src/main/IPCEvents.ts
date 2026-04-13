@@ -698,16 +698,16 @@ function onFilterNewScriptSources(
   return newSources.filter((s) => fs.existsSync(s));
 }
 
-function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string) {
+function onGetCachePath(ev: IpcMainInvokeEvent, sourceURL: string, config: Config) {
   let cachePath = "";
   const fileType = getSourceType(sourceURL);
   if (fileType != ST.local) {
     if (fileType == ST.video || fileType == ST.playlist) {
       cachePath =
-        getCachePath(sourceURL, this.props.config) +
+        getCachePath(sourceURL, config) +
         getFileName(sourceURL, path.sep);
     } else {
-      cachePath = getCachePath(sourceURL, this.props.config);
+      cachePath = getCachePath(sourceURL, config);
     }
   }
 
