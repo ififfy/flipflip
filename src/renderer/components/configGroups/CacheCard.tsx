@@ -54,6 +54,7 @@ class CacheCard extends React.Component<CacheCardProps> {
   readonly state: {
     cacheSize: string;
     clearCacheAlert: boolean;
+    cachePath: string;
   };
 
   constructor(props: CacheCardProps) {
@@ -62,12 +63,12 @@ class CacheCard extends React.Component<CacheCardProps> {
     this.state = {
       cacheSize: "--",
       clearCacheAlert: false,
+      cachePath: "",
     };
   }
 
   render() {
     const classes = this.props.classes;
-    const cachePath = getCachePath(null, this.props.config); // FIXME
     return (
       <Grid
         container
@@ -130,7 +131,7 @@ class CacheCard extends React.Component<CacheCardProps> {
                   variant="standard"
                   fullWidth
                   label="Caching Directory"
-                  placeholder={cachePath}
+                  placeholder={this.state.cachePath}
                   value={this.props.config.caching.directory}
                   InputLabelProps={{
                     shrink: true,
@@ -197,10 +198,10 @@ class CacheCard extends React.Component<CacheCardProps> {
               Are you SURE you want to delete the contents of{" "}
               <Link
                 href="#"
-                onClick={this.openDirectory.bind(this, cachePath)}
+                onClick={this.openDirectory.bind(this)}
                 underline="hover"
               >
-                {cachePath}
+                {this.state.cachePath}
               </Link>{" "}
               ?
             </DialogContentText>
@@ -223,6 +224,13 @@ class CacheCard extends React.Component<CacheCardProps> {
 
   componentDidMount() {
     this.calculateCacheSize();
+    this.getCachePath();
+  }
+
+  componentDidUpdate(props: any) {
+    if (props.config != this.props.config) {
+      this.getCachePath();
+    }
   }
 
   calculateCacheSize() {
@@ -232,6 +240,12 @@ class CacheCard extends React.Component<CacheCardProps> {
         this.setState({ cacheSize: mbSize.toFixed(2) });
       });
     }
+  }
+
+  getCachePath() {
+    window.ipc.getCachePath(this.props.config).then((cachePath) => {
+      this.setState({ cachePath });
+    });
   }
 
   onCloseClear() {
@@ -299,11 +313,11 @@ class CacheCard extends React.Component<CacheCardProps> {
     this.props.onUpdateSettings(fn);
   }
 
-  openDirectory(cachePath: string) {
+  openDirectory() {
     if (window.ipc.platform() === "win32") {
-      this.openExternalURL(cachePath);
+      this.openExternalURL(this.state.cachePath);
     } else {
-      this.openExternalURL(urlToPath(cachePath));
+      this.openExternalURL(urlToPath(this.state.cachePath));
     }
   }
 

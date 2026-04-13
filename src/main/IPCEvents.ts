@@ -14,7 +14,6 @@ import {
   webFrame,
 } from "electron";
 import {
-  getCachePath,
   randomizeList,
   toArrayBuffer,
   urlToPath,
@@ -63,7 +62,7 @@ import { getFileName, getSourceType } from "../common/utils";
 import { move, outputFile } from "fs-extra";
 import LibrarySource from "../common/LibrarySource";
 import path from "path";
-import { getLocalPath } from "../node/data/utils";
+import { getLocalPath, getCachePath } from "../node/data/utils";
 import LibraryMoveResult from "../common/LibraryMoveResult";
 import GifInfo from "../common/GifInfo";
 import { Constants } from "../common/constants";
@@ -697,6 +696,10 @@ function onFilterNewScriptSources(
   return newSources.filter((s) => fs.existsSync(s));
 }
 
+function onGetCachePath(ev: IpcMainInvokeEvent, config: Config) {
+  return getCachePath(null, config);
+}
+
 function onGetSourceCachePath(
   ev: IpcMainInvokeEvent,
   sourceURL: string,
@@ -918,6 +921,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
   ipcMain.handle(IPC.deleteSource, onDeleteSource);
   ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
+  ipcMain.handle(IPC.getCachePath, onGetCachePath);
   ipcMain.handle(IPC.getSourceCachePath, onGetSourceCachePath);
   ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
   ipcMain.handle(IPC.cleanCache, onCleanCache);
