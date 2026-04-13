@@ -3634,26 +3634,17 @@ export function markOffline(getState: () => State, setState: Function) {
 export function detectBPMs(getState: () => State, setState: Function) {
   const readMetadata = (audio: Audio, offset: number) => {
     const state = getState();
-    window.files
-      .parseAudioFile(audio.url)
-      .then((metadata: any) => {
-        if (metadata && metadata.common && metadata.common.bpm) {
-          audio.bpm = metadata.common.bpm;
-          state.progressCurrent = offset + 1;
-          setState({ progressCurrent: state.progressCurrent });
-          window.ipc.setProgressBar(
-            state.progressCurrent / state.progressTotal,
-          );
-          setTimeout(detectBPMLoop, 100);
-        } else {
-          detectBPM(audio, offset);
-        }
-      })
-      .catch((e: any) => {
-        console.error("Error reading track metadata: " + audio.url);
-        console.error(e);
+    window.ipc.getAudioBPMMetadata(audio.url).then((bpm) => {
+      if (bpm != -1) {
+        audio.bpm = bpm;
+        state.progressCurrent = offset + 1;
+        setState({ progressCurrent: state.progressCurrent });
+        window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+        setTimeout(detectBPMLoop, 100);
+      } else {
         detectBPM(audio, offset);
-      });
+      }
+    });
   };
 
   const detectBPM = (audio: Audio, offset: number) => {
