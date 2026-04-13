@@ -285,6 +285,8 @@ function onCopyImageToClipboard(ev: IpcMainEvent, url: string) {
 function onShowPlayerContextMenu(
   ev: IpcMainEvent,
   config: Config,
+  showGotoTagSource: boolean,
+  showRecentPictureGrid: boolean,
   url: string,
   source: string,
   post?: string,
@@ -368,7 +370,7 @@ function onShowPlayerContextMenu(
       },
     }),
   );
-  if (this.props.config.caching.enabled && type != ST.local) {
+  if (config.caching.enabled && type != ST.local) {
     contextMenu.append(
       new MenuItem({
         label: "Open Cached Images",
@@ -423,7 +425,7 @@ function onShowPlayerContextMenu(
       }),
     );
   }
-  if (!this.props.allTags) {
+  if (showGotoTagSource) {
     contextMenu.append(
       new MenuItem({
         label: "Goto Tag Source",
@@ -443,7 +445,7 @@ function onShowPlayerContextMenu(
       }),
     );
   }
-  if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
+  if (showRecentPictureGrid) {
     contextMenu.append(
       new MenuItem({
         label: "Recent Picture Grid",

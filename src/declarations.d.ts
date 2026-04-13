@@ -176,6 +176,8 @@ declare global {
       copyImageToClipboard: (sourceURL: string) => void;
       showPlayerContextMenu: (
         config: Config,
+        showGotoTagSource: boolean,
+        showRecentPictureGrid: boolean,
         url: string,
         source: string,
         post?: string,

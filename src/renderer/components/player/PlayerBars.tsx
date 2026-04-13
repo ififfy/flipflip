@@ -1265,6 +1265,9 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       window.ipc.offShowRecentPictureGrid(showRecentPictureGrid);
     });
 
+    const doShowGotoTagSource = !this.props.allTags;
+    const doShowRecentPictureGrid =
+      !this.props.recentPictureGrid && !this.props.scene.downloadScene;
     const img = this.props.recentPictureGrid
       ? e.target
       : this.props.historyPaths[
@@ -1273,7 +1276,14 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     const url = img.src;
     let source = img.getAttribute("source");
     let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
-    window.ipc.showPlayerContextMenu(this.props.config, url, source, post);
+    window.ipc.showPlayerContextMenu(
+      this.props.config,
+      doShowGotoTagSource,
+      doShowRecentPictureGrid,
+      url,
+      source,
+      post,
+    );
   };
 
   onKeyDown = (e: KeyboardEvent) => {

@@ -182,10 +182,12 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.copyImageToClipboard, sourceURL),
   showPlayerContextMenu: (
     config: Config,
+    showGotoTagSource: boolean,
+    showRecentPictureGrid: boolean,
     url: string,
     source: string,
     post?: string,
-  ) => ipcRenderer.send(IPC.showPlayerContextMenu, config, url, source, post),
+  ) => ipcRenderer.send(IPC.showPlayerContextMenu, config, showGotoTagSource, showRecentPictureGrid, url, source, post),
   onClosePlayerContextMenu: (callback: () => void) =>
     ipcRenderer.once(IPC.closePlayerContextMenu, callback),
   onBlacklistFile: (
