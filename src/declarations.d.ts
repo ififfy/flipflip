@@ -281,6 +281,11 @@ declare global {
         id: number,
         config: Config,
       ) => Promise<Audio | undefined>;
+      addAudioURL: (
+        url: string,
+        id: number,
+        config: Config,
+      ) => Promise<Audio | undefined>;
       getAudioMetadata: (
         audio: Audio,
         config: Config,

@@ -72,7 +72,7 @@ export async function parseMusicMetadata(url: string) {
     return await parseFile(url);
   }
 
-  return undefined
+  return undefined;
 }
 
 export function extractMusicMetadata(

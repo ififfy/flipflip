@@ -1634,60 +1634,23 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
     });
 
     const url = this.state.importURL;
-    const newAudio = new Audio({
-      url: url,
-      id: id,
-      tags: [],
-    });
-    id += 1;
     this.setState({ loadingMetadata: true });
-
-    const error = (err: any) => {
-      console.error("File is not available:", err.message);
-      this.setState({ loadingMetadata: false, error: true });
-      setTimeout(() => {
-        this.setState({ error: false });
-      }, 3000);
-    };
-    wretch(url)
-      .get()
-      .unauthorized(error)
-      .notFound(error)
-      .timeout(error)
-      .internalError(error)
-      .arrayBuffer((buffer) => {
-        parseBuffer(Buffer.from(buffer)) // FIXME
-          .then((metadata: any) => {
-            if (metadata) {
-              extractMusicMetadata(
-                newAudio,
-                metadata,
-                getCachePath(null, this.props.config),
-              ); // FIXME
-            }
-            if (!newAudio.name) {
-              newAudio.name = url.substring(
-                url.lastIndexOf(window.constants.pathSep) + 1,
-                url.lastIndexOf("."),
-              );
-            }
-            originalSources.unshift(newAudio);
-            this.props.onUpdateLibrary((l) => {
-              l.splice(0, l.length);
-              l.push(...originalSources);
-            });
-            this.setState({ loadingMetadata: false });
-            this.onCloseDialog();
-          })
-          .catch((err: any) => {
-            console.error("Error reading metadata:", err.message);
-            this.setState({ loadingMetadata: false, error: true });
-            setTimeout(() => {
-              this.setState({ error: false });
-            }, 3000);
-          });
-      })
-      .catch(error);
+    window.ipc.addAudioSource(url, id, this.props.config).then((newAudio) => {
+      if (newAudio != null) {
+        originalSources.unshift(newAudio);
+        this.props.onUpdateLibrary((l) => {
+          l.splice(0, l.length);
+          l.push(...originalSources);
+        });
+        this.setState({ loadingMetadata: false });
+        this.onCloseDialog();
+      } else {
+        this.setState({ loadingMetadata: false, error: true });
+        setTimeout(() => {
+          this.setState({ error: false });
+        }, 3000);
+      }
+    });
   }
 
   addAudioSources(newSources: Array<string>) {

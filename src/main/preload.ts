@@ -317,6 +317,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getAudioThumbnail, config),
   addAudioSource: (url: string, id: number, config: Config) =>
     ipcRenderer.invoke(IPC.addAudioSource, url, id, config),
+  addAudioURL: (url: string, id: number, config: Config) =>
+    ipcRenderer.invoke(IPC.addAudioURL, url, id, config),
   getAudioMetadata: (audio: Audio, config: Config) =>
     ipcRenderer.invoke(IPC.getAudioMetadata, audio, config),
   getAudioBPMMetadata: (url: string) =>

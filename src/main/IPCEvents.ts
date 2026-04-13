@@ -909,6 +909,19 @@ async function onAddAudioSource(
   return newAudio;
 }
 
+async function onAddAudioURL(
+  ev: IpcMainInvokeEvent,
+  url: string,
+  id: number,
+  config: Config,
+) {
+  if (!url.startsWith("http")) {
+    return undefined;
+  }
+
+  return await onAddAudioSource(ev, url, id, config);
+}
+
 async function onGetAudioMetadata(
   ev: IpcMainInvokeEvent,
   audio: Audio,
@@ -1020,6 +1033,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.addAudioSource, onAddAudioSource);
   ipcMain.handle(IPC.getAudioMetadata, onGetAudioMetadata);
   ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
+  ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
 }
 
 export function releaseIpcEvents() {
