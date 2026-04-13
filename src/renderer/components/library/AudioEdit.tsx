@@ -243,21 +243,12 @@ class AudioEdit extends React.Component<AudioEditProps> {
   }
 
   loadSuggestions() {
-    const url = this.state.audio.url;
-    parseFile(url) // FIXME
-      .then((metadata: any) => {
-        if (metadata) {
-          const newAudio = new Audio(this.state.audio);
-          extractMusicMetadata(
-            newAudio,
-            metadata,
-            getCachePath(null, this.props.config) /* FIXME */,
-          );
-          this.setState({ audio: newAudio });
+    window.ipc
+      .getAudioMetadata(this.state.audio, this.props.config)
+      .then((audio) => {
+        if (audio != null) {
+          this.setState({ audio });
         }
-      })
-      .catch((err: any) => {
-        console.error("Error reading metadata:", err.message);
       });
   }
 }

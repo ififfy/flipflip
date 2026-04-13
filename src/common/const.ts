@@ -296,6 +296,7 @@ const IPC = {
   getScraperSources: "ipc.getScraperSources",
   getAudioThumbnail: "ipc.getAudioThumbnail",
   addAudioSource: "ipc.addAudioSource",
+  getAudioMetadata: "ipc.getAudioMetadata",
 };
 
 const MO = {

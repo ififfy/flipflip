@@ -47,7 +47,7 @@ import {
   saveDir,
   generateThumbnailFile,
   extractMusicMetadataFromURL,
-  getLocalPath, 
+  getLocalPath,
   getCachePath,
 } from "./utils";
 import {
@@ -888,22 +888,13 @@ async function onAddAudioSource(
   id: number,
   config: Config,
 ) {
-  if (!url.startsWith("http") && !fs.existsSync(url)) {
-    return undefined;
-  }
-
   let newAudio = new Audio({
     url: url,
     id: id,
     tags: [],
   });
 
-  if (url.startsWith("http")) {
-    newAudio = await extractMusicMetadataFromURL(newAudio, config);
-  } else {
-    newAudio = await extractMusicMetadataFromFile(newAudio, config);
-  }
-
+  newAudio = await getAudioMetadata(newAudio, config);
   if (newAudio == null) {
     return undefined;
   }
@@ -916,6 +907,27 @@ async function onAddAudioSource(
   }
 
   return newAudio;
+}
+
+async function onGetAudioMetadata(
+  ev: IpcMainInvokeEvent,
+  audio: Audio,
+  config: Config,
+) {
+  return await getAudioMetadata(audio, config);
+}
+
+async function getAudioMetadata(audio: Audio, config: Config) {
+  if (!audio.url.startsWith("http") && !fs.existsSync(audio.url)) {
+    return undefined;
+  }
+
+  const newAudio = new Audio(audio);
+  if (newAudio.url.startsWith("http")) {
+    return await extractMusicMetadataFromURL(newAudio, config);
+  } else {
+    return await extractMusicMetadataFromFile(newAudio, config);
+  }
 }
 
 // Initialize and release listeners
@@ -993,6 +1005,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getScraperSources, onGetScraperSources);
   ipcMain.handle(IPC.getAudioThumbnail, onGetAudioThumbnail);
   ipcMain.handle(IPC.addAudioSource, onAddAudioSource);
+  ipcMain.handle(IPC.getAudioMetadata, onGetAudioMetadata);
 }
 
 export function releaseIpcEvents() {

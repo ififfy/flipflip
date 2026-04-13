@@ -4,6 +4,7 @@ import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
 import LibrarySource from "../common/LibrarySource";
+import Audio from "../common/Audio";
 // import { parseFile } from "music-metadata";
 
 // FIXME these are just dummys
@@ -316,4 +317,6 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getAudioThumbnail, config),
   addAudioSource: (url: string, id: number, config: Config) =>
     ipcRenderer.invoke(IPC.addAudioSource, url, id, config),
+  getAudioMetadata: (audio: Audio, config: Config) =>
+    ipcRenderer.invoke(IPC.getAudioMetadata, audio, config),
 });
