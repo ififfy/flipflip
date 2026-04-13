@@ -281,7 +281,7 @@ const IPC = {
   deleteAllLibrarySources: "ipc.deleteAllLibrarySources",
   deleteSource: "ipc.deleteSource",
   filterNewScriptSources: "ipc.filterNewScriptSources",
-  getCachePath: "ipc.getCachePath",
+  getSourceCachePath: "ipc.getSourceCachePath",
   deleteBlacklistedFile: "ipc.deleteBlacklistedFile",
   cleanCache: "ipc.cleanCache",
   revealFile: "ipc.revealFile",

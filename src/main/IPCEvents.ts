@@ -697,7 +697,7 @@ function onFilterNewScriptSources(
   return newSources.filter((s) => fs.existsSync(s));
 }
 
-function onGetCachePath(
+function onGetSourceCachePath(
   ev: IpcMainInvokeEvent,
   sourceURL: string,
   config: Config,
@@ -918,7 +918,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.deleteAllLibrarySources, onDeleteAllLibrarySources);
   ipcMain.handle(IPC.deleteSource, onDeleteSource);
   ipcMain.handle(IPC.filterNewScriptSources, onFilterNewScriptSources);
-  ipcMain.handle(IPC.getCachePath, onGetCachePath);
+  ipcMain.handle(IPC.getSourceCachePath, onGetSourceCachePath);
   ipcMain.on(IPC.deleteBlacklistedFile, onDeleteBlacklistedFile);
   ipcMain.handle(IPC.cleanCache, onCleanCache);
   ipcMain.on(IPC.revealFile, onRevealFile);
