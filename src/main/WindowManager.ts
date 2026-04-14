@@ -6,8 +6,7 @@ import windowStateKeeper from "electron-window-state";
 import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
 import { getFilesRecursively } from "./utils";
-import { isText, isAudio, isVideo, isVideoPlaylist } from "../common/utils";
-import { isImage } from "./scraper/Scrapers";
+import { isText, isAudio, isVideo, isVideoPlaylist, isImage } from "../common/utils";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();

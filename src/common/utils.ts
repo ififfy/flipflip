@@ -24,6 +24,32 @@ export function isText(path: string, strict: boolean): boolean {
   return false;
 }
 
+export const isImageOrVideo = (path: string, strict: boolean): boolean => {
+  return isImage(path, strict) || isVideo(path, strict);
+};
+
+export function isImage(path: string, strict: boolean): boolean {
+  if (path == null) return false;
+  const p = path.toLowerCase();
+  const acceptableExtensions = [
+    ".gif",
+    ".png",
+    ".jpeg",
+    ".jpg",
+    ".webp",
+    ".tiff",
+    ".svg",
+  ];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
+  return false;
+}
+
 export function isVideo(path: string, strict: boolean): boolean {
   if (path == null) return false;
   const p = path.toLowerCase();

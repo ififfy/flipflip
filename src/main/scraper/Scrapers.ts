@@ -9,7 +9,7 @@ import Snoowrap from "snoowrap";
 import { IF, RF, RT, WF } from "../../common/const";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
-import { getFileGroup, getFileName, isVideo } from "../../common/utils";
+import { getFileGroup, getFileName, isVideo, isImage, isImageOrVideo } from "../../common/utils";
 
 export const processAllURLs = (
   data: string[],
@@ -3052,32 +3052,6 @@ export function filterPathsToJustPlayable(
     case IF.videos:
       return paths.filter((p) => isVideo(p, strict));
   }
-}
-
-export const isImageOrVideo = (path: string, strict: boolean): boolean => {
-  return isImage(path, strict) || isVideo(path, strict);
-};
-
-export function isImage(path: string, strict: boolean): boolean {
-  if (path == null) return false;
-  const p = path.toLowerCase();
-  const acceptableExtensions = [
-    ".gif",
-    ".png",
-    ".jpeg",
-    ".jpg",
-    ".webp",
-    ".tiff",
-    ".svg",
-  ];
-  for (let ext of acceptableExtensions) {
-    if (strict) {
-      if (p.endsWith(ext)) return true;
-    } else {
-      if (p.includes(ext)) return true;
-    }
-  }
-  return false;
 }
 
 let _redgifOAuth: any = null;
