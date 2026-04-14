@@ -1000,6 +1000,39 @@ async function onGetAudioBuffer(
   }
 }
 
+function onBuildPlayerMenu(
+  ev: IpcMainEvent,
+  isPlaying: boolean,
+  fullScreen: boolean,
+  alwaysOnTop: boolean,
+  showMenu: boolean,
+  cachingEnabled: boolean,
+  downloadScene: boolean,
+  audioScene: boolean,
+  scriptScene: boolean,
+  hasAllTags: boolean,
+) {
+  PlayerMenu.create(
+    isPlaying,
+    fullScreen,
+    alwaysOnTop,
+    showMenu,
+    cachingEnabled,
+    downloadScene,
+    audioScene,
+    scriptScene,
+    hasAllTags,
+  );
+}
+
+function onDestroyPlayerMenu() {
+  PlayerMenu.destroy();
+}
+
+function onPlayerMenuSetPlayPause(ev: IpcMainEvent, playing: boolean) {
+  PlayerMenu.setIsPlaying(playing);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1037,12 +1070,12 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.setProgressBar, onSetProgressBar);
   ipcMain.handle(IPC.redditSubscriptions, onGetRedditSubscriptions);
   ipcMain.handle(IPC.tumblrFollowing, onGetTumblrFollowing);
-  ipcMain.on(IPC.buildPlayerMenu, PlayerMenu.create);
-  ipcMain.on(IPC.destroyPlayerMenu, PlayerMenu.destroy);
+  ipcMain.on(IPC.buildPlayerMenu, onBuildPlayerMenu);
+  ipcMain.on(IPC.destroyPlayerMenu, onDestroyPlayerMenu);
   ipcMain.on(IPC.setAllwaysOnTop, onSetAlwaysOnTop);
   ipcMain.on(IPC.setMenuBarVisibility, onSetMenuBarVisibility);
   ipcMain.on(IPC.setFullScreen, onSetFullScreen);
-  ipcMain.on(IPC.playerMenuSetPlayPause, PlayerMenu.setIsPlaying);
+  ipcMain.on(IPC.playerMenuSetPlayPause, onPlayerMenuSetPlayPause);
   ipcMain.on(IPC.copyImageToClipboard, onCopyImageToClipboard);
   ipcMain.on(IPC.showPlayerContextMenu, onShowPlayerContextMenu);
   ipcMain.handle(IPC.startPowerSaveBlocker, onStartPowerSaveBlocker);

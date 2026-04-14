@@ -322,6 +322,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   _drawerTimeout: any = null;
   _tagDrawerTimeout: any = null;
   _showVideoControls = false;
+  _onPlayPause: () => void = null;
   _onNavigateBack: () => void = null;
   _onToggleFullscreen: () => void = null;
   _onToggleAlwaysOnTop: () => void = null;
@@ -955,6 +956,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     this._tagDrawerTimeout = null;
 
     window.ipc.offPlayerMenu(
+      this._onPlayPause,
       this._onHistoryBack,
       this._onHistoryForward,
       this._onNavigateBack,
@@ -966,6 +968,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       this._onNextSource,
     );
 
+    this._onPlayPause = null;
     this._onNavigateBack = null;
     this._onToggleFullscreen = null;
     this._onToggleAlwaysOnTop = null;
@@ -1198,6 +1201,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       return;
     }
 
+    this._onPlayPause = this.playPause.bind(this);
     this._onNavigateBack = this.navigateBack.bind(this);
     this._onToggleFullscreen = this.toggleFullscreen.bind(this);
     this._onToggleAlwaysOnTop = this.toggleAlwaysOnTop.bind(this);
@@ -1208,6 +1212,7 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     this._onPrevSource = this.prevSource.bind(this);
     this._onNextSource = this.nextSource.bind(this);
     window.ipc.onPlayerMenu(
+      this._onPlayPause,
       this._onHistoryBack,
       this._onHistoryForward,
       this._onNavigateBack,

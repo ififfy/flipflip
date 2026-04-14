@@ -152,6 +152,7 @@ declare global {
       setFullScreen: (fullScreen: boolean) => void;
       playerMenuSetPlayPause: (play: boolean) => void;
       onPlayerMenu: (
+        playPause: () => void,
         historyBack: () => void,
         historyForward: () => void,
         navigateBack: () => void,
@@ -163,6 +164,7 @@ declare global {
         nextSource: () => void,
       ) => void;
       offPlayerMenu: (
+        playPause: () => void,
         historyBack: () => void,
         historyForward: () => void,
         navigateBack: () => void,

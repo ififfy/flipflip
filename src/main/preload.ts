@@ -115,6 +115,7 @@ contextBridge.exposeInMainWorld("ipc", {
     ),
   destroyPlayerMenu: () => ipcRenderer.send(IPC.destroyPlayerMenu),
   onPlayerMenu: (
+    playPause: () => void,
     historyBack: () => void,
     historyForward: () => void,
     navigateBack: () => void,
@@ -125,6 +126,7 @@ contextBridge.exposeInMainWorld("ipc", {
     prevSource: () => void,
     nextSource: () => void,
   ) => {
+    ipcRenderer.on(IPC.playerMenuPlayPause, playPause);
     ipcRenderer.on(IPC.playerMenuHistoryBack, historyBack);
     ipcRenderer.on(IPC.playerMenuHistoryForward, historyForward);
     ipcRenderer.on(IPC.playerMenuNavigateBack, navigateBack);
@@ -136,6 +138,7 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.on(IPC.playerMenuNextSource, nextSource);
   },
   offPlayerMenu: (
+    playPause: () => void,
     historyBack: () => void,
     historyForward: () => void,
     navigateBack: () => void,
@@ -146,6 +149,7 @@ contextBridge.exposeInMainWorld("ipc", {
     prevSource: () => void,
     nextSource: () => void,
   ) => {
+    ipcRenderer.off(IPC.playerMenuPlayPause, playPause);
     ipcRenderer.off(IPC.playerMenuHistoryBack, historyBack);
     ipcRenderer.off(IPC.playerMenuHistoryForward, historyForward);
     ipcRenderer.off(IPC.playerMenuNavigateBack, navigateBack);

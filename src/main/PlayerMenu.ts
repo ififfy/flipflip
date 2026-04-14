@@ -1,10 +1,7 @@
 import {
   app,
-  BaseWindow,
-  IpcMainEvent,
-  KeyboardEvent,
+  BrowserWindow,
   Menu,
-  WebContents,
 } from "electron";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { IPC } from "../common/const";
@@ -14,7 +11,6 @@ export default class PlayerMenu {
   private static counter = 0;
 
   public static create(
-    ev: IpcMainEvent,
     isPlaying: boolean,
     fullScreen: boolean,
     alwaysOnTop: boolean,
@@ -51,7 +47,7 @@ export default class PlayerMenu {
     }
   }
 
-  public static setIsPlaying(ev: IpcMainEvent, playing: boolean) {
+  public static setIsPlaying(playing: boolean) {
     if (PlayerMenu.instance == null) {
       return;
     }
@@ -153,83 +149,49 @@ export default class PlayerMenu {
     );
   }
 
-  playPause(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuPlayPause);
+  private getBrowserWindow() {
+    return BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
   }
 
-  historyBack(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuHistoryBack);
+  playPause() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuPlayPause);
   }
 
-  historyForward(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuHistoryForward);
+  historyBack() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuHistoryBack);
   }
 
-  navigateBack(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuNavigateBack);
+  historyForward() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuHistoryForward);
   }
 
-  toggleFullscreen(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuToggleFullscreen);
+  navigateBack() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuNavigateBack);
   }
 
-  toggleAlwaysOnTop(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuToggleAlwaysOnTop);
+  toggleFullscreen() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuToggleFullscreen);
   }
 
-  toggleMenuBarDisplay(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuToggleMenuBarDisplay);
+  toggleAlwaysOnTop() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuToggleAlwaysOnTop);
   }
 
-  onDelete(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuOnDelete);
+  toggleMenuBarDisplay() {
+    this.getBrowserWindow().webContents.send(
+      IPC.playerMenuToggleMenuBarDisplay,
+    );
   }
 
-  prevSource(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuPrevSource);
+  onDelete() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuOnDelete);
   }
 
-  nextSource(
-    event: KeyboardEvent,
-    focusedWindow: BaseWindow,
-    focusedWebContents: WebContents,
-  ) {
-    focusedWebContents.send(IPC.playerMenuNextSource);
+  prevSource() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuPrevSource);
+  }
+
+  nextSource() {
+    this.getBrowserWindow().webContents.send(IPC.playerMenuNextSource);
   }
 }
