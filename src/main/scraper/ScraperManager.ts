@@ -7,7 +7,6 @@ import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import { IF, ST } from "../../common/const";
 import { urlToPath } from "../../common/utils";
-import { getCachePath } from "../utils";
 import {
   filterPathsToJustPlayable,
   loadBDSMlr,
@@ -295,7 +294,7 @@ const loadPlaylist = (
     });
 };
 
-const { allURLs, allPosts, config, source, filter, weight, helpers } =
+const { allURLs, allPosts, config, source, filter, weight, helpers, cacheDir } =
   workerData;
 const pm = (object: any) => {
   if (
@@ -353,7 +352,7 @@ if (sourceType == ST.local) {
   );
 } else if (sourceType == ST.video) {
   const cachePath =
-    getCachePath(source.url, config) + getFileName(source.url, path.sep);
+    cacheDir + getFileName(source.url, path.sep);
   loadVideo(
     pm,
     allURLs,
@@ -367,7 +366,7 @@ if (sourceType == ST.local) {
   );
 } else if (sourceType == ST.playlist) {
   const cachePath =
-    getCachePath(source.url, config) + getFileName(source.url, path.sep);
+    cacheDir + getFileName(source.url, path.sep);
   loadPlaylist(
     pm,
     allURLs,
@@ -429,7 +428,7 @@ if (sourceType == ST.local) {
   }
   if (helpers.next == -1) {
     helpers.next = 0;
-    const cachePath = getCachePath(source.url, config);
+    const cachePath = cacheDir;
     if (
       config.caching.enabled &&
       fs.existsSync(cachePath) &&
