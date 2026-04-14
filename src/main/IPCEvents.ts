@@ -517,7 +517,9 @@ function onCacheImage(
   source: string,
 ) {
   const cachePath = getCachePath(null, config);
-  fs.mkdirSync(cachePath);
+  if (!fs.existsSync(cachePath)) {
+    fs.mkdirSync(cachePath);
+  }
 
   const maxSize = config.caching.maxSize;
   const sourceCachePath = getCachePath(source, config);
