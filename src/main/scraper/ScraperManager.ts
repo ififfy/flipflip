@@ -351,8 +351,7 @@ if (sourceType == ST.local) {
     pm,
   );
 } else if (sourceType == ST.video) {
-  const cachePath =
-    cacheDir + getFileName(source.url, path.sep);
+  const cachePath = cacheDir + getFileName(source.url, path.sep);
   loadVideo(
     pm,
     allURLs,
@@ -365,8 +364,7 @@ if (sourceType == ST.local) {
     config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
   );
 } else if (sourceType == ST.playlist) {
-  const cachePath =
-    cacheDir + getFileName(source.url, path.sep);
+  const cachePath = cacheDir + getFileName(source.url, path.sep);
   loadPlaylist(
     pm,
     allURLs,

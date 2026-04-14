@@ -580,9 +580,18 @@ function onScrapeFiles(
     return;
   }
 
-  const cacheDir = getCachePath(source.url, config)
+  const cacheDir = getCachePath(source.url, config);
   const worker = new Worker(path.join(__dirname, "ScraperManager.js"), {
-    workerData: { allURLs, allPosts, config, source, filter, weight, helpers, cacheDir },
+    workerData: {
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      cacheDir,
+    },
   });
   worker.on("message", (message) => {
     window.webContents.send(IPC.scrapeFilesResponse, message);

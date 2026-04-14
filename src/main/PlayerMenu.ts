@@ -1,8 +1,4 @@
-import {
-  app,
-  BrowserWindow,
-  Menu,
-} from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { IPC } from "../common/const";
 

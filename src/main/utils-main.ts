@@ -1,5 +1,5 @@
-import fs from "fs"
-import path from 'path'
+import fs from "fs";
+import path from "path";
 import { app } from "electron";
 import Backup from "../common/Backup";
 import { ST } from "../common/const";
@@ -8,7 +8,7 @@ import Config from "../common/Config";
 import en from "../common/en";
 
 /**
- * utils that only work in the Electron main process (NOT workers) 
+ * utils that only work in the Electron main process (NOT workers)
  */
 export const saveDir = path.join(app.getPath("appData"), "flipflip");
 export const savePath = path.join(saveDir, "data.json");
