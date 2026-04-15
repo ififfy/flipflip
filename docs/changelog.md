@@ -7,6 +7,7 @@
 - Remove Instagram
 - Upgrade xmldom to 0.9.9
 - Upgrade tumblr.js to 5.0.1
+- Escape '.' in hostname regexes
 
 #### v4.0.0-beta10 <small>(10/13/2025)</small>
 - Fix images only partially loading
