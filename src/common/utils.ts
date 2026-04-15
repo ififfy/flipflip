@@ -213,7 +213,7 @@ export function getFileGroup(url: string, pathSep: string) {
       }
       return redgifID;
     case ST.imagefap:
-      let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
+      let imagefapID = url.replace(/https?:\/\/www\.imagefap\.com\//, "");
       imagefapID = imagefapID.replace(/pictures\//, "");
       imagefapID = imagefapID.replace(/gallery\//, "");
       imagefapID = imagefapID.replace(/organizer\//, "");
@@ -221,7 +221,7 @@ export function getFileGroup(url: string, pathSep: string) {
       imagefapID = imagefapID.split("/")[0];
       return imagefapID;
     case ST.sexcom:
-      let sexcomID = url.replace(/https?:\/\/www.sex.com\//, "");
+      let sexcomID = url.replace(/https?:\/\/www\.sex\.com\//, "");
       sexcomID = sexcomID.replace(/user\//, "");
       sexcomID = sexcomID.split("?")[0];
       if (sexcomID.endsWith("/")) {
@@ -229,11 +229,11 @@ export function getFileGroup(url: string, pathSep: string) {
       }
       return sexcomID;
     case ST.imgur:
-      let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
+      let imgurID = url.replace(/https?:\/\/imgur\.com\//, "");
       imgurID = imgurID.replace(/a\//, "");
       return imgurID;
     case ST.deviantart:
-      let authorID = url.replace(/https?:\/\/www.deviantart.com\//, "");
+      let authorID = url.replace(/https?:\/\/www\.deviantart\.com\//, "");
       if (authorID.includes("/")) {
         authorID = authorID.substring(0, authorID.indexOf("/"));
       }
