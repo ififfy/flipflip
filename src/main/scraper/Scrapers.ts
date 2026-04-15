@@ -1,7 +1,7 @@
 import path from "path";
 import wretch from "wretch";
 import { JSDOM } from "jsdom";
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 import * as imgur from "imgur";
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";

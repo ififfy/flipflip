@@ -2751,6 +2751,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmldom/xmldom@npm:^0.9.9":
+  version: 0.9.9
+  resolution: "@xmldom/xmldom@npm:0.9.9"
+  checksum: 10c0/f1ecf6cd6926651a752d578fe662c10c47b8f8d98abe646f3318998283ac4a0e591161f89c8d1fc1822ae2524b82f8ff3de4ab396fba7ad7988f508cd5118e89
+  languageName: node
+  linkType: hard
+
 "@xtuc/ieee754@npm:^1.2.0":
   version: 1.2.0
   resolution: "@xtuc/ieee754@npm:1.2.0"
@@ -5583,6 +5590,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^5.62.0"
     "@typescript-eslint/parser": "npm:^5.62.0"
     "@vercel/webpack-asset-relocator-loader": "npm:^1.7.3"
+    "@xmldom/xmldom": "npm:^0.9.9"
     canvas: "npm:^3.2.3"
     clsx: "npm:^1.2.1"
     codemirror: "npm:^5.59.0"
@@ -5639,7 +5647,6 @@ __metadata:
     uuid: "npm:^13.0.0"
     web-audio-beat-detector: "npm:^8.1.33"
     wretch: "npm:^1.7.10"
-    xmldom: "npm:^0.6.0"
   languageName: unknown
   linkType: soft
 
@@ -12148,13 +12155,6 @@ __metadata:
   version: 2.2.0
   resolution: "xmlchars@npm:2.2.0"
   checksum: 10c0/b64b535861a6f310c5d9bfa10834cf49127c71922c297da9d4d1b45eeaae40bf9b4363275876088fbe2667e5db028d2cd4f8ee72eed9bede840a67d57dab7593
-  languageName: node
-  linkType: hard
-
-"xmldom@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "xmldom@npm:0.6.0"
-  checksum: 10c0/93cbb4854f73f431a402e7942baa87a59e8445fd0b4ae6bf6af3a1007809e849da8ac70bbe1509242212bce5d19e30b55ea282cbd9d87281701d1bdc13b74623
   languageName: node
   linkType: hard
 
