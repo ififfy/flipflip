@@ -29,6 +29,7 @@
     "@types/d3-ease": "^3.0.1",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/jsdom": "^28.0.1",
+    "@types/oauth": "^0.9.6",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -97,7 +98,7 @@
     "snoowrap": "^1.23.0",
     "sortablejs": "^1.10.2",
     "system-font-families": "^0.6.0",
-    "tumblr.js": "^3.0.0",
+    "tumblr.js": "^5.0.1",
     "uuid": "^13.0.0",
     "web-audio-beat-detector": "^8.1.33",
     "wretch": "^1.7.10"
