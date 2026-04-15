@@ -45,7 +45,6 @@ declare module "system-font-families" {
     getFonts(): Promise<string[]>;
   }
 }
-declare module "uuid/v4";
 declare module "web-audio-beat-detector";
 declare module "xmldom";
 declare module "react-sound" {
