@@ -9,7 +9,13 @@ import Snoowrap from "snoowrap";
 import { IF, RF, RT, WF } from "../../common/const";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
-import { getFileGroup, getFileName, isVideo, isImage, isImageOrVideo } from "../../common/utils";
+import {
+  getFileGroup,
+  getFileName,
+  isVideo,
+  isImage,
+  isImageOrVideo,
+} from "../../common/utils";
 import { Timespan } from "snoowrap/dist/objects/Subreddit";
 
 export const processAllURLs = (
