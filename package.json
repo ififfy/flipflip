@@ -62,7 +62,6 @@
     "@mui/styles": "5.13.7",
     "@mui/system": "5.13.7",
     "@xmldom/xmldom": "^0.9.9",
-    "canvas": "^3.2.3",
     "clsx": "^1.2.1",
     "codemirror": "^5.59.0",
     "core-js": "^3.16.3",
