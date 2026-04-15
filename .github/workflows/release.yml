@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+        matrix:
+            os: [ubuntu-latest, windows-latest, macos-latest]
+            arch: [x64, arm64]
+    env:
+      PLATFORM: ${{ matrix.os == 'ubuntu-latest' && 'linux' || (matrix.os == 'windows-latest' && 'win32' || 'darwin') }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+    - name: Enable Yarn
+      run: |
+        corepack enable
+        corepack prepare yarn@stable --activate
+    - name: Install packages
+      run: yarn install
+    - name: Get Package Version
+      id: get-package-version
+      uses: stevenbenitez/get-package-version-action@v1
+    - name: Make Release
+      run: yarn make --platform ${{ env.PLATFORM }} --arch ${{ matrix.arch }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./out/make/zip/${{ env.PLATFORM }}/${{ matrix.arch }}/FlipFlip-${{ env.PLATFORM }}-${{ matrix.arch }}-${{ steps.get-package-version.outputs.version }}.zip
+        asset_name: FlipFlip-${{ env.PLATFORM }}-${{ matrix.arch }}-${{ steps.get-package-version.outputs.version }}.zip
+        asset_content_type: application/zip
