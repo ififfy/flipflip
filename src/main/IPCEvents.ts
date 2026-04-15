@@ -15,7 +15,6 @@ import {
 } from "electron";
 import { urlToPath } from "../common/utils";
 import getFolderSize from "get-folder-size";
-import { Worker } from "worker_threads";
 import { rimrafSync } from "rimraf";
 import gifInfo from "gif-info";
 
@@ -76,6 +75,7 @@ import GifInfo from "../common/GifInfo";
 import { Constants } from "../common/constants";
 import Audio from "../common/Audio";
 import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
+import { loadSources } from "./scraper/ScraperManager";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -581,32 +581,17 @@ function onScrapeFiles(
   }
 
   const cacheDir = getCachePath(source.url, config);
-  const worker = new Worker(path.join(__dirname, "ScraperManager.js"), {
-    workerData: {
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      cacheDir,
-    },
-  });
-  worker.on("message", (message) => {
-    window.webContents.send(IPC.scrapeFilesResponse, message);
-  });
-  worker.on("error", (err) => {
-    window.webContents.send(IPC.scrapeFilesResponse, { error: String(err) });
-  });
-
-  worker.on("exit", (code) => {
-    if (code !== 0) {
-      window.webContents.send(IPC.scrapeFilesResponse, {
-        error: `Worker stopped with exit code ${code}`,
-      });
-    }
-  });
+  loadSources(
+    allURLs,
+    allPosts,
+    config,
+    source,
+    filter,
+    weight,
+    helpers,
+    cacheDir,
+    (message) => window.webContents.send(IPC.scrapeFilesResponse, message)
+  )
 }
 
 function onDeleteLibrarySource(

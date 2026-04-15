@@ -29,7 +29,6 @@ import {
   processAllURLs,
 } from "./Scrapers";
 import { getFileName, getSourceType, isVideo } from "../../common/utils";
-import { workerData, parentPort } from "worker_threads";
 
 const loadNimja = (
   pm: Function,
@@ -294,156 +293,177 @@ const loadPlaylist = (
     });
 };
 
-const { allURLs, allPosts, config, source, filter, weight, helpers, cacheDir } =
-  workerData;
-const pm = (object: any) => {
-  if (
-    object?.source &&
-    object?.data &&
-    object?.allURLs &&
-    object?.weight &&
-    object?.helpers
-  ) {
-    const source = object.source;
-    if (source.blacklist && source.blacklist.length > 0) {
-      object.data = object.data.filter(
-        (url: string) => !source.blacklist.includes(url),
+export function loadSources(
+  allURLs: Map<string, Array<string>>,
+  allPosts: Map<string, string>,
+  config: Config,
+  source: LibrarySource,
+  filter: string,
+  weight: string,
+  helpers: { next: any; count: number; retries: number; uuid: string },
+  cacheDir: string,
+  onLoaded: (object: any) => void
+) {
+  const pm = (object: any) => {
+    if (
+      object?.source &&
+      object?.data &&
+      object?.allURLs &&
+      object?.weight &&
+      object?.helpers
+    ) {
+      const source = object.source;
+      if (source.blacklist && source.blacklist.length > 0) {
+        object.data = object.data.filter(
+          (url: string) => !source.blacklist.includes(url),
+        );
+      }
+      object.allURLs = processAllURLs(
+        object.data,
+        object.allURLs,
+        object.source,
+        object.weight,
+        object.helpers,
       );
     }
-    object.allURLs = processAllURLs(
-      object.data,
-      object.allURLs,
-      object.source,
-      object.weight,
-      object.helpers,
+
+    onLoaded(object)
+  };
+
+  // Determine what kind of source we have based on the URL
+  const sourceType = getSourceType(source.url);
+  if (sourceType == ST.local) {
+    // Local files
+    loadLocalDirectory(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      null,
     );
-  }
-
-  parentPort.postMessage(object);
-};
-
-// Determine what kind of source we have based on the URL
-const sourceType = getSourceType(source.url);
-if (sourceType == ST.local) {
-  // Local files
-  loadLocalDirectory(
-    pm,
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    null,
-  );
-} else if (sourceType == ST.list) {
-  // Image List
-  helpers.next = null;
-  loadRemoteImageURLList(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    pm,
-  );
-} else if (sourceType == ST.video) {
-  const cachePath = cacheDir + getFileName(source.url, path.sep);
-  loadVideo(
-    pm,
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-  );
-} else if (sourceType == ST.playlist) {
-  const cachePath = cacheDir + getFileName(source.url, path.sep);
-  loadPlaylist(
-    pm,
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-  );
-} else if (sourceType == ST.nimja) {
-  loadNimja(
-    pm,
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    null,
-  );
-} else {
-  // Paging sources
-  let workerFunction: any;
-  if (sourceType == ST.tumblr) {
-    workerFunction = loadTumblr;
-  } else if (sourceType == ST.reddit) {
-    workerFunction = loadReddit;
-  } else if (sourceType == ST.redgifs) {
-    workerFunction = loadRedGifs;
-  } else if (sourceType == ST.imagefap) {
-    workerFunction = loadImageFap;
-  } else if (sourceType == ST.sexcom) {
-    workerFunction = loadSexCom;
-  } else if (sourceType == ST.imgur) {
-    workerFunction = loadImgur;
-  } else if (sourceType == ST.deviantart) {
-    workerFunction = loadDeviantArt;
-  } else if (sourceType == ST.danbooru) {
-    workerFunction = loadDanbooru;
-  } else if (sourceType == ST.e621) {
-    workerFunction = loadE621;
-  } else if (sourceType == ST.luscious) {
-    workerFunction = loadLuscious;
-  } else if (sourceType == ST.gelbooru1) {
-    workerFunction = loadGelbooru1;
-  } else if (sourceType == ST.gelbooru2) {
-    workerFunction = loadGelbooru2;
-  } else if (sourceType == ST.ehentai) {
-    workerFunction = loadEHentai;
-  } else if (sourceType == ST.bdsmlr) {
-    workerFunction = loadBDSMlr;
-  } else if (sourceType == ST.hydrus) {
-    workerFunction = loadHydrus;
-  } else if (sourceType == ST.piwigo) {
-    workerFunction = loadPiwigo;
-  }
-  if (helpers.next == -1) {
-    helpers.next = 0;
-    const cachePath = cacheDir;
-    if (
-      config.caching.enabled &&
-      fs.existsSync(cachePath) &&
-      fs.readdirSync(cachePath).length > 0
-    ) {
-      // If the cache directory exists, use it
-      loadLocalDirectory(
-        pm,
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-        cachePath,
-      );
+  } else if (sourceType == ST.list) {
+    // Image List
+    helpers.next = null;
+    loadRemoteImageURLList(
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      pm,
+    );
+  } else if (sourceType == ST.video) {
+    const cachePath = cacheDir + getFileName(source.url, path.sep);
+    loadVideo(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+    );
+  } else if (sourceType == ST.playlist) {
+    const cachePath = cacheDir + getFileName(source.url, path.sep);
+    loadPlaylist(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+    );
+  } else if (sourceType == ST.nimja) {
+    loadNimja(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      null,
+    );
+  } else {
+    // Paging sources
+    let workerFunction: any;
+    if (sourceType == ST.tumblr) {
+      workerFunction = loadTumblr;
+    } else if (sourceType == ST.reddit) {
+      workerFunction = loadReddit;
+    } else if (sourceType == ST.redgifs) {
+      workerFunction = loadRedGifs;
+    } else if (sourceType == ST.imagefap) {
+      workerFunction = loadImageFap;
+    } else if (sourceType == ST.sexcom) {
+      workerFunction = loadSexCom;
+    } else if (sourceType == ST.imgur) {
+      workerFunction = loadImgur;
+    } else if (sourceType == ST.deviantart) {
+      workerFunction = loadDeviantArt;
+    } else if (sourceType == ST.danbooru) {
+      workerFunction = loadDanbooru;
+    } else if (sourceType == ST.e621) {
+      workerFunction = loadE621;
+    } else if (sourceType == ST.luscious) {
+      workerFunction = loadLuscious;
+    } else if (sourceType == ST.gelbooru1) {
+      workerFunction = loadGelbooru1;
+    } else if (sourceType == ST.gelbooru2) {
+      workerFunction = loadGelbooru2;
+    } else if (sourceType == ST.ehentai) {
+      workerFunction = loadEHentai;
+    } else if (sourceType == ST.bdsmlr) {
+      workerFunction = loadBDSMlr;
+    } else if (sourceType == ST.hydrus) {
+      workerFunction = loadHydrus;
+    } else if (sourceType == ST.piwigo) {
+      workerFunction = loadPiwigo;
+    }
+    if (helpers.next == -1) {
+      helpers.next = 0;
+      const cachePath = cacheDir;
+      if (
+        config.caching.enabled &&
+        fs.existsSync(cachePath) &&
+        fs.readdirSync(cachePath).length > 0
+      ) {
+        // If the cache directory exists, use it
+        loadLocalDirectory(
+          pm,
+          allURLs,
+          allPosts,
+          config,
+          source,
+          filter,
+          weight,
+          helpers,
+          cachePath,
+        );
+      } else {
+        workerFunction(
+          allURLs,
+          allPosts,
+          config,
+          source,
+          filter,
+          weight,
+          helpers,
+          pm,
+        );
+      }
     } else {
       workerFunction(
         allURLs,
@@ -456,16 +476,5 @@ if (sourceType == ST.local) {
         pm,
       );
     }
-  } else {
-    workerFunction(
-      allURLs,
-      allPosts,
-      config,
-      source,
-      filter,
-      weight,
-      helpers,
-      pm,
-    );
   }
 }
