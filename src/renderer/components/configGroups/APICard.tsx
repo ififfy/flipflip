@@ -5,6 +5,7 @@ import wretch from "wretch";
 
 import {
   Alert,
+  AlertColor,
   Avatar,
   Button,
   Dialog,
@@ -635,7 +636,7 @@ class APICard extends React.Component<APICardProps> {
         >
           <Alert
             onClose={this.onCloseSnack.bind(this)}
-            severity={this.state.snackbarSeverity as any}
+            severity={this.state.snackbarSeverity as AlertColor}
           >
             {this.state.snackbar}
           </Alert>

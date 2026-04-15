@@ -16,3 +16,4 @@ FlipFlip-linux-ia32/
 *.iws
 .idea/
 .vite/
+.webpack/

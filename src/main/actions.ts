@@ -196,12 +196,6 @@ export function tumblrAuth(
   const requestTokenUrl = "https://www.tumblr.com/oauth/request_token";
   const accessTokenUrl = "https://www.tumblr.com/oauth/access_token";
 
-  const closeServer = (server?: http.Server) => {
-    if (server != null) {
-      server.close();
-    }
-  };
-
   const oauth = new OAuth(
     requestTokenUrl,
     accessTokenUrl,
@@ -212,7 +206,6 @@ export function tumblrAuth(
     "HMAC-SHA1",
   );
 
-  let server: http.Server | undefined = undefined;
   let sharedSecret = "";
 
   oauth.getOAuthRequestToken(
@@ -225,7 +218,7 @@ export function tumblrAuth(
         const error = err.statusCode + " - " + err.data;
         console.error(error);
         window.webContents.send(IPC.tumblrAuthResponse, { error });
-        closeServer(server);
+        server.close();
         return;
       }
 
@@ -235,58 +228,67 @@ export function tumblrAuth(
   );
 
   // Start a server to listen for Tumblr OAuth response
-  server = http
-    .createServer((req, res) => {
-      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-      const html =
-        "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.write(html);
+  const server = http.createServer();
+  server
+    .on(
+      "request",
+      (
+        req: http.IncomingMessage,
+        res: http.ServerResponse<http.IncomingMessage> & {
+          req: http.IncomingMessage;
+        },
+      ) => {
+        // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+        const html =
+          "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.write(html);
 
-      if (!req.url.endsWith("favicon.ico")) {
-        if (
-          req.url.includes("oauth_token") &&
-          req.url.includes("oauth_verifier")
-        ) {
-          const args = req.url.replace("\/?", "").split("&");
-          const oauthToken = args[0].substring(12);
-          const oauthVerifier = args[1].substring(15);
+        if (!req.url.endsWith("favicon.ico")) {
+          if (
+            req.url.includes("oauth_token") &&
+            req.url.includes("oauth_verifier")
+          ) {
+            const args = req.url.replace("\/?", "").split("&");
+            const oauthToken = args[0].substring(12);
+            const oauthVerifier = args[1].substring(15);
 
-          oauth.getOAuthAccessToken(
-            oauthToken,
-            sharedSecret,
-            oauthVerifier,
-            (err: any, token: string, secret: string) => {
-              if (err) {
-                console.error("Validation failed with error", err);
+            oauth.getOAuthAccessToken(
+              oauthToken,
+              sharedSecret,
+              oauthVerifier,
+              (err: any, token: string, secret: string) => {
+                if (err) {
+                  console.error("Validation failed with error", err);
+                  window.webContents.send(IPC.tumblrAuthResponse, {
+                    error: String(err),
+                  });
+                  server.close();
+                  req.socket.destroy();
+                  res.end();
+                  return;
+                }
+
                 window.webContents.send(IPC.tumblrAuthResponse, {
-                  error: String(err),
+                  success: { token, secret },
                 });
-                closeServer(server);
+                window.show();
+
+                server.close();
                 req.socket.destroy();
-                res.end();
-                return;
-              }
-
-              window.webContents.send(IPC.tumblrAuthResponse, {
-                success: { token, secret },
-              });
-              window.show();
-
-              closeServer(server);
-              req.socket.destroy();
-            },
-          );
-        } else {
-          window.webContents.send(IPC.tumblrAuthResponse, {
-            error: "Access Denied",
-          });
-          closeServer(server);
-          req.socket.destroy();
+              },
+            );
+          } else {
+            window.webContents.send(IPC.tumblrAuthResponse, {
+              error: "Access Denied",
+            });
+            server.close();
+            req.socket.destroy();
+          }
         }
-      }
-      res.end();
-    })
+        res.end();
+      },
+    )
     .listen(65010);
 }
 
@@ -296,13 +298,79 @@ export function redditAuth(
   clientID: string,
   deviceID: string,
 ) {
-  const closeServer = (server?: http.Server) => {
-    if (server != null) {
-      server.close();
-    }
-  };
+  // Start a server to listen for Reddit OAuth response
+  const server = http.createServer();
+  server
+    .on(
+      "request",
+      (
+        req: http.IncomingMessage,
+        res: http.ServerResponse<http.IncomingMessage> & {
+          req: http.IncomingMessage;
+        },
+      ) => {
+        // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+        const html =
+          "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.write(html);
 
-  let server: http.Server | undefined = undefined;
+        if (!req.url.endsWith("favicon.ico")) {
+          if (req.url.includes("state") && req.url.includes("code")) {
+            const args = req.url.replace("\/?", "").split("&");
+            // This should be the same as the deviceID
+            const state = args[0].substring(6);
+            if (state == deviceID) {
+              // This is what we use to get our token
+              const code = args[1].substring(5);
+              wretch("https://www.reddit.com/api/v1/access_token")
+                .headers({
+                  "User-Agent": userAgent,
+                  Authorization: "Basic " + btoa(clientID + ":"),
+                })
+                .formData({
+                  grant_type: "authorization_code",
+                  code: code,
+                  redirect_uri: "http://localhost:65010",
+                })
+                .post()
+                .json((json) => {
+                  window.webContents.send(IPC.redditAuthResponse, {
+                    success: { token: json.refresh_token, secret: "" },
+                  });
+                  window.show();
+                  server.close();
+                  req.socket.destroy();
+                })
+                .catch((e) => {
+                  console.error(e);
+                  window.webContents.send(IPC.redditAuthResponse, {
+                    error: e.message,
+                  });
+                  server.close();
+                  req.socket.destroy();
+                  res.end();
+                });
+            }
+          } else if (req.url.includes("state") && req.url.includes("error")) {
+            const args = req.url.replace("\/?", "").split("&");
+            // This should be the same as the deviceID
+            const state = args[0].substring(6);
+            if (state == deviceID) {
+              const error = args[1].substring(6);
+              console.error(error);
+              window.webContents.send(IPC.redditAuthResponse, { error });
+            }
+
+            server.close();
+            req.socket.destroy();
+          }
+        }
+        res.end();
+      },
+    )
+    .listen(65010);
+
   // Make initial request and open authorization form in browser
   wretch(
     "https://www.reddit.com/api/v1/authorize?client_id=" +
@@ -318,72 +386,8 @@ export function redditAuth(
     .catch((e) => {
       console.error(e);
       window.webContents.send(IPC.redditAuthResponse, { error: e.message });
-      closeServer(server);
+      server.close();
     });
-
-  // Start a server to listen for Reddit OAuth response
-  server = http
-    .createServer((req, res) => {
-      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-      const html =
-        "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.write(html);
-
-      if (!req.url.endsWith("favicon.ico")) {
-        if (req.url.includes("state") && req.url.includes("code")) {
-          const args = req.url.replace("\/?", "").split("&");
-          // This should be the same as the deviceID
-          const state = args[0].substring(6);
-          if (state == deviceID) {
-            // This is what we use to get our token
-            const code = args[1].substring(5);
-            wretch("https://www.reddit.com/api/v1/access_token")
-              .headers({
-                "User-Agent": userAgent,
-                Authorization: "Basic " + btoa(clientID + ":"),
-              })
-              .formData({
-                grant_type: "authorization_code",
-                code: code,
-                redirect_uri: "http://localhost:65010",
-              })
-              .post()
-              .json((json) => {
-                window.webContents.send(IPC.redditAuthResponse, {
-                  success: { token: json.refresh_token, secret: "" },
-                });
-                window.show();
-                closeServer(server);
-                req.socket.destroy();
-              })
-              .catch((e) => {
-                console.error(e);
-                window.webContents.send(IPC.redditAuthResponse, {
-                  error: e.message,
-                });
-                closeServer(server);
-                req.socket.destroy();
-                res.end();
-              });
-          }
-        } else if (req.url.includes("state") && req.url.includes("error")) {
-          const args = req.url.replace("\/?", "").split("&");
-          // This should be the same as the deviceID
-          const state = args[0].substring(6);
-          if (state == deviceID) {
-            const error = args[1].substring(6);
-            console.error(error);
-            window.webContents.send(IPC.redditAuthResponse, { error });
-          }
-
-          closeServer(server);
-          req.socket.destroy();
-        }
-      }
-      res.end();
-    })
-    .listen(65010);
 }
 
 export function printMemoryReport() {

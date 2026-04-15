@@ -10,6 +10,7 @@ import { IF, RF, RT, WF } from "../../common/const";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import { getFileGroup, getFileName, isVideo, isImage, isImageOrVideo } from "../../common/utils";
+import { Timespan } from "snoowrap/dist/objects/Subreddit";
 
 export const processAllURLs = (
   data: string[],
@@ -476,7 +477,7 @@ export const loadReddit = (
           const time = source.redditTime == null ? RT.day : source.redditTime;
           reddit
             .getSubreddit(getFileGroup(url, path.sep))
-            .getTop({ time: time, after: helpers.next })
+            .getTop({ time: time as Timespan, after: helpers.next })
             .then(handleSubmissions)
             .catch(errorSubmission);
           break;
@@ -845,7 +846,7 @@ const loadImageFapGallery = (
     .text((html) => {
       const galleryWindow = new JSDOM(html, { contentType: "text/html" })
         .window;
-      let imageEl = galleryWindow.document.querySelector(
+      let imageEl = galleryWindow.document.querySelector<HTMLAnchorElement>(
         ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a",
       );
       if (imageEl) {
@@ -856,7 +857,7 @@ const loadImageFapGallery = (
             let captcha = undefined;
             const ahrefs = new JSDOM(html, {
               contentType: "text/html",
-            }).window.document.querySelectorAll(
+            }).window.document.querySelectorAll<HTMLAnchorElement>(
               'a[href^="https://cdn.imagefap.com/images/full/"]',
             );
             if (ahrefs.length > 0) {
@@ -900,9 +901,10 @@ const loadImageFapGallery = (
           timeout: timeout,
         });
       }
-      const nextGalleryLink = galleryWindow.document.querySelector(
-        "#gallery > font > span > a:last-child",
-      );
+      const nextGalleryLink =
+        galleryWindow.document.querySelector<HTMLAnchorElement>(
+          "#gallery > font > span > a:last-child",
+        );
       if (nextGalleryLink && nextGalleryLink.innerHTML == ":: next ::") {
         let href = nextGalleryLink.href;
         if (href.startsWith("/")) {

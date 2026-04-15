@@ -2,6 +2,7 @@ import * as React from "react";
 
 import {
   Alert,
+  AlertColor,
   Box,
   createTheme,
   CssBaseline,
@@ -11,7 +12,11 @@ import {
   Slide,
   Snackbar,
 } from "@mui/material";
-import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
+import {
+  StyledEngineProvider,
+  ThemeOptions,
+  ThemeProvider,
+} from "@mui/material/styles";
 
 import { SP } from "../../common/const";
 import * as actions from "../data/actions";
@@ -28,14 +33,22 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
-import AppStorageState from "../../common/AppStorageState";
+import AppStorageState, {
+  defaultInitialState,
+} from "../../common/AppStorageState";
 
 function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
 export default class Meta extends React.Component {
-  readonly state?: AppStorageState;
+  readonly state: AppStorageState;
+
+  constructor(props: {}) {
+    super(props);
+
+    this.state = defaultInitialState;
+  }
 
   isRoute(kind: string): Boolean {
     return actions.isRoute(this.state, kind);
@@ -158,7 +171,7 @@ export default class Meta extends React.Component {
       this.applyAction.bind(this, fn, ...args);
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
-    const theme = createTheme(this.state.theme);
+    const theme = createTheme(this.state.theme as ThemeOptions);
     // @ts-ignore
     return (
       <StyledEngineProvider injectFirst>
@@ -546,7 +559,7 @@ export default class Meta extends React.Component {
               >
                 <Alert
                   onClose={a(actions.closeMessage)}
-                  severity={this.state.systemSnackSeverity}
+                  severity={this.state.systemSnackSeverity as AlertColor}
                 >
                   {this.state.systemSnack}
                 </Alert>

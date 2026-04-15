@@ -213,7 +213,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
 
       let message = d ? [d.url] : [""];
       if (this.props.isOverlay) {
-        message = ["Loading '" + this.props.scene.name + "'...", message];
+        message = ["Loading '" + this.props.scene.name + "'", ...message];
       }
       this.props.setProgress(sources.length, n + 1, message);
 

@@ -302,7 +302,7 @@ export function loadSources(
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
   cacheDir: string,
-  onLoaded: (object: any) => void
+  onLoaded: (object: any) => void,
 ) {
   const pm = (object: any) => {
     if (
@@ -327,7 +327,7 @@ export function loadSources(
       );
     }
 
-    onLoaded(object)
+    onLoaded(object);
   };
 
   // Determine what kind of source we have based on the URL

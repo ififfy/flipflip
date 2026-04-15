@@ -15,52 +15,10 @@ import defaultTheme from "../../common/theme";
 import Playlist from "../../common/Playlist";
 import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
-import AppStorageState from "../../common/AppStorageState";
+import AppStorageState, {
+  defaultInitialState,
+} from "../../common/AppStorageState";
 import { removeDuplicatesBy } from "../../common/utils";
-
-/**
- * A compile-time global variable defined in webpack.config' [plugins]
- * section to pick up the version string from package.json
- */
-export declare var __VERSION__: string;
-
-export const defaultInitialState: AppStorageState = {
-  version: __VERSION__,
-  config: new Config(),
-  sceneGroups: Array<SceneGroup>(),
-  scenes: Array<Scene>(),
-  grids: Array<SceneGrid>(),
-  library: Array<LibrarySource>(),
-  audios: Array<Audio>(),
-  scripts: Array<CaptionScript>(),
-  playlists: Array<Playlist>(),
-  tags: Array<Tag>(),
-  route: Array<Route>(),
-  specialMode: null as string,
-  openTab: 0,
-  displayedSources: Array<LibrarySource>(),
-  libraryYOffset: 0,
-  libraryFilters: Array<string>(),
-  librarySelected: Array<string>(),
-  audioOpenTab: 3,
-  audioYOffset: 0,
-  audioFilters: Array<string>(),
-  audioSelected: Array<string>(),
-  scriptYOffset: 0,
-  scriptFilters: Array<string>(),
-  scriptSelected: Array<string>(),
-  progressMode: null as string,
-  progressTitle: null as string,
-  progressCurrent: 0,
-  progressTotal: 0,
-  progressNext: null as string,
-  systemMessage: null as string,
-  systemSnackOpen: false,
-  systemSnack: null as string,
-  systemSnackSeverity: null as string,
-  tutorial: null as string,
-  theme: defaultTheme,
-};
 
 /**
  * Archives a file (if it exists) to same path appending '.{epoch now}'
@@ -77,6 +35,7 @@ export default class AppStorage {
   initialState: AppStorageState = defaultInitialState;
 
   constructor(windowId: number) {
+    this.initialState.version = process.env.APP_VERSION;
     try {
       fs.mkdirSync(saveDir);
     } catch (e) {
@@ -109,7 +68,7 @@ export default class AppStorage {
         if (fs.existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
       }
 
-      if (data.version != __VERSION__) {
+      if (data.version != process.env.APP_VERSION) {
         // Preserve the existing file - so as not to destroy user's data
         archiveFile(portableMode ? portablePath : savePath);
       }
@@ -126,7 +85,7 @@ export default class AppStorage {
           sources = removeDuplicatesBy((s: string) => s, sources);
           // Create our initialState object
           this.initialState = {
-            version: __VERSION__,
+            version: process.env.APP_VERSION,
             specialMode: data.specialMode ? data.specialMode : null,
             openTab: data.openTab ? data.openTab : 0,
             displayedSources: Array<LibrarySource>(),
@@ -208,7 +167,7 @@ export default class AppStorage {
         case "3.0.0-beta1":
         case "3.0.0-beta2":
           this.initialState = {
-            version: __VERSION__,
+            version: process.env.APP_VERSION,
             specialMode: data.specialMode,
             openTab: 0,
             displayedSources: Array<LibrarySource>(),
@@ -405,7 +364,7 @@ export default class AppStorage {
         case "3.2.0":
         case "3.2.1":
           this.initialState = {
-            version: __VERSION__,
+            version: process.env.APP_VERSION,
             specialMode: data.specialMode,
             openTab: data.openTab,
             displayedSources: Array<LibrarySource>(),
@@ -467,7 +426,7 @@ export default class AppStorage {
           break;
         default:
           this.initialState = {
-            version: __VERSION__,
+            version: process.env.APP_VERSION,
             specialMode: data.specialMode,
             openTab: data.openTab,
             displayedSources: Array<LibrarySource>(),

@@ -1,15 +1,3 @@
-import { IAudioMetadata } from "music-metadata";
-import AppStorageState from "./common/AppStorageState";
-import Audio from "./common/Audio";
-import Backup from "./common/Backup";
-import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
-import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
-import { Config } from "./common/Config";
-import LibrarySource from "./common/LibrarySource";
-import LibraryMoveResult from "./common/LibraryMoveResult";
-import { Constants } from "./common/constants";
-import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
-
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
   const value: any;
@@ -60,6 +48,33 @@ declare module "system-font-families" {
 declare module "uuid/v4";
 declare module "web-audio-beat-detector";
 declare module "xmldom";
+declare module "react-sound" {
+  import * as React from "react";
+  export interface ReactSoundProps {
+    url: string;
+    playStatus: "PLAYING" | "STOPPED" | "PAUSED";
+    playFromPosition?: number | undefined;
+    position?: number | undefined;
+    volume?: number | undefined;
+    playbackRate?: number | undefined;
+    autoLoad?: boolean | undefined;
+    loop?: boolean | undefined;
+    onError?: (() => void) | undefined;
+    onLoading?: (() => void) | undefined;
+    onLoad?: (() => void) | undefined;
+    onPlaying?: (() => void) | undefined;
+    onPause?: (() => void) | undefined;
+    onResume?: (() => void) | undefined;
+    onStop?: (() => void) | undefined;
+    onFinishedPlaying?: (() => void) | undefined;
+    onBufferChange?: (() => void) | undefined;
+  }
+
+  export default class Sound extends React.Component<ReactSoundProps> {
+    // This line fixes the JSX error
+    readonly props: ReactSoundProps;
+  }
+}
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
@@ -74,221 +89,3 @@ interface NavigatorClipboard {
 }
 
 interface Navigator extends NavigatorClipboard {}
-
-declare global {
-  interface Window {
-    constants: Constants;
-    ipc: {
-      platform: () => string;
-      getConstants(): Promise<Constants>;
-      newWindow: () => void;
-      isFirstWindow: () => Promise<boolean>;
-      setProgressBar: (progress: number) => void;
-      getBackups: () => Promise<Array<Backup>>;
-      getAppStorage: () => Promise<AppStorageState>;
-      saveAppStorage: (state: AppStorageState) => void;
-      createBackup: (state: AppStorageState) => void;
-      cleanBackups: (config: Config) => void;
-      restoreBackup: (backupFile: string) => Promise<AppStorageState>;
-      onStartScene: (callback: (sceneName: string) => void) => void;
-      openExternal: (url: string) => void;
-      showItemInFolder: (path: string) => void;
-      reset: () => void;
-      saveExport: (filePath: string, json: string) => void;
-      openImport: () => Promise<string | undefined>;
-      openDirectory: (multiSelections?: boolean) => Promise<string[]>;
-      openVideoDirs: () => Promise<string[]>;
-      openVideos: () => Promise<string[]>;
-      openAudios: (shiftKey: boolean) => Promise<string[]>;
-      openScripts: (shiftKey: boolean) => Promise<string[]>;
-      openSubtitle: () => Promise<string | undefined>;
-      openScript: () => Promise<string | undefined>;
-      saveScript: (url: string, script: string) => Promise<void>;
-      saveScriptAs: (
-        script: string,
-        defaultPath: string,
-      ) => Promise<string | undefined>;
-      getFonts: () => Promise<string[]>;
-      tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) => void;
-      onTumblrAuthResponse: (
-        callback: (response: AuthResponse) => void,
-      ) => void;
-      tumblrFollowing: (
-        key: string,
-        secret: string,
-        token: string,
-        tokenSecret: string,
-        limit: number,
-        offset: number,
-      ) => Promise<TumblrFollowingResponse>;
-      redditAuthRequest: (
-        userAgent: string,
-        clientID: string,
-        deviceID: string,
-      ) => void;
-      onRedditAuthResponse: (
-        callback: (response: AuthResponse) => void,
-      ) => void;
-      redditSubscriptions: (
-        userAgent: string,
-        clientId: string,
-        refreshToken: string,
-        after: string,
-      ) => Promise<RedditSubscriptionResponse>;
-      buildPlayerMenu: (
-        isPlaying: boolean,
-        fullScreen: boolean,
-        alwaysOnTop: boolean,
-        showMenu: boolean,
-        cachingEnabled: boolean,
-        downloadScene: boolean,
-        audioScene: boolean,
-        scriptScene: boolean,
-        hasAllTags: boolean,
-      ) => void;
-      destroyPlayerMenu: () => void;
-      setAllwaysOnTop: (alwaysOnTop: boolean) => void;
-      setMenuBarVisibility: (showMenu: boolean) => void;
-      setFullScreen: (fullScreen: boolean) => void;
-      playerMenuSetPlayPause: (play: boolean) => void;
-      onPlayerMenu: (
-        playPause: () => void,
-        historyBack: () => void,
-        historyForward: () => void,
-        navigateBack: () => void,
-        toggleFullscreen: () => void,
-        toggleAlwaysOnTop: () => void,
-        toggleMenuBarDisplay: () => void,
-        onDelete: () => void,
-        prevSource: () => void,
-        nextSource: () => void,
-      ) => void;
-      offPlayerMenu: (
-        playPause: () => void,
-        historyBack: () => void,
-        historyForward: () => void,
-        navigateBack: () => void,
-        toggleFullscreen: () => void,
-        toggleAlwaysOnTop: () => void,
-        toggleMenuBarDisplay: () => void,
-        onDelete: () => void,
-        prevSource: () => void,
-        nextSource: () => void,
-      ) => void;
-      copyImageToClipboard: (sourceURL: string) => void;
-      showPlayerContextMenu: (
-        config: Config,
-        showGotoTagSource: boolean,
-        showRecentPictureGrid: boolean,
-        url: string,
-        source: string,
-        post?: string,
-      ) => void;
-      onClosePlayerContextMenu: (callback: () => void) => void;
-      onBlacklistFile: (
-        callback: (
-          event: IpcRendererEvent,
-          literalSource: string,
-          path: string,
-        ) => void,
-      ) => void;
-      onDeletePath: (
-        callback: (event: IpcRendererEvent, path: string) => void,
-      ) => void;
-      onGoToTagSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      onGoToClipSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      onShowRecentPictureGrid: (callback: () => void) => void;
-      offBlacklistFile: (
-        callback: (
-          event: IpcRendererEvent,
-          literalSource: string,
-          path: string,
-        ) => void,
-      ) => void;
-      offDeletePath: (
-        callback: (event: IpcRendererEvent, path: string) => void,
-      ) => void;
-      offGoToTagSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      offGoToClipSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      offShowRecentPictureGrid: (callback: () => void) => void;
-      startPowerSaveBlocker: () => Promise<number>;
-      stopPowerSaveBlocker: (powerSaveID: number) => void;
-      clearBrowserCaches: () => void;
-      getFileSize: (path: string) => Promise<number>;
-      readTextFile: (path: string) => Promise<string>;
-      cacheImage: (config: Config, url: string, source: string) => void;
-      getCacheSize: (config: Config) => Promise<number>;
-      onScrapeFilesResponse: (callback: (message: any) => void) => void;
-      scrapeFiles: (
-        allURLs: Map<string, string[]>,
-        allPosts: Map<string, string>,
-        config: Config,
-        source: LibrarySource,
-        imageTypeFilter: string,
-        weightFunction: string,
-        helpers: { next: any; count: number; retries: number; uuid: string },
-      ) => void;
-      deleteLibrarySource: (sourceURL: string, config: Config) => Promise<void>;
-      clearCache: (config: Config) => Promise<void>;
-      moveLibrarySource: (
-        sourceURL: string,
-        config: Config,
-      ) => Promise<LibraryMoveResult>;
-      portablePathExists: () => Promise<boolean>;
-      validateConfig: (config: Config) => Promise<string>;
-      deleteAllLibrarySources: (sourceURLs: string[]) => Promise<void>;
-      deleteSource: (sourceURL: string) => Promise<void>;
-      filterNewScriptSources: (newSources: string[]) => Promise<string[]>;
-      getCachePath: (config: Config) => Promise<string>;
-      getSourceCachePath: (
-        sourceURL: string,
-        config: Config,
-      ) => Promise<string>;
-      deleteBlacklistedFile: (
-        fileToBlacklist: string,
-        sourceURL: string,
-        config: Config,
-      ) => void;
-      cleanCache: (cachePath: string) => Promise<void>;
-      revealFile: (sourceURL: string, config: Config) => void;
-      finishDelete: (filePath: string) => Promise<string | undefined>;
-      getBackupFile: (backupURL: string) => Promise<string>;
-      shouldShowDeleteDialog: (sourceURL: string) => Promise<boolean>;
-      getGifInfo: (url: string) => Promise<GifInfo | null>;
-      fileExists: (filePath: string) => Promise<boolean>;
-      getCachedFileURL: (
-        source: string,
-        url: string,
-        config: Config,
-      ) => Promise<string>;
-      getScraperSources: (sources: LibrarySource[]) => Promise<LibrarySource[]>;
-      getAudioThumbnail: (config: Config) => Promise<string | undefined>;
-      addAudioSource: (
-        url: string,
-        id: number,
-        config: Config,
-      ) => Promise<Audio | undefined>;
-      addAudioURL: (
-        url: string,
-        id: number,
-        config: Config,
-      ) => Promise<Audio | undefined>;
-      getAudioMetadata: (
-        audio: Audio,
-        config: Config,
-      ) => Promise<Audio | undefined>;
-      getAudioBPMMetadata: (url: string) => Promise<number>;
-      getAudioBuffer: (url: string) => Promise<GetAudioBufferResponse>;
-    };
-  }
-}
-
-export {};

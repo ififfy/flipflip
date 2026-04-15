@@ -3,6 +3,7 @@ import clsx from "clsx";
 
 import {
   Alert,
+  AlertColor,
   AppBar,
   Backdrop,
   Badge,
@@ -1594,7 +1595,7 @@ class SceneDetail extends React.Component<SceneDetailProps> {
         >
           <Alert
             onClose={this.onCloseSnackbar.bind(this)}
-            severity={this.state.snackbarSeverity as any}
+            severity={this.state.snackbarSeverity as AlertColor}
           >
             {this.state.snackbar}
           </Alert>

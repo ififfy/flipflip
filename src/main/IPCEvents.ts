@@ -590,8 +590,8 @@ function onScrapeFiles(
     weight,
     helpers,
     cacheDir,
-    (message) => window.webContents.send(IPC.scrapeFilesResponse, message)
-  )
+    (message) => window.webContents.send(IPC.scrapeFilesResponse, message),
+  );
 }
 
 function onDeleteLibrarySource(

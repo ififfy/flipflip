@@ -17,7 +17,7 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { FontSettingsI } from "../../data/CaptionScript";
+import { FontSettingsI } from "../../../common/CaptionScript";
 import ColorPicker from "../config/ColorPicker";
 
 const styles = (theme: Theme) =>

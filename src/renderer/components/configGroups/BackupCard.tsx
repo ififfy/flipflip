@@ -3,6 +3,7 @@ import clsx from "clsx";
 
 import {
   Alert,
+  AlertColor,
   Button,
   Chip,
   Dialog,
@@ -416,7 +417,7 @@ class BackupCard extends React.Component<BackupCardProps> {
         >
           <Alert
             onClose={this.onCloseDialog.bind(this)}
-            severity={this.state.snackbarSeverity as any}
+            severity={this.state.snackbarSeverity as AlertColor}
           >
             {this.state.snackbar}
           </Alert>

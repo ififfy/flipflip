@@ -2,9 +2,13 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
-import { VitePlugin } from "@electron-forge/plugin-vite";
+import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
+import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
+
+import { mainConfig } from "./webpack.main.config";
+import { rendererConfig } from "./webpack.renderer.config";
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -17,28 +21,24 @@ const config: ForgeConfig = {
     new MakerDeb({}),
   ],
   plugins: [
-    new VitePlugin({
-      // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
-      // If you are familiar with Vite configuration, it will look really familiar.
-      build: [
-        {
-          // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
-          entry: "src/main/main.ts",
-          config: "vite.main.config.ts",
-          target: "main",
-        },
-        {
-          entry: "src/main/preload.ts",
-          config: "vite.preload.config.ts",
-          target: "preload",
-        }
-      ],
-      renderer: [
-        {
-          name: "main_window",
-          config: "vite.renderer.config.ts",
-        },
-      ],
+    new AutoUnpackNativesPlugin({}),
+    new WebpackPlugin({
+      mainConfig,
+      devContentSecurityPolicy:
+        "default-src 'self' data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.github.com; frame-src https://www.imagefap.com http://www.imagefap.com https://hypno.nimja.com/ http://hypno.nimja.com/",
+      renderer: {
+        config: rendererConfig,
+        entryPoints: [
+          {
+            html: "./src/renderer/index.html",
+            js: "./src/renderer/renderer.tsx",
+            name: "main_window",
+            preload: {
+              js: "./src/main/preload.ts",
+            },
+          },
+        ],
+      },
     }),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
