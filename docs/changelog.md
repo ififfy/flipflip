@@ -3,6 +3,8 @@
 - Based on 3.2.3
 - Upgrade Electron to 41.2.0
 - Move Node.js and Electron code to main process
+- Remove Twitter
+- Remove Instagram
 
 #### v4.0.0-beta10 <small>(10/13/2025)</small>
 - Fix images only partially loading
