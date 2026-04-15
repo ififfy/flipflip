@@ -46,7 +46,6 @@ declare module "system-font-families" {
   }
 }
 declare module "web-audio-beat-detector";
-declare module "xmldom";
 declare module "react-sound" {
   import * as React from "react";
   export interface ReactSoundProps {
