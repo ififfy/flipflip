@@ -10,6 +10,7 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    name: 'FlipFlip',
     icon: 'src/renderer/icons/flipflip_logo'
   },
   rebuildConfig: {},
