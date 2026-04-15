@@ -328,7 +328,8 @@ export default class InteractiveMediaZoom extends React.PureComponent<
         }}
       >
         {/* Inner wrapper that receives the CSS transform.  Kept separate from the
-            clipping container so the transform-origin math stays simple. */}
+            clipping container so the transform-origin math stays simple and the
+            compositor can promote it to its own GPU layer via willChange. */}
         <div
           style={{
             position: 'absolute',
@@ -338,6 +339,9 @@ export default class InteractiveMediaZoom extends React.PureComponent<
             left: 0,
             transform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
             transformOrigin: '50% 50%',
+            // Hint to the GPU compositor to promote this element to its own layer
+            // for smooth 60fps zoom/pan animations without repaints.
+            willChange: 'transform',
           }}
         >
           {children}
