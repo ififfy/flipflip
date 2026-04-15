@@ -25,7 +25,7 @@ declare global {
       createBackup: (state: AppStorageState) => void;
       cleanBackups: (config: Config) => void;
       restoreBackup: (backupFile: string) => Promise<AppStorageState>;
-      onStartScene: (callback: (sceneName: string) => void) => void;
+      onStartScene: (callback: (sceneName: string) => void) => () => void;
       openExternal: (url: string) => void;
       showItemInFolder: (path: string) => void;
       reset: () => void;
@@ -86,30 +86,16 @@ declare global {
       setMenuBarVisibility: (showMenu: boolean) => void;
       setFullScreen: (fullScreen: boolean) => void;
       playerMenuSetPlayPause: (play: boolean) => void;
-      onPlayerMenu: (
-        playPause: () => void,
-        historyBack: () => void,
-        historyForward: () => void,
-        navigateBack: () => void,
-        toggleFullscreen: () => void,
-        toggleAlwaysOnTop: () => void,
-        toggleMenuBarDisplay: () => void,
-        onDelete: () => void,
-        prevSource: () => void,
-        nextSource: () => void,
-      ) => void;
-      offPlayerMenu: (
-        playPause: () => void,
-        historyBack: () => void,
-        historyForward: () => void,
-        navigateBack: () => void,
-        toggleFullscreen: () => void,
-        toggleAlwaysOnTop: () => void,
-        toggleMenuBarDisplay: () => void,
-        onDelete: () => void,
-        prevSource: () => void,
-        nextSource: () => void,
-      ) => void;
+      onPlayerMenuPlayPause: (callback: () => void) => () => void;
+      onPlayerMenuHistoryBack: (callback: () => void) => () => void;
+      onPlayerMenuHistoryForward: (callback: () => void) => () => void;
+      onPlayerMenuNavigateBack: (callback: () => void) => () => void;
+      onPlayerMenuToggleFullscreen: (callback: () => void) => () => void;
+      onPlayerMenuToggleAlwaysOnTop: (callback: () => void) => () => void;
+      onPlayerMenuToggleMenuBarDisplay: (callback: () => void) => () => void;
+      onPlayerMenuOnDelete: (callback: () => void) => () => void;
+      onPlayerMenuPrevSource: (callback: () => void) => () => void;
+      onPlayerMenuNextSource: (callback: () => void) => () => void;
       copyImageToClipboard: (sourceURL: string) => void;
       showPlayerContextMenu: (
         config: Config,
@@ -121,39 +107,12 @@ declare global {
       ) => void;
       onClosePlayerContextMenu: (callback: () => void) => void;
       onBlacklistFile: (
-        callback: (
-          event: IpcRendererEvent,
-          literalSource: string,
-          path: string,
-        ) => void,
-      ) => void;
-      onDeletePath: (
-        callback: (event: IpcRendererEvent, path: string) => void,
-      ) => void;
-      onGoToTagSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      onGoToClipSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      onShowRecentPictureGrid: (callback: () => void) => void;
-      offBlacklistFile: (
-        callback: (
-          event: IpcRendererEvent,
-          literalSource: string,
-          path: string,
-        ) => void,
-      ) => void;
-      offDeletePath: (
-        callback: (event: IpcRendererEvent, path: string) => void,
-      ) => void;
-      offGoToTagSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      offGoToClipSource: (
-        callback: (event: IpcRendererEvent, source: string) => void,
-      ) => void;
-      offShowRecentPictureGrid: (callback: () => void) => void;
+        callback: (literalSource: string, path: string) => void,
+      ) => () => void;
+      onDeletePath: (callback: (path: string) => void) => () => void;
+      onGoToTagSource: (callback: (source: string) => void) => () => void;
+      onGoToClipSource: (callback: (source: string) => void) => () => void;
+      onShowRecentPictureGrid: (callback: () => void) => () => void;
       startPowerSaveBlocker: () => Promise<number>;
       stopPowerSaveBlocker: (powerSaveID: number) => void;
       clearBrowserCaches: () => void;

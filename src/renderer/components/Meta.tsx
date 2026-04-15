@@ -50,6 +50,8 @@ export default class Meta extends React.Component {
     this.state = defaultInitialState;
   }
 
+  _removeOnStartScene: () => void = null;
+
   isRoute(kind: string): Boolean {
     return actions.isRoute(this.state, kind);
   }
@@ -84,12 +86,17 @@ export default class Meta extends React.Component {
       this.setState(result);
       setInterval(this.queueSave.bind(this), 500);
     });
-    // We never bother cleaning this up, but that's OK because this is the top level
-    // component of the whole app.
-    window.ipc.onStartScene(this.startScene.bind(this));
+
+    this._removeOnStartScene = window.ipc.onStartScene(
+      this.startScene.bind(this),
+    );
 
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({ debugMode: false });
+  }
+
+  componentWillUnMount() {
+    this._removeOnStartScene();
   }
 
   _queueSave = false;

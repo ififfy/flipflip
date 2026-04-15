@@ -86,10 +86,13 @@ contextBridge.exposeInMainWorld("ipc", {
       refreshToken,
       after,
     ),
-  onStartScene: (callback: (sceneName: string) => void) =>
-    ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
-      callback(sceneName),
-    ),
+  onStartScene: (callback: (sceneName: string) => void) => {
+    const channel = IPC.startScene;
+    const listener = (event: IpcRendererEvent, sceneName: string) =>
+      callback(sceneName);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
   buildPlayerMenu: (
     isPlaying: boolean,
     fullScreen: boolean,
@@ -114,51 +117,65 @@ contextBridge.exposeInMainWorld("ipc", {
       hasAllTags,
     ),
   destroyPlayerMenu: () => ipcRenderer.send(IPC.destroyPlayerMenu),
-  onPlayerMenu: (
-    playPause: () => void,
-    historyBack: () => void,
-    historyForward: () => void,
-    navigateBack: () => void,
-    toggleFullscreen: () => void,
-    toggleAlwaysOnTop: () => void,
-    toggleMenuBarDisplay: () => void,
-    onDelete: () => void,
-    prevSource: () => void,
-    nextSource: () => void,
-  ) => {
-    ipcRenderer.on(IPC.playerMenuPlayPause, playPause);
-    ipcRenderer.on(IPC.playerMenuHistoryBack, historyBack);
-    ipcRenderer.on(IPC.playerMenuHistoryForward, historyForward);
-    ipcRenderer.on(IPC.playerMenuNavigateBack, navigateBack);
-    ipcRenderer.on(IPC.playerMenuToggleFullscreen, toggleFullscreen);
-    ipcRenderer.on(IPC.playerMenuToggleAlwaysOnTop, toggleAlwaysOnTop);
-    ipcRenderer.on(IPC.playerMenuToggleMenuBarDisplay, toggleMenuBarDisplay);
-    ipcRenderer.on(IPC.playerMenuOnDelete, onDelete);
-    ipcRenderer.on(IPC.playerMenuPrevSource, prevSource);
-    ipcRenderer.on(IPC.playerMenuNextSource, nextSource);
+  onPlayerMenuPlayPause: (callback: () => void) => {
+    const channel = IPC.playerMenuPlayPause;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
   },
-  offPlayerMenu: (
-    playPause: () => void,
-    historyBack: () => void,
-    historyForward: () => void,
-    navigateBack: () => void,
-    toggleFullscreen: () => void,
-    toggleAlwaysOnTop: () => void,
-    toggleMenuBarDisplay: () => void,
-    onDelete: () => void,
-    prevSource: () => void,
-    nextSource: () => void,
-  ) => {
-    ipcRenderer.off(IPC.playerMenuPlayPause, playPause);
-    ipcRenderer.off(IPC.playerMenuHistoryBack, historyBack);
-    ipcRenderer.off(IPC.playerMenuHistoryForward, historyForward);
-    ipcRenderer.off(IPC.playerMenuNavigateBack, navigateBack);
-    ipcRenderer.off(IPC.playerMenuToggleFullscreen, toggleFullscreen);
-    ipcRenderer.off(IPC.playerMenuToggleAlwaysOnTop, toggleAlwaysOnTop);
-    ipcRenderer.off(IPC.playerMenuToggleMenuBarDisplay, toggleMenuBarDisplay);
-    ipcRenderer.off(IPC.playerMenuOnDelete, onDelete);
-    ipcRenderer.off(IPC.playerMenuPrevSource, prevSource);
-    ipcRenderer.off(IPC.playerMenuNextSource, nextSource);
+  onPlayerMenuHistoryBack: (callback: () => void) => {
+    const channel = IPC.playerMenuHistoryBack;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuHistoryForward: (callback: () => void) => {
+    const channel = IPC.playerMenuHistoryForward;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuNavigateBack: (callback: () => void) => {
+    const channel = IPC.playerMenuNavigateBack;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuToggleFullscreen: (callback: () => void) => {
+    const channel = IPC.playerMenuToggleFullscreen;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuToggleAlwaysOnTop: (callback: () => void) => {
+    const channel = IPC.playerMenuToggleAlwaysOnTop;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuToggleMenuBarDisplay: (callback: () => void) => {
+    const channel = IPC.playerMenuToggleMenuBarDisplay;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuOnDelete: (callback: () => void) => {
+    const channel = IPC.playerMenuOnDelete;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuPrevSource: (callback: () => void) => {
+    const channel = IPC.playerMenuPrevSource;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onPlayerMenuNextSource: (callback: () => void) => {
+    const channel = IPC.playerMenuNextSource;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
   },
   setAllwaysOnTop: (alwaysOnTop: boolean) =>
     ipcRenderer.send(IPC.setAllwaysOnTop, alwaysOnTop),
@@ -190,39 +207,43 @@ contextBridge.exposeInMainWorld("ipc", {
   onClosePlayerContextMenu: (callback: () => void) =>
     ipcRenderer.once(IPC.closePlayerContextMenu, callback),
   onBlacklistFile: (
-    callback: (
+    callback: (literalSource: string, path: string) => void,
+  ) => {
+    const channel = IPC.blacklistFile;
+    const listener = (
       event: IpcRendererEvent,
       literalSource: string,
       path: string,
-    ) => void,
-  ) => ipcRenderer.on(IPC.blacklistFile, callback),
-  onDeletePath: (callback: (event: IpcRendererEvent, path: string) => void) =>
-    ipcRenderer.on(IPC.deletePath, callback),
-  onGoToTagSource: (
-    callback: (event: IpcRendererEvent, source: string) => void,
-  ) => ipcRenderer.on(IPC.goToTagSource, callback),
-  onGoToClipSource: (
-    callback: (event: IpcRendererEvent, source: string) => void,
-  ) => ipcRenderer.on(IPC.goToClipSource, callback),
-  onShowRecentPictureGrid: (callback: () => void) =>
-    ipcRenderer.on(IPC.showRecentPictureGrid, callback),
-  offBlacklistFile: (
-    callback: (
-      event: IpcRendererEvent,
-      literalSource: string,
-      path: string,
-    ) => void,
-  ) => ipcRenderer.off(IPC.blacklistFile, callback),
-  offDeletePath: (callback: (event: IpcRendererEvent, path: string) => void) =>
-    ipcRenderer.off(IPC.deletePath, callback),
-  offGoToTagSource: (
-    callback: (event: IpcRendererEvent, source: string) => void,
-  ) => ipcRenderer.off(IPC.goToTagSource, callback),
-  offGoToClipSource: (
-    callback: (event: IpcRendererEvent, source: string) => void,
-  ) => ipcRenderer.off(IPC.goToClipSource, callback),
-  offShowRecentPictureGrid: (callback: () => void) =>
-    ipcRenderer.off(IPC.showRecentPictureGrid, callback),
+    ) => callback(literalSource, path);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onDeletePath: (callback: (path: string) => void) => {
+    const channel = IPC.deletePath;
+    const listener = (event: IpcRendererEvent, path: string) => callback(path);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onGoToTagSource: (callback: (source: string) => void) => {
+    const channel = IPC.goToTagSource;
+    const listener = (event: IpcRendererEvent, source: string) =>
+      callback(source);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onGoToClipSource: (callback: (source: string) => void) => {
+    const channel = IPC.goToClipSource;
+    const listener = (event: IpcRendererEvent, source: string) =>
+      callback(source);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
+  onShowRecentPictureGrid: (callback: () => void) => {
+    const channel = IPC.showRecentPictureGrid;
+    const listener = (event: IpcRendererEvent) => callback();
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
   startPowerSaveBlocker: () => ipcRenderer.invoke(IPC.startPowerSaveBlocker),
   stopPowerSaveBlocker: (powerSaveID: number) =>
     ipcRenderer.send(IPC.stopPowerSaveBlocker, powerSaveID),

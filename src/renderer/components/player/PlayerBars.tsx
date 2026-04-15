@@ -322,16 +322,21 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
   _drawerTimeout: any = null;
   _tagDrawerTimeout: any = null;
   _showVideoControls = false;
-  _onPlayPause: () => void = null;
-  _onNavigateBack: () => void = null;
-  _onToggleFullscreen: () => void = null;
-  _onToggleAlwaysOnTop: () => void = null;
-  _onToggleMenuBarDisplay: () => void = null;
-  _onHistoryBack: () => void = null;
-  _onHistoryForward: () => void = null;
-  _onDelete: () => void = null;
-  _onPrevSource: () => void = null;
-  _onNextSource: () => void = null;
+  _removeOnPlayPause: () => void = null;
+  _removeOnNavigateBack: () => void = null;
+  _removeOnToggleFullscreen: () => void = null;
+  _removeOnToggleAlwaysOnTop: () => void = null;
+  _removeOnToggleMenuBarDisplay: () => void = null;
+  _removeOnHistoryBack: () => void = null;
+  _removeOnHistoryForward: () => void = null;
+  _removeOnDelete: () => void = null;
+  _removeOnPrevSource: () => void = null;
+  _removeOnNextSource: () => void = null;
+  _removeOnBlacklistFile: () => void = null;
+  _removeOnDeletePath: () => void = null;
+  _removeOnGoToTagSource: () => void = null;
+  _removeOnGoToClipSource: () => void = null;
+  _removeOnShowRecentPictureGrid: () => void = null;
 
   render() {
     const classes = this.props.classes;
@@ -955,30 +960,33 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     this._drawerTimeout = null;
     this._tagDrawerTimeout = null;
 
-    window.ipc.offPlayerMenu(
-      this._onPlayPause,
-      this._onHistoryBack,
-      this._onHistoryForward,
-      this._onNavigateBack,
-      this._onToggleFullscreen,
-      this._onToggleAlwaysOnTop,
-      this._onToggleMenuBarDisplay,
-      this._onDelete,
-      this._onPrevSource,
-      this._onNextSource,
-    );
-
-    this._onPlayPause = null;
-    this._onNavigateBack = null;
-    this._onToggleFullscreen = null;
-    this._onToggleAlwaysOnTop = null;
-    this._onToggleMenuBarDisplay = null;
-    this._onHistoryBack = null;
-    this._onHistoryForward = null;
-    this._onDelete = null;
-    this._onPrevSource = null;
-    this._onNextSource = null;
+    this._removeOnPlayPause();
+    this._removeOnNavigateBack();
+    this._removeOnToggleFullscreen();
+    this._removeOnToggleAlwaysOnTop();
+    this._removeOnToggleMenuBarDisplay();
+    this._removeOnHistoryBack();
+    this._removeOnHistoryForward();
+    this._removeOnDelete();
+    this._removeOnPrevSource();
+    this._removeOnNextSource();
     window.ipc.destroyPlayerMenu();
+
+    if (this._removeOnBlacklistFile != null) {
+      this._removeOnBlacklistFile();
+    }
+    if (this._removeOnDeletePath != null) {
+      this._removeOnDeletePath();
+    }
+    if (this._removeOnGoToTagSource != null) {
+      this._removeOnGoToTagSource();
+    }
+    if (this._removeOnGoToClipSource != null) {
+      this._removeOnGoToClipSource();
+    }
+    if (this._removeOnShowRecentPictureGrid != null) {
+      this._removeOnShowRecentPictureGrid();
+    }
 
     window.removeEventListener("contextmenu", this.showContextMenu);
     window.removeEventListener("keydown", this.onKeyDown);
@@ -1201,27 +1209,36 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       return;
     }
 
-    this._onPlayPause = this.playPause.bind(this);
-    this._onNavigateBack = this.navigateBack.bind(this);
-    this._onToggleFullscreen = this.toggleFullscreen.bind(this);
-    this._onToggleAlwaysOnTop = this.toggleAlwaysOnTop.bind(this);
-    this._onToggleMenuBarDisplay = this.toggleMenuBarDisplay.bind(this);
-    this._onHistoryBack = this.historyBack.bind(this);
-    this._onHistoryForward = this.historyForward.bind(this);
-    this._onDelete = this.onDelete.bind(this);
-    this._onPrevSource = this.prevSource.bind(this);
-    this._onNextSource = this.nextSource.bind(this);
-    window.ipc.onPlayerMenu(
-      this._onPlayPause,
-      this._onHistoryBack,
-      this._onHistoryForward,
-      this._onNavigateBack,
-      this._onToggleFullscreen,
-      this._onToggleAlwaysOnTop,
-      this._onToggleMenuBarDisplay,
-      this._onDelete,
-      this._onPrevSource,
-      this._onNextSource,
+    this._removeOnPlayPause = window.ipc.onPlayerMenuPlayPause(
+      this.playPause.bind(this),
+    );
+    this._removeOnNavigateBack = window.ipc.onPlayerMenuNavigateBack(
+      this.navigateBack.bind(this),
+    );
+    this._removeOnToggleFullscreen = window.ipc.onPlayerMenuToggleFullscreen(
+      this.toggleFullscreen.bind(this),
+    );
+    this._removeOnToggleAlwaysOnTop = window.ipc.onPlayerMenuToggleAlwaysOnTop(
+      this.toggleAlwaysOnTop.bind(this),
+    );
+    this._removeOnToggleMenuBarDisplay =
+      window.ipc.onPlayerMenuToggleMenuBarDisplay(
+        this.toggleMenuBarDisplay.bind(this),
+      );
+    this._removeOnHistoryBack = window.ipc.onPlayerMenuHistoryBack(
+      this.historyBack.bind(this),
+    );
+    this._removeOnHistoryForward = window.ipc.onPlayerMenuHistoryForward(
+      this.historyForward.bind(this),
+    );
+    this._removeOnDelete = window.ipc.onPlayerMenuOnDelete(
+      this.onDelete.bind(this),
+    );
+    this._removeOnPrevSource = window.ipc.onPlayerMenuPrevSource(
+      this.prevSource.bind(this),
+    );
+    this._removeOnNextSource = window.ipc.onPlayerMenuNextSource(
+      this.nextSource.bind(this),
     );
 
     const { fullScreen, alwaysOnTop, showMenu } =
@@ -1246,27 +1263,28 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
       return;
     }
 
-    const onBlacklistFile = (_ev: unknown, source: string, path: string) =>
-      this.onBlacklistFile(source, path);
-    const onDeletePath = (_ev: unknown, path: string) =>
-      this.onDeletePath(path);
-    const goToTagSource = (_ev: unknown, source: string) =>
+    const goToTagSource = (source: string) =>
       this.props.goToTagSource(new LibrarySource({ url: source }));
-    const goToClipSource = (_ev: unknown, source: string) =>
+    const goToClipSource = (source: string) =>
       this.props.goToClipSource(new LibrarySource({ url: source }));
-    const showRecentPictureGrid = () => this.props.onRecentPictureGrid();
 
-    window.ipc.onBlacklistFile(onBlacklistFile);
-    window.ipc.onDeletePath(onDeletePath);
-    window.ipc.onGoToTagSource(goToTagSource);
-    window.ipc.onGoToClipSource(goToClipSource);
-    window.ipc.onShowRecentPictureGrid(showRecentPictureGrid);
+    this._removeOnBlacklistFile = window.ipc.onBlacklistFile(
+      this.onBlacklistFile.bind(this),
+    );
+    this._removeOnDeletePath = window.ipc.onDeletePath(
+      this.onDeletePath.bind(this),
+    );
+    this._removeOnGoToTagSource = window.ipc.onGoToTagSource(goToTagSource);
+    this._removeOnGoToClipSource = window.ipc.onGoToClipSource(goToClipSource);
+    this._removeOnShowRecentPictureGrid = window.ipc.onShowRecentPictureGrid(
+      this.props.onRecentPictureGrid.bind(this),
+    );
     window.ipc.onClosePlayerContextMenu(() => {
-      window.ipc.offBlacklistFile(onBlacklistFile);
-      window.ipc.offDeletePath(onDeletePath);
-      window.ipc.offGoToTagSource(goToTagSource);
-      window.ipc.offGoToClipSource(goToClipSource);
-      window.ipc.offShowRecentPictureGrid(showRecentPictureGrid);
+      this._removeOnBlacklistFile();
+      this._removeOnDeletePath();
+      this._removeOnGoToTagSource();
+      this._removeOnGoToClipSource();
+      this._removeOnShowRecentPictureGrid();
     });
 
     const doShowGotoTagSource = !this.props.allTags;
