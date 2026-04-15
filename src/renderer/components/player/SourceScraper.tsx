@@ -220,7 +220,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      window.ipc.onScrapeFilesResponse((object: any) => {
+      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
@@ -228,6 +228,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
           return;
         }
 
+        removeOnResponse()
         if (object?.captcha != null && this.state.captcha == null) {
           this.setState({
             captcha: {
@@ -241,8 +242,8 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         if (object?.error != null) {
           console.error(
             "Error retrieving " +
-              object?.source?.url +
-              (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
+            object?.source?.url +
+            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
           );
           console.error(object.error);
         }
@@ -317,18 +318,20 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      window.ipc.onScrapeFilesResponse((object: any) => {
+      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
-        )
+        ) {
           return;
+        }
 
+        removeOnResponse()
         if (object?.error != null) {
           console.error(
             "Error retrieving " +
-              object?.source?.url +
-              (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
+            object?.source?.url +
+            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
           );
           console.error(object.error);
         }
@@ -393,13 +396,15 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         return;
       }
 
-      window.ipc.onScrapeFilesResponse((object: any) => {
+      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
         if (
           object?.type == "RPC" ||
           (object?.helpers != null && object.helpers.uuid != uuid)
-        )
+        ) {
           return;
+        }
 
+        removeOnResponse()
         if (object?.captcha != null && this.state.captcha == null) {
           this.setState({
             captcha: {
@@ -413,8 +418,8 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         if (object?.error != null) {
           console.error(
             "Error retrieving " +
-              object?.source?.url +
-              (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
+            object?.source?.url +
+            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
           );
           console.error(object.error);
         }

@@ -254,10 +254,12 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.cacheImage, config, url, source),
   getCacheSize: (config: Config) =>
     ipcRenderer.invoke(IPC.getCacheSize, config),
-  onScrapeFilesResponse: (callback: (message: any) => void) =>
-    ipcRenderer.once(IPC.scrapeFilesResponse, (event, message: any) =>
-      callback(message),
-    ),
+  onScrapeFilesResponse: (callback: (message: any) => void) => {
+    const channel = IPC.scrapeFilesResponse;
+    const listener = (event: IpcRendererEvent, message: any) => callback(message);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
   scrapeFiles: (
     allURLs: Map<string, string[]>,
     allPosts: Map<string, string>,

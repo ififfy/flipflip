@@ -120,7 +120,7 @@ declare global {
       readTextFile: (path: string) => Promise<string>;
       cacheImage: (config: Config, url: string, source: string) => void;
       getCacheSize: (config: Config) => Promise<number>;
-      onScrapeFilesResponse: (callback: (message: any) => void) => void;
+      onScrapeFilesResponse: (callback: (message: any) => void) => () => void;
       scrapeFiles: (
         allURLs: Map<string, string[]>,
         allPosts: Map<string, string>,
