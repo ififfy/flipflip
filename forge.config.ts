@@ -25,7 +25,7 @@ const config: ForgeConfig = {
     new WebpackPlugin({
       mainConfig,
       devContentSecurityPolicy:
-        "default-src 'self' data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.github.com; frame-src https://www.imagefap.com http://www.imagefap.com https://hypno.nimja.com/ http://hypno.nimja.com/",
+        "default-src 'self' data:; worker-src 'self' blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.github.com; frame-src https://www.imagefap.com http://www.imagefap.com https://hypno.nimja.com/ http://hypno.nimja.com/",
       renderer: {
         config: rendererConfig,
         entryPoints: [
