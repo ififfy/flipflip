@@ -1205,17 +1205,18 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
           scriptChanged: false,
         });
       } else {
-        // FIXME
-        wretch(this.props.openScript.url)
-          .get()
-          .text((data) => {
-            this.state.codeMirrorOverwriteHack.args = [data];
-            this.state.codeMirrorOverwriteHack.fire();
-            this.setState({
-              captionScript: this.props.openScript,
-              scriptChanged: false,
-            });
+        window.ipc.getTextFromURL(this.props.openScript.url).then((data) => {
+          if (data == null) {
+            return;
+          }
+
+          this.state.codeMirrorOverwriteHack.args = [data];
+          this.state.codeMirrorOverwriteHack.fire();
+          this.setState({
+            captionScript: this.props.openScript,
+            scriptChanged: false,
           });
+        });
       }
     }
   }
@@ -1395,10 +1396,6 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
   onConfirmLoadFromScene() {
     const error = (error: any) => {
       console.error(error);
-      this.setState({ loadFromSceneError: true });
-      setTimeout(() => {
-        this.setState({ loadFromSceneError: false });
-      }, 3000);
     };
 
     const script = JSON.parse(
@@ -1406,23 +1403,21 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
         this.state.sceneScripts.find((s) => s.url == this.state.selectScript),
       ),
     );
+
     this.onCloseDialog();
-    // FIXME
-    wretch(script.url)
-      .get()
-      .badRequest(error)
-      .unauthorized(error)
-      .forbidden(error)
-      .notFound(error)
-      .timeout(error)
-      .internalError(error)
-      .fetchError(error)
-      .error(503, error)
-      .text((data) => {
-        this.state.codeMirrorOverwriteHack.args = [data];
-        this.state.codeMirrorOverwriteHack.fire();
-        this.setState({ captionScript: script, scriptChanged: false });
-      });
+    window.ipc.getTextFromURL(script.url).then((data) => {
+      if (data == null) {
+        this.setState({ loadFromSceneError: true });
+        setTimeout(() => {
+          this.setState({ loadFromSceneError: false });
+        }, 3000);
+        return;
+      }
+
+      this.state.codeMirrorOverwriteHack.args = [data];
+      this.state.codeMirrorOverwriteHack.fire();
+      this.setState({ captionScript: script, scriptChanged: false });
+    });
   }
 
   onFullscreen() {

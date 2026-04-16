@@ -159,7 +159,7 @@ async function onOpenScript(ev: IpcMainEvent) {
   const filePath = await openScript(ev.sender.id);
   if (filePath != null) {
     try {
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = fs.readFileSync(filePath, "utf-8");
       const response: OpenScriptResponse = { url: filePath, data };
       return response;
     } catch (err) {
@@ -1261,6 +1261,16 @@ function onMarkOffline(ev: IpcMainInvokeEvent, url: string) {
   });
 }
 
+async function onGetTextFromURL(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    return await wretch(this.state.importFile).get().text();
+  } catch (err) {
+    console.error(err);
+  }
+
+  return undefined;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1346,6 +1356,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.piwigoGetAlbums, onPiwigoGetAlbums);
   ipcMain.handle(IPC.piwigoGetTags, onPiwigoGetTags);
   ipcMain.handle(IPC.markOffline, onMarkOffline);
+  ipcMain.handle(IPC.getTextFromURL, onGetTextFromURL);
 }
 
 export function releaseIpcEvents() {

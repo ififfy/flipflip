@@ -315,17 +315,11 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
       if (this.props.captionScript.script != null) {
         resolve({ data: [this.props.captionScript.script], helpers: null });
       } else {
-        // FIXME
-        wretch(url)
-          .get()
-          .error(503, (error) => {
-            console.warn(
-              "Unable to access " + url + " - Service is unavailable",
-            );
-          })
-          .text((data) => {
-            resolve({ data: [data], helpers: null });
-          });
+        window.ipc.getTextFromURL(url).then((text) => {
+          if (text != null) {
+            resolve({ data: [text], helpers: null });
+          }
+        });
       }
     });
     this._runningPromise.then(async (data) => {

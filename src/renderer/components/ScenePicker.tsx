@@ -2094,22 +2094,19 @@ class ScenePicker extends React.Component<ScenePickerProps> {
 
   onFinishImportScene() {
     if (this.state.importFile.startsWith("http")) {
-      // FIXME combine with readTextFile
-      wretch(this.state.importFile)
-        .get()
-        .text((text) => {
-          let json;
+      window.ipc.getTextFromURL(this.state.importFile).then((text) => {
+        if (text != null) {
           try {
-            json = JSON.parse(text);
+            const json = JSON.parse(text);
             this.props.onImportScene(json, this.state.importSources);
             this.onCloseDialog();
           } catch (e) {
             this.props.systemMessage("This is not a valid JSON file");
           }
-        })
-        .catch((e) => {
+        } else {
           this.props.systemMessage("Error accessing URL");
-        });
+        }
+      });
     } else {
       window.ipc.readTextFile(this.state.importFile).then((text) => {
         this.props.onImportScene(JSON.parse(text), this.state.importSources);

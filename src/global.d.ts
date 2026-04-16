@@ -206,6 +206,7 @@ declare global {
       piwigoGetAlbums: (url: string) => Promise<Album[]>;
       piwigoGetTags: (url: string) => Promise<Tag[]>;
       markOffline: (url: string) => Promise<string>;
+      getTextFromURL: (url: string) => Promise<string | undefined>;
     };
   }
 }

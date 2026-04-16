@@ -306,6 +306,7 @@ const IPC = {
   piwigoGetAlbums: "ipc.piwigoGetAlbums",
   piwigoGetTags: "ipc.piwigoGetTags",
   markOffline: "ipc.markOffline",
+  getTextFromURL: "ipc.getTextFromURL",
 };
 
 const MO = {
