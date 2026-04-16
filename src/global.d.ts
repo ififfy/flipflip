@@ -202,8 +202,8 @@ declare global {
         username: string,
         password: string,
       ) => Promise<boolean>;
-      piwigoGetAlbums: (url: string) => Promise<Album[] | undefined>;
-      piwigoGetTags: (url: string) => Promise<Tag[] | undefined>;
+      piwigoGetAlbums: (url: string) => Promise<Album[]>;
+      piwigoGetTags: (url: string) => Promise<Tag[]>;
     };
   }
 }

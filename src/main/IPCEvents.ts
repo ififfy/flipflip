@@ -1211,7 +1211,7 @@ async function onPiwigoGetAlbums(ev: IpcMainInvokeEvent, url: string) {
     console.error(err);
   }
 
-  return undefined;
+  return [];
 }
 
 async function onPiwigoGetTags(ev: IpcMainInvokeEvent, url: string) {
@@ -1223,13 +1223,13 @@ async function onPiwigoGetTags(ev: IpcMainInvokeEvent, url: string) {
       .json();
 
     if (json.stat == "ok") {
-      return json.result;
+      return json.result.tags;
     }
   } catch (err) {
     console.error(err);
   }
 
-  return undefined;
+  return [];
 }
 
 // Initialize and release listeners
