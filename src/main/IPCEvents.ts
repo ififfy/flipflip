@@ -1251,9 +1251,7 @@ export function initializeIpcEvents() {
 
 export function releaseIpcEvents() {
   if (initialized) {
-    ipcMain.removeAllListeners(IPC.newWindow);
-    ipcMain.removeAllListeners(IPC.getBackups);
-    // FIXME removeAllListeners for all initialized events
+    ipcMain.removeAllListeners()
   }
 
   initialized = false;
