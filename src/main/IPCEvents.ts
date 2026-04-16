@@ -1166,6 +1166,27 @@ async function onAuthPiwigo(
   }
 }
 
+async  function onLoginPiwigo(ev: IpcMainInvokeEvent, url: string, username: string, password: string) {
+  let loggedIn = false
+  try {
+    const json = await wretch(url)
+        .formUrl({
+          method: "pwg.session.login",
+          username,
+          password,
+        })
+        .post()
+        .setTimeout(5000)
+        .json()
+
+    loggedIn = json.stat == "ok"
+  } catch(err) {
+    console.error(err)
+  }
+
+  return loggedIn
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1247,6 +1268,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
   ipcMain.handle(IPC.authHydrus, onAuthHydrus);
   ipcMain.handle(IPC.authPiwigo, onAuthPiwigo);
+  ipcMain.handle(IPC.loginPiwigo, onLoginPiwigo)
 }
 
 export function releaseIpcEvents() {

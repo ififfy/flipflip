@@ -346,4 +346,5 @@ contextBridge.exposeInMainWorld("ipc", {
     username: string,
     password: string,
   ) => ipcRenderer.invoke(IPC.authPiwigo, schema, host, username, password),
+        loginPiwigo: (url: string, username: string, password: string) => ipcRenderer.invoke(IPC.loginPiwigo, url, username, password)
 });

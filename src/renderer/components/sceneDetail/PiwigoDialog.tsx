@@ -496,39 +496,11 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
 
   login() {
     const { piwigoPassword, piwigoUsername } = this.props.config.remoteSettings;
-    return (
-      // FIXME
-      wretch(this.makeURL())
-        .formUrl({
-          method: "pwg.session.login",
-          username: piwigoUsername,
-          password: piwigoPassword,
-        })
-        .post()
-        .setTimeout(5000)
-        // .notFound((e) => pm({
-        //   error: e.message,
-        //   helpers: helpers,
-        //   source: source,
-        //   timeout: timeout,
-        // }))
-        // .internalError((e) => pm({
-        //   error: e.message,
-        //   helpers: helpers,
-        //   source: source,
-        //   timeout: timeout,
-        // }))
-        .json((json) => {
-          if (json.stat == "ok") {
-            this.setState({ loggedIn: true });
-          } else {
-            //
+    return window.ipc.loginPiwigo(this.makeURL(), piwigoUsername, piwigoPassword).then((loggedIn) => {
+      if (loggedIn) {
+            this.setState({ loggedIn });
           }
-        })
-        .catch((e) => {
-          //
-        })
-    );
+    })
   }
 
   getAlbums() {

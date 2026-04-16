@@ -195,6 +195,7 @@ declare global {
         username: string,
         password: string,
       ) => Promise<string | undefined>;
+      loginPiwigo: (url: string, username: string, password: string) => Promise<boolean>
     };
   }
 }
