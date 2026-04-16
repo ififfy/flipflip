@@ -1,5 +1,5 @@
 import * as React from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Dialog, DialogContent } from "@mui/material";
 
 import { flatten, randomizeList } from "../../data/utils";
@@ -220,84 +220,88 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
-        if (
-          object?.type == "RPC" ||
-          (object?.helpers != null && object.helpers.uuid != uuid)
-        ) {
-          return;
-        }
+      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+        (object: any) => {
+          if (
+            object?.type == "RPC" ||
+            (object?.helpers != null && object.helpers.uuid != uuid)
+          ) {
+            return;
+          }
 
-        removeOnResponse()
-        if (object?.captcha != null && this.state.captcha == null) {
-          this.setState({
-            captcha: {
-              captcha: object.captcha,
-              source: object?.source,
-              helpers: object?.helpers,
-            },
-          });
-        }
+          removeOnResponse();
+          if (object?.captcha != null && this.state.captcha == null) {
+            this.setState({
+              captcha: {
+                captcha: object.captcha,
+                source: object?.source,
+                helpers: object?.helpers,
+              },
+            });
+          }
 
-        if (object?.error != null) {
-          console.error(
-            "Error retrieving " +
-            object?.source?.url +
-            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
-          );
-          console.error(object.error);
-        }
-
-        if (object?.warning != null) {
-          console.warn(object.warning);
-        }
-
-        if (object?.systemMessage != null) {
-          this.props.systemMessage(object.systemMessage);
-        }
-
-        if (object?.source) {
-          n += 1;
-
-          // Just add the new urls to the end of the list
-          if (object?.data && object?.allURLs) {
-            const source = object.source;
-            newAllURLs = object.allURLs;
-            this.setState({ allURLs: newAllURLs });
-            newAllPosts = object.allPosts;
-            this.setState({ allPosts: newAllPosts });
-
-            // If this is a remote URL, queue up the next promise
-            if (object.helpers.next != null) {
-              this._promiseQueue.push({
-                source: source,
-                helpers: object.helpers,
-              });
-            }
-            this.props.setCount(
-              source.url,
-              object.helpers.count,
-              object.helpers.next == null,
+          if (object?.error != null) {
+            console.error(
+              "Error retrieving " +
+                object?.source?.url +
+                (object?.helpers?.next > 0
+                  ? " Page " + object.helpers.next
+                  : ""),
             );
+            console.error(object.error);
           }
 
-          if (n < sources.length) {
-            const timeout = object?.timeout != null ? object.timeout : 1000;
-            window.setTimeout(sourceLoop, timeout);
-          } else {
-            const values = flatten(Array.from(newAllURLs.values()));
-            if (this._promiseQueue.length == 0) {
-              this.setState({ singleImage: values.length == 1 });
+          if (object?.warning != null) {
+            console.warn(object.warning);
+          }
+
+          if (object?.systemMessage != null) {
+            this.props.systemMessage(object.systemMessage);
+          }
+
+          if (object?.source) {
+            n += 1;
+
+            // Just add the new urls to the end of the list
+            if (object?.data && object?.allURLs) {
+              const source = object.source;
+              newAllURLs = object.allURLs;
+              this.setState({ allURLs: newAllURLs });
+              newAllPosts = object.allPosts;
+              this.setState({ allPosts: newAllPosts });
+
+              // If this is a remote URL, queue up the next promise
+              if (object.helpers.next != null) {
+                this._promiseQueue.push({
+                  source: source,
+                  helpers: object.helpers,
+                });
+              }
+              this.props.setCount(
+                source.url,
+                object.helpers.count,
+                object.helpers.next == null,
+              );
             }
-            this.props.finishedLoading(isEmpty(values));
-            promiseLoop();
-            if (this.props.nextScene && this.props.playNextScene) {
-              n = 0;
-              nextSourceLoop();
+
+            if (n < sources.length) {
+              const timeout = object?.timeout != null ? object.timeout : 1000;
+              window.setTimeout(sourceLoop, timeout);
+            } else {
+              const values = flatten(Array.from(newAllURLs.values()));
+              if (this._promiseQueue.length == 0) {
+                this.setState({ singleImage: values.length == 1 });
+              }
+              this.props.finishedLoading(isEmpty(values));
+              promiseLoop();
+              if (this.props.nextScene && this.props.playNextScene) {
+                n = 0;
+                nextSourceLoop();
+              }
             }
           }
-        }
-      });
+        },
+      );
 
       window.ipc.scrapeFiles(
         this.state.allURLs,
@@ -318,63 +322,67 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
-        if (
-          object?.type == "RPC" ||
-          (object?.helpers != null && object.helpers.uuid != uuid)
-        ) {
-          return;
-        }
+      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+        (object: any) => {
+          if (
+            object?.type == "RPC" ||
+            (object?.helpers != null && object.helpers.uuid != uuid)
+          ) {
+            return;
+          }
 
-        removeOnResponse()
-        if (object?.error != null) {
-          console.error(
-            "Error retrieving " +
-            object?.source?.url +
-            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
-          );
-          console.error(object.error);
-        }
+          removeOnResponse();
+          if (object?.error != null) {
+            console.error(
+              "Error retrieving " +
+                object?.source?.url +
+                (object?.helpers?.next > 0
+                  ? " Page " + object.helpers.next
+                  : ""),
+            );
+            console.error(object.error);
+          }
 
-        if (object?.warning != null) {
-          console.warn(object.warning);
-        }
+          if (object?.warning != null) {
+            console.warn(object.warning);
+          }
 
-        if (object?.systemMessage != null) {
-          this.props.systemMessage(object.systemMessage);
-        }
+          if (object?.systemMessage != null) {
+            this.props.systemMessage(object.systemMessage);
+          }
 
-        if (object?.source) {
-          n += 1;
+          if (object?.source) {
+            n += 1;
 
-          // Just add the new urls to the end of the list
-          if (object?.data != null) {
-            const source = object.source;
-            this._nextAllURLs = object.allURLs;
-            this._nextAllPosts = object.allPosts;
+            // Just add the new urls to the end of the list
+            if (object?.data != null) {
+              const source = object.source;
+              this._nextAllURLs = object.allURLs;
+              this._nextAllPosts = object.allPosts;
 
-            // If this is a remote URL, queue up the next promise
-            if (object.helpers.next != null) {
-              this._nextPromiseQueue.push({
-                source: source,
-                helpers: object.helpers,
-              });
+              // If this is a remote URL, queue up the next promise
+              if (object.helpers.next != null) {
+                this._nextPromiseQueue.push({
+                  source: source,
+                  helpers: object.helpers,
+                });
+              }
+              this.props.setCount(
+                source.url,
+                object.helpers.count,
+                object.helpers.next == null,
+              );
             }
-            this.props.setCount(
-              source.url,
-              object.helpers.count,
-              object.helpers.next == null,
-            );
-          }
 
-          if (n < nextSources.length) {
-            window.setTimeout(
-              nextSourceLoop,
-              object.timeout != null ? object.timeout : 1000,
-            );
+            if (n < nextSources.length) {
+              window.setTimeout(
+                nextSourceLoop,
+                object.timeout != null ? object.timeout : 1000,
+              );
+            }
           }
-        }
-      });
+        },
+      );
 
       window.ipc.scrapeFiles(
         this._nextAllURLs,
@@ -396,71 +404,75 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         return;
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse((object: any) => {
-        if (
-          object?.type == "RPC" ||
-          (object?.helpers != null && object.helpers.uuid != uuid)
-        ) {
-          return;
-        }
-
-        removeOnResponse()
-        if (object?.captcha != null && this.state.captcha == null) {
-          this.setState({
-            captcha: {
-              captcha: object.captcha,
-              source: object?.source,
-              helpers: object?.helpers,
-            },
-          });
-        }
-
-        if (object?.error != null) {
-          console.error(
-            "Error retrieving " +
-            object?.source?.url +
-            (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""),
-          );
-          console.error(object.error);
-        }
-
-        if (object?.warning != null) {
-          console.warn(object.warning);
-        }
-
-        if (object?.systemMessage != null) {
-          this.props.systemMessage(object.systemMessage);
-        }
-
-        // If we are not at the end of a source
-        if (object?.source) {
-          if (object?.data) {
-            const source = object.source;
-            let newAllURLs = object.allURLs;
-            this.setState({ allURLs: newAllURLs });
-            let newAllPosts = object.allPosts;
-            this.setState({ allPosts: newAllPosts });
-
-            // Add the next promise to the queue
-            if (object.helpers.next != null) {
-              this._promiseQueue.push({
-                source: source,
-                helpers: object.helpers,
-              });
-            }
-            this.props.setCount(
-              source.url,
-              object.helpers.count,
-              object.helpers.next == null,
-            );
+      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+        (object: any) => {
+          if (
+            object?.type == "RPC" ||
+            (object?.helpers != null && object.helpers.uuid != uuid)
+          ) {
+            return;
           }
 
-          window.setTimeout(
-            promiseLoop,
-            object?.timeout != null ? object.timeout : 1000,
-          );
-        }
-      });
+          removeOnResponse();
+          if (object?.captcha != null && this.state.captcha == null) {
+            this.setState({
+              captcha: {
+                captcha: object.captcha,
+                source: object?.source,
+                helpers: object?.helpers,
+              },
+            });
+          }
+
+          if (object?.error != null) {
+            console.error(
+              "Error retrieving " +
+                object?.source?.url +
+                (object?.helpers?.next > 0
+                  ? " Page " + object.helpers.next
+                  : ""),
+            );
+            console.error(object.error);
+          }
+
+          if (object?.warning != null) {
+            console.warn(object.warning);
+          }
+
+          if (object?.systemMessage != null) {
+            this.props.systemMessage(object.systemMessage);
+          }
+
+          // If we are not at the end of a source
+          if (object?.source) {
+            if (object?.data) {
+              const source = object.source;
+              let newAllURLs = object.allURLs;
+              this.setState({ allURLs: newAllURLs });
+              let newAllPosts = object.allPosts;
+              this.setState({ allPosts: newAllPosts });
+
+              // Add the next promise to the queue
+              if (object.helpers.next != null) {
+                this._promiseQueue.push({
+                  source: source,
+                  helpers: object.helpers,
+                });
+              }
+              this.props.setCount(
+                source.url,
+                object.helpers.count,
+                object.helpers.next == null,
+              );
+            }
+
+            window.setTimeout(
+              promiseLoop,
+              object?.timeout != null ? object.timeout : 1000,
+            );
+          }
+        },
+      );
 
       const promiseData = this._promiseQueue.shift();
       window.ipc.scrapeFiles(

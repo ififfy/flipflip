@@ -1,6 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import wretch from "wretch";
 
 import {
@@ -919,6 +919,7 @@ class APICard extends React.Component<APICardProps> {
   }
 
   onFinishAuthHydrus() {
+    // FIXME
     wretch(
       this.state.input1 +
         "://" +
@@ -999,6 +1000,7 @@ class APICard extends React.Component<APICardProps> {
       reqURL += "&method=reflection.getMethodList";
     }
 
+    // FIXME
     let req = wretch(reqURL);
     if (this.state.input3) {
       req = req.formUrl({
