@@ -41,6 +41,7 @@ import { AF, PW, PWS } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
 import en from "../../../common/en";
 import Album from "../../data/piwigo/Album";
+import Tag from "../../data/piwigo/Tag";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -89,12 +90,6 @@ const styles = (theme: Theme) =>
       marginLeft: 10,
     },
   });
-
-interface Tag {
-  id: number;
-  name: string;
-  counter: number;
-}
 
 interface Column {
   label: string;
@@ -522,35 +517,11 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
     const { loggedIn = false } = this.state;
 
     const getTags = () => {
-      return (
-        // FIXME
-        wretch(this.makeURL())
-          .formUrl({ method: "pwg.tags.getList" })
-          .post()
-          .setTimeout(5000)
-          // .notFound((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          // .internalError((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          .json((json) => {
-            if (json.stat == "ok") {
-              this.setState({ tags: json.result.tags.map((t: Tag) => t) });
-            } else {
-              //
-            }
-          })
-          .catch((e) => {
-            //
-          })
-      );
+      window.ipc.piwigoGetTags(this.makeURL()).then((tags) => {
+        if (tags) {
+          this.setState({ tags });
+        }
+      });
     };
 
     if (!loggedIn && !!piwigoUsername) {

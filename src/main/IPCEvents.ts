@@ -1214,6 +1214,24 @@ async function onPiwigoGetAlbums(ev: IpcMainInvokeEvent, url: string) {
   return undefined;
 }
 
+async function onPiwigoGetTags(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    const json = await wretch(url)
+      .formUrl({ method: "pwg.tags.getList" })
+      .post()
+      .setTimeout(5000)
+      .json();
+
+    if (json.stat == "ok") {
+      return json.result;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return undefined;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1297,6 +1315,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.piwigoAuth, onPiwigoAuth);
   ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin);
   ipcMain.handle(IPC.piwigoGetAlbums, onPiwigoGetAlbums);
+  ipcMain.handle(IPC.piwigoGetTags, onPiwigoGetTags);
 }
 
 export function releaseIpcEvents() {

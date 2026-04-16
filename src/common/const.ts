@@ -304,6 +304,7 @@ const IPC = {
   piwigoAuth: "ipc.piwigoAuth",
   piwigoLogin: "ipc.piwigoLogin",
   piwigoGetAlbums: "ipc.piwigoGetAlbums",
+  piwigoGetTags: "ipc.piwigoGetTags",
 };
 
 const MO = {
