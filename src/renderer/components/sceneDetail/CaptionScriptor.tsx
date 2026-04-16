@@ -1268,21 +1268,18 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
 
   onConfirmOpen() {
     this.onCloseDialog();
-    window.ipc.openScript().then((url) => {
-      if (url == null) {
+    window.ipc.openScript().then((response) => {
+      if (response == null) {
         return;
       }
-      // FIXME combine with openScript
-      wretch(url)
-        .get()
-        .text((data) => {
-          this.state.codeMirrorOverwriteHack.args = [data];
-          this.state.codeMirrorOverwriteHack.fire();
-          this.setState({
-            captionScript: new CaptionScript({ url }),
-            scriptChanged: false,
-          });
-        });
+
+      const { data, url } = response;
+      this.state.codeMirrorOverwriteHack.args = [data];
+      this.state.codeMirrorOverwriteHack.fire();
+      this.setState({
+        captionScript: new CaptionScript({ url }),
+        scriptChanged: false,
+      });
     });
   }
 

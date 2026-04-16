@@ -13,6 +13,7 @@ import ScenePickerInitResponse from "./common/ScenePickerInitResponse";
 import HydrusAuthResponse from "./common/HydrusAuthResponse";
 import Album from "./renderer/data/piwigo/Album";
 import Tag from "./renderer/data/piwigo/Tag";
+import OpenScriptResponse from "./common/OpenScriptResponse";
 
 declare global {
   interface Window {
@@ -41,7 +42,7 @@ declare global {
       openAudios: (shiftKey: boolean) => Promise<string[]>;
       openScripts: (shiftKey: boolean) => Promise<string[]>;
       openSubtitle: () => Promise<string | undefined>;
-      openScript: () => Promise<string | undefined>;
+      openScript: () => Promise<OpenScriptResponse | undefined>;
       saveScript: (url: string, script: string) => Promise<void>;
       saveScriptAs: (
         script: string,

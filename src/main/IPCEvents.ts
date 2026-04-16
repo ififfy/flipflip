@@ -78,6 +78,7 @@ import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
 import { loadSources } from "./scraper/ScraperManager";
 import ScenePickerInitResponse from "../common/ScenePickerInitResponse";
 import HydrusAuthResponse from "../common/HydrusAuthResponse";
+import OpenScriptResponse from "../common/OpenScriptResponse";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -155,7 +156,18 @@ async function onOpenSubtitle(ev: IpcMainEvent) {
 }
 
 async function onOpenScript(ev: IpcMainEvent) {
-  return await openScript(ev.sender.id);
+  const filePath = await openScript(ev.sender.id);
+  if (filePath != null) {
+    try {
+      const data = fs.readFileSync(filePath, 'utf-8');
+      const response: OpenScriptResponse = { url: filePath, data };
+      return response;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  return undefined;
 }
 
 async function onSaveScriptAs(
