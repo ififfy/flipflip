@@ -1271,6 +1271,16 @@ async function onGetTextFromURL(ev: IpcMainInvokeEvent, url: string) {
   return undefined;
 }
 
+async function onGetSubtitles(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    return await wretch(url).get().arrayBuffer()
+  } catch(err) {
+    console.error(err)
+  }
+
+  return undefined
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1357,6 +1367,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.piwigoGetTags, onPiwigoGetTags);
   ipcMain.handle(IPC.markOffline, onMarkOffline);
   ipcMain.handle(IPC.getTextFromURL, onGetTextFromURL);
+  ipcMain.handle(IPC.getSubtitles, onGetSubtitles)
 }
 
 export function releaseIpcEvents() {

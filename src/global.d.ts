@@ -207,6 +207,7 @@ declare global {
       piwigoGetTags: (url: string) => Promise<Tag[]>;
       markOffline: (url: string) => Promise<string>;
       getTextFromURL: (url: string) => Promise<string | undefined>;
+      getSubtitles: (url: string) => Promise<ArrayBuffer | undefined>
     };
   }
 }
