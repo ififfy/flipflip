@@ -300,6 +300,7 @@ const IPC = {
   getAudioBPMMetadata: "ipc.getAudioBPMMetadata",
   addAudioURL: "ipc.addAudioURL",
   getAudioBuffer: "ipc.getAudioBuffer",
+  authHydrus: "ipc.authHydrus",
 };
 
 const MO = {

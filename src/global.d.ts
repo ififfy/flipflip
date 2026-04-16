@@ -10,6 +10,7 @@ import LibraryMoveResult from "./common/LibraryMoveResult";
 import { Constants } from "./common/constants";
 import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
 import ScenePickerInitResponse from "./common/ScenePickerInitResponse";
+import HydrusAuthResponse from "./common/HydrusAuthResponse";
 
 declare global {
   interface Window {
@@ -182,6 +183,12 @@ declare global {
       ) => Promise<Audio | undefined>;
       getAudioBPMMetadata: (url: string) => Promise<number>;
       getAudioBuffer: (url: string) => Promise<GetAudioBufferResponse>;
+      authHydrus: (
+        schema: string,
+        host: string,
+        port: string,
+        apiKey: string,
+      ) => Promise<HydrusAuthResponse>;
     };
   }
 }

@@ -338,4 +338,6 @@ contextBridge.exposeInMainWorld("ipc", {
   getAudioBPMMetadata: (url: string) =>
     ipcRenderer.invoke(IPC.getAudioBPMMetadata, url),
   getAudioBuffer: (url: string) => ipcRenderer.invoke(IPC.getAudioBuffer, url),
+  authHydrus: (schema: string, host: string, port: string, apiKey: string) =>
+    ipcRenderer.invoke(IPC.authHydrus, schema, host, port, apiKey),
 });

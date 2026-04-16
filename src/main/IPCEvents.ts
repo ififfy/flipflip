@@ -77,6 +77,7 @@ import Audio from "../common/Audio";
 import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
 import { loadSources } from "./scraper/ScraperManager";
 import ScenePickerInitResponse from "../common/ScenePickerInitResponse";
+import HydrusAuthResponse from "../common/HydrusAuthResponse";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -1093,6 +1094,37 @@ function onPlayerMenuSetPlayPause(ev: IpcMainEvent, playing: boolean) {
   PlayerMenu.setIsPlaying(playing);
 }
 
+async function onAuthHydrus(
+  ev: IpcMainInvokeEvent,
+  schema: string,
+  host: string,
+  port: string,
+  apiKey: string,
+) {
+  const response: HydrusAuthResponse = {};
+  const url = `${schema}://${host}:${port}/session_key`;
+  try {
+    const json = await wretch(url)
+      .headers({ "Hydrus-Client-API-Access-Key": apiKey })
+      .get()
+      .setTimeout(5000)
+      .json();
+
+    if (json.session_key) {
+      response.sessionKey = json.session_key;
+    } else {
+      const error = "Invalid response from Hydrus server";
+      console.error(error);
+      response.error = error;
+    }
+  } catch (err) {
+    console.error(err);
+    response.error = `Error: ${err.message}`;
+  }
+
+  return response;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1172,6 +1204,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
   ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
+  ipcMain.handle(IPC.authHydrus, onAuthHydrus);
 }
 
 export function releaseIpcEvents() {

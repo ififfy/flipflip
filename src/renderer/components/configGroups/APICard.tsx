@@ -919,36 +919,22 @@ class APICard extends React.Component<APICardProps> {
   }
 
   onFinishAuthHydrus() {
-    // FIXME
-    wretch(
-      this.state.input1 +
-        "://" +
-        this.state.input2 +
-        ":" +
-        this.state.input3 +
-        "/session_key",
-    )
-      .headers({ "Hydrus-Client-API-Access-Key": this.state.input4 })
-      .get()
-      .setTimeout(5000)
-      .notFound((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
-      })
-      .internalError((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
-      })
-      .json((json) => {
-        if (json.session_key) {
+    window.ipc
+      .authHydrus(
+        this.state.input1,
+        this.state.input2,
+        this.state.input3,
+        this.state.input4,
+      )
+      .then(({ error, sessionKey }) => {
+        if (error != null) {
+          this.setState({
+            snackbarOpen: true,
+            snackbar: error,
+            snackbarSeverity: SS.error,
+          });
+        }
+        if (sessionKey != null) {
           // Update props
           this.props.onUpdateConfig((c) => {
             c.remoteSettings.hydrusProtocol = this.state.input1;
@@ -969,22 +955,7 @@ class APICard extends React.Component<APICardProps> {
             snackbarSeverity: SS.success,
           });
           this.onCloseDialog();
-        } else {
-          console.error("Invalid response from Hydrus server");
-          this.setState({
-            snackbarOpen: true,
-            snackbar: "Invalid response from Hydrus server",
-            snackbarSeverity: SS.error,
-          });
         }
-      })
-      .catch((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
       });
   }
 
