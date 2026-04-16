@@ -7,7 +7,6 @@ import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 import Strobe from "./Strobe";
-import wretch from "wretch";
 import FadeInOut from "./FadeInOut";
 import Panning from "./Panning";
 import CrossFade from "./CrossFade";

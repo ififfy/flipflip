@@ -1,5 +1,4 @@
 import * as React from "react";
-import wretch from "wretch";
 import Sound from "react-sound";
 
 import captionProgramDefaults, {

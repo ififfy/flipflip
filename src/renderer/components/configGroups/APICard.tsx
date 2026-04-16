@@ -1,7 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
 import { v4 as uuidv4 } from "uuid";
-import wretch from "wretch";
 
 import {
   Alert,

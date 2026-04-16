@@ -1,5 +1,4 @@
 import * as React from "react";
-import wretch from "wretch";
 import clsx from "clsx";
 import Sortable from "react-sortablejs";
 

@@ -1,5 +1,3 @@
-import wretch from "wretch";
-
 import { removeDuplicatesBy } from "../../common/utils";
 import {
   applyEffects,
