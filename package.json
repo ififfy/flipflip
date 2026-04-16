@@ -1,8 +1,8 @@
 {
   "name": "flipflip",
   "productName": "flipflip",
-  "version": "5.0.0-beta1",
-  "description": "My Electron application description",
+  "version": "5.0.0-beta2",
+  "description": "Random slideshow of images. Electron app for Mac/Windows/Linux",
   "main": ".webpack/main",
   "private": true,
   "scripts": {
