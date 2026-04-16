@@ -353,5 +353,5 @@ contextBridge.exposeInMainWorld("ipc", {
   piwigoGetTags: (url: string) => ipcRenderer.invoke(IPC.piwigoGetTags, url),
   markOffline: (url: string) => ipcRenderer.invoke(IPC.markOffline, url),
   getTextFromURL: (url: string) => ipcRenderer.invoke(IPC.getTextFromURL, url),
-  getSubtitles: (url: string) => ipcRenderer.invoke(IPC.getSubtitles, url)
+  getSubtitles: (url: string) => ipcRenderer.invoke(IPC.getSubtitles, url),
 });

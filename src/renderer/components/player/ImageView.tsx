@@ -119,15 +119,15 @@ export default class ImageView extends React.Component<ImageViewProps> {
     ) {
       let subURL = img.getAttribute("subtitles");
       window.ipc.getSubtitles(subURL).then((buffer) => {
-        if(buffer == null) {
-          return
+        if (buffer == null) {
+          return;
         }
-        
+
         const track: any = document.createElement("track");
         track.kind = "captions";
         track.label = "English";
         track.srclang = "en";
-        const blob = new Blob([buffer], { type: "text/vtt" })
+        const blob = new Blob([buffer], { type: "text/vtt" });
         track.src = URL.createObjectURL(blob);
         if (img.textTracks.length == 0) {
           img.append(track);
@@ -136,7 +136,7 @@ export default class ImageView extends React.Component<ImageViewProps> {
         }
         track.mode = "showing";
         img.textTracks[0].mode = "showing";
-      })
+      });
     }
 
     const videoLoop = (v: any) => {
@@ -208,9 +208,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
         return;
       for (let canvas of document.getElementsByClassName(
         "canvas-" +
-        this.props.gridCoordinates[0] +
-        "-" +
-        this.props.gridCoordinates[1],
+          this.props.gridCoordinates[0] +
+          "-" +
+          this.props.gridCoordinates[1],
       )) {
         const context = (canvas as HTMLCanvasElement).getContext("2d");
         context.drawImage(v, 0, 0, w, h);
@@ -228,9 +228,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
         return;
       for (let canvas of document.getElementsByClassName(
         "canvas-bg-" +
-        this.props.gridCoordinates[0] +
-        "-" +
-        this.props.gridCoordinates[1],
+          this.props.gridCoordinates[0] +
+          "-" +
+          this.props.gridCoordinates[1],
       )) {
         const context = (canvas as HTMLCanvasElement).getContext("2d");
         context.drawImage(v, 0, 0, w, h);
@@ -611,9 +611,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
       if (this.props.gridCoordinates) {
         for (let element of document.getElementsByClassName(
           "copy-" +
-          this.props.gridCoordinates[0] +
-          "-" +
-          this.props.gridCoordinates[1],
+            this.props.gridCoordinates[0] +
+            "-" +
+            this.props.gridCoordinates[1],
         )) {
           if (element == el) {
             appendOriginal();
@@ -669,9 +669,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
       if (this.props.gridCoordinates) {
         for (let element of document.getElementsByClassName(
           "copy-bg-" +
-          this.props.gridCoordinates[0] +
-          "-" +
-          this.props.gridCoordinates[1],
+            this.props.gridCoordinates[0] +
+            "-" +
+            this.props.gridCoordinates[1],
         )) {
           if (element == bg) {
             appendOriginalBG();
@@ -713,9 +713,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
       if (this.props.gridCoordinates && type == null) {
         for (let canvas of document.getElementsByClassName(
           "canvas-bg-" +
-          this.props.gridCoordinates[0] +
-          "-" +
-          this.props.gridCoordinates[1],
+            this.props.gridCoordinates[0] +
+            "-" +
+            this.props.gridCoordinates[1],
         )) {
           const context: any = (canvas as HTMLCanvasElement).getContext("2d");
           context.drawImage(img, 0, 0, parentWidth, parentHeight);
@@ -735,9 +735,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
         this.props.image &&
         (props.image.src !== this.props.image.src ||
           props.image.getAttribute("start") !==
-          this.props.image.getAttribute("start") ||
+            this.props.image.getAttribute("start") ||
           props.image.getAttribute("end") !==
-          this.props.image.getAttribute("end"))) ||
+            this.props.image.getAttribute("end"))) ||
       (props.scene &&
         (props.scene.strobe || props.scene.fadeInOut) &&
         props.toggleStrobe !== this.props.toggleStrobe) ||
@@ -820,18 +820,18 @@ export default class ImageView extends React.Component<ImageViewProps> {
     let viewDiv;
     const imageClassName = this.props.gridCoordinates
       ? "copy-" +
-      this.props.gridCoordinates[0] +
-      "-" +
-      this.props.gridCoordinates[1]
-      : undefined;
-    const backgroundClassName =
-      !this.props.pictureGrid &&
-        this.props.scene.backgroundType == BT.blur &&
-        this.props.gridCoordinates
-        ? "copy-bg-" +
         this.props.gridCoordinates[0] +
         "-" +
         this.props.gridCoordinates[1]
+      : undefined;
+    const backgroundClassName =
+      !this.props.pictureGrid &&
+      this.props.scene.backgroundType == BT.blur &&
+      this.props.gridCoordinates
+        ? "copy-bg-" +
+          this.props.gridCoordinates[0] +
+          "-" +
+          this.props.gridCoordinates[1]
         : undefined;
     let imageDiv = (
       <animated.div
@@ -1030,9 +1030,9 @@ export default class ImageView extends React.Component<ImageViewProps> {
     if (this.props.gridCoordinates) {
       for (let element of document.getElementsByClassName(
         "copy-" +
-        this.props.gridCoordinates[0] +
-        "-" +
-        this.props.gridCoordinates[1],
+          this.props.gridCoordinates[0] +
+          "-" +
+          this.props.gridCoordinates[1],
       )) {
         if (el && img && img.src == this.props.image.src) {
           if (element == el) {

@@ -307,7 +307,7 @@ const IPC = {
   piwigoGetTags: "ipc.piwigoGetTags",
   markOffline: "ipc.markOffline",
   getTextFromURL: "ipc.getTextFromURL",
-  getSubtitles: "ipc.getSubtitles"
+  getSubtitles: "ipc.getSubtitles",
 };
 
 const MO = {
