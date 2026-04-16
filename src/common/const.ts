@@ -303,6 +303,7 @@ const IPC = {
   hydrusAuth: "ipc.hydrusAuth",
   piwigoAuth: "ipc.piwigoAuth",
   piwigoLogin: "ipc.piwigoLogin",
+  piwigoGetAlbums: "ipc.piwigoGetAlbums",
 };
 
 const MO = {

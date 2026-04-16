@@ -11,6 +11,7 @@ import { Constants } from "./common/constants";
 import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
 import ScenePickerInitResponse from "./common/ScenePickerInitResponse";
 import HydrusAuthResponse from "./common/HydrusAuthResponse";
+import Album from "./renderer/data/piwigo/Album";
 
 declare global {
   interface Window {
@@ -195,7 +196,12 @@ declare global {
         username: string,
         password: string,
       ) => Promise<string | undefined>;
-      piwigoLogin: (url: string, username: string, password: string) => Promise<boolean>
+      piwigoLogin: (
+        url: string,
+        username: string,
+        password: string,
+      ) => Promise<boolean>;
+      piwigoGetAlbums: (url: string) => Promise<Album[] | undefined>;
     };
   }
 }

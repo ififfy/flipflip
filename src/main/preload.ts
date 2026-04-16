@@ -346,5 +346,8 @@ contextBridge.exposeInMainWorld("ipc", {
     username: string,
     password: string,
   ) => ipcRenderer.invoke(IPC.piwigoAuth, schema, host, username, password),
-  piwigoLogin: (url: string, username: string, password: string) => ipcRenderer.invoke(IPC.piwigoLogin, url, username, password)
+  piwigoLogin: (url: string, username: string, password: string) =>
+    ipcRenderer.invoke(IPC.piwigoLogin, url, username, password),
+  piwigoGetAlbums: (url: string) =>
+    ipcRenderer.invoke(IPC.piwigoGetAlbums, url),
 });

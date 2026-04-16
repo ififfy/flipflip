@@ -1166,25 +1166,52 @@ async function onPiwigoAuth(
   }
 }
 
-async  function onPiwigoLogin(ev: IpcMainInvokeEvent, url: string, username: string, password: string) {
-  let loggedIn = false
+async function onPiwigoLogin(
+  ev: IpcMainInvokeEvent,
+  url: string,
+  username: string,
+  password: string,
+) {
+  let loggedIn = false;
   try {
     const json = await wretch(url)
-        .formUrl({
-          method: "pwg.session.login",
-          username,
-          password,
-        })
-        .post()
-        .setTimeout(5000)
-        .json()
+      .formUrl({
+        method: "pwg.session.login",
+        username,
+        password,
+      })
+      .post()
+      .setTimeout(5000)
+      .json();
 
-    loggedIn = json.stat == "ok"
-  } catch(err) {
-    console.error(err)
+    loggedIn = json.stat == "ok";
+  } catch (err) {
+    console.error(err);
   }
 
-  return loggedIn
+  return loggedIn;
+}
+
+async function onPiwigoGetAlbums(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    const json = await wretch(url)
+      .formUrl({
+        method: "pwg.categories.getList",
+        recursive: true,
+        tree_output: true,
+      })
+      .post()
+      .setTimeout(5000)
+      .json();
+
+    if (json.stat == "ok") {
+      return json.result;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return undefined;
 }
 
 // Initialize and release listeners
@@ -1268,12 +1295,13 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
   ipcMain.handle(IPC.hydrusAuth, onHydrusAuth);
   ipcMain.handle(IPC.piwigoAuth, onPiwigoAuth);
-  ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin)
+  ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin);
+  ipcMain.handle(IPC.piwigoGetAlbums, onPiwigoGetAlbums);
 }
 
 export function releaseIpcEvents() {
   if (initialized) {
-    ipcMain.removeAllListeners()
+    ipcMain.removeAllListeners();
   }
 
   initialized = false;
