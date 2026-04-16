@@ -189,6 +189,12 @@ declare global {
         port: string,
         apiKey: string,
       ) => Promise<HydrusAuthResponse>;
+      authPiwigo: (
+        schema: string,
+        host: string,
+        username: string,
+        password: string,
+      ) => Promise<string | undefined>;
     };
   }
 }

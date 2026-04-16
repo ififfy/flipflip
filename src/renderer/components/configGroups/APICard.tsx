@@ -960,48 +960,15 @@ class APICard extends React.Component<APICardProps> {
   }
 
   onFinishAuthPiwigo() {
-    let reqURL =
-      this.state.input1 +
-      "://" +
-      this.state.input2 +
-      (this.state.input2.endsWith("/") ? "" : "/") +
-      "ws.php?format=json";
-
-    if (!this.state.input3) {
-      reqURL += "&method=reflection.getMethodList";
-    }
-
-    // FIXME
-    let req = wretch(reqURL);
-    if (this.state.input3) {
-      req = req.formUrl({
-        method: "pwg.session.login",
-        username: this.state.input3,
-        password: this.state.input4,
-      });
-    }
-
-    req
-      .post()
-      .setTimeout(5000)
-      .notFound((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
-      })
-      .internalError((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
-      })
-      .json((json) => {
-        if (json.stat == "ok") {
+    window.ipc
+      .authPiwigo(
+        this.state.input1,
+        this.state.input2,
+        this.state.input3,
+        this.state.input4,
+      )
+      .then((error) => {
+        if (!error) {
           this.props.onUpdateConfig((c) => {
             c.remoteSettings.piwigoProtocol = this.state.input1;
             c.remoteSettings.piwigoHost = this.state.input2;
@@ -1022,21 +989,12 @@ class APICard extends React.Component<APICardProps> {
           });
           this.onCloseDialog();
         } else {
-          console.error("Invalid response from Piwigo server");
           this.setState({
             snackbarOpen: true,
-            snackbar: "Invalid response from Piwigo server",
+            snackbar: error,
             snackbarSeverity: SS.error,
           });
         }
-      })
-      .catch((e) => {
-        console.error(e);
-        this.setState({
-          snackbarOpen: true,
-          snackbar: "Error: " + e.message,
-          snackbarSeverity: SS.error,
-        });
       });
   }
 }

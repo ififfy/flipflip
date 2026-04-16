@@ -340,4 +340,10 @@ contextBridge.exposeInMainWorld("ipc", {
   getAudioBuffer: (url: string) => ipcRenderer.invoke(IPC.getAudioBuffer, url),
   authHydrus: (schema: string, host: string, port: string, apiKey: string) =>
     ipcRenderer.invoke(IPC.authHydrus, schema, host, port, apiKey),
+  authPiwigo: (
+    schema: string,
+    host: string,
+    username: string,
+    password: string,
+  ) => ipcRenderer.invoke(IPC.authPiwigo, schema, host, username, password),
 });

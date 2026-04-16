@@ -301,6 +301,7 @@ const IPC = {
   addAudioURL: "ipc.addAudioURL",
   getAudioBuffer: "ipc.getAudioBuffer",
   authHydrus: "ipc.authHydrus",
+  authPiwigo: "ipc.authPiwigo",
 };
 
 const MO = {

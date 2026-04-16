@@ -1125,6 +1125,47 @@ async function onAuthHydrus(
   return response;
 }
 
+async function onAuthPiwigo(
+  ev: IpcMainInvokeEvent,
+  schema: string,
+  host: string,
+  username: string,
+  password: string,
+) {
+  if (!host.endsWith("/")) {
+    host += "/";
+  }
+
+  let reqURL = `${schema}://${host}ws.php?format=json`;
+  if (!username) {
+    reqURL += "&method=reflection.getMethodList";
+  }
+
+  let req = wretch(reqURL);
+  if (username) {
+    req = req.formUrl({
+      method: "pwg.session.login",
+      username,
+      password,
+    });
+  }
+
+  try {
+    const json = await req.post().setTimeout(5000).json();
+
+    if (json.stat !== "ok") {
+      const error = "Invalid response from Piwigo server";
+      console.error(error);
+      return error;
+    } else {
+      return undefined;
+    }
+  } catch (err) {
+    console.error(err);
+    return err.message;
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1205,6 +1246,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
   ipcMain.handle(IPC.authHydrus, onAuthHydrus);
+  ipcMain.handle(IPC.authPiwigo, onAuthPiwigo);
 }
 
 export function releaseIpcEvents() {
