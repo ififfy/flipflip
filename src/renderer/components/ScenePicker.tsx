@@ -2022,67 +2022,21 @@ class ScenePicker extends React.Component<ScenePickerProps> {
       displayGrids: this.getDisplayGrids(),
     });
 
-    window.ipc.isFirstWindow().then((isFirstWindow) => {
-      if (!isFirstWindow) {
-        return;
-      }
+    window.ipc
+      .initScenePicker(this.props.version)
+      .then(({ isFirstWindow, update }) => {
+        if (!isFirstWindow) {
+          return;
+        }
 
-      this.setState({ isFirstWindow });
-      wretch("https://api.github.com/repos/regtemp8/flipflip/releases")
-        .get()
-        .json((json) => {
-          const newestReleaseTag = json[0].tag_name;
-          const newestReleaseURL = json[0].html_url;
-          let releaseVersion = newestReleaseTag
-            .replace("v", "")
-            .replace(".", "")
-            .replace(".", "");
-          let releaseBetaVersion = -1;
-          if (releaseVersion.includes("-")) {
-            const releaseSplit = releaseVersion.split("-");
-            releaseVersion = releaseSplit[0];
-            const betaString = releaseSplit[1];
-            const betaNumber = betaString.replace("beta", "");
-            if (betaNumber == "") {
-              releaseBetaVersion = 0;
-            } else {
-              releaseBetaVersion = parseInt(betaNumber);
-            }
-          }
-          let thisVersion = this.props.version
-            .replace(".", "")
-            .replace(".", "");
-          let thisBetaVersion = -1;
-          if (thisVersion.includes("-")) {
-            const releaseSplit = thisVersion.split("-");
-            thisVersion = releaseSplit[0];
-            const betaString = releaseSplit[1];
-            const betaNumber = betaString.replace("beta", "");
-            if (betaNumber == "") {
-              thisBetaVersion = 0;
-            } else {
-              thisBetaVersion = parseInt(betaNumber);
-            }
-          }
-          if (parseInt(releaseVersion) > parseInt(thisVersion)) {
-            this.setState({
-              newVersion: newestReleaseTag,
-              newVersionLink: newestReleaseURL,
-            });
-          } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
-            if (
-              (releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
-              releaseBetaVersion > thisBetaVersion
-            ) {
-              this.setState({
-                newVersion: newestReleaseTag,
-                newVersionLink: newestReleaseURL,
-              });
-            }
-          }
-        })
-        .catch((e) => console.error(e));
-    });
+        this.setState({ isFirstWindow });
+        if (update != null) {
+          this.setState({
+            newVersion: update.releaseTag,
+            newVersionLink: update.releaseURL,
+          });
+        }
+      });
   }
 
   componentDidUpdate(props: any, state: any) {

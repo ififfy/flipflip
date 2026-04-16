@@ -76,6 +76,7 @@ import { Constants } from "../common/constants";
 import Audio from "../common/Audio";
 import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
 import { loadSources } from "./scraper/ScraperManager";
+import ScenePickerInitResponse from "../common/ScenePickerInitResponse";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -199,8 +200,73 @@ function onRedditAuthRequest(
   redditAuth(window, userAgent, clientID, deviceID);
 }
 
-function onRequestIsFirstWindow(ev: IpcMainInvokeEvent) {
-  return ev.sender.id === 1;
+async function onInitScenePicker(ev: IpcMainInvokeEvent, version: string) {
+  const response: ScenePickerInitResponse = {
+    isFirstWindow: ev.sender.id === 1,
+  };
+  if (!response.isFirstWindow) {
+    return response;
+  }
+
+  try {
+    const json = await wretch(
+      "https://api.github.com/repos/regtemp8/flipflip/releases",
+    )
+      .get()
+      .json();
+
+    const newestReleaseTag = json[0].tag_name;
+    const newestReleaseURL = json[0].html_url;
+    let releaseVersion = newestReleaseTag
+      .replace("v", "")
+      .replace(".", "")
+      .replace(".", "");
+    let releaseBetaVersion = -1;
+    if (releaseVersion.includes("-")) {
+      const releaseSplit = releaseVersion.split("-");
+      releaseVersion = releaseSplit[0];
+      const betaString = releaseSplit[1];
+      const betaNumber = betaString.replace("beta", "");
+      if (betaNumber == "") {
+        releaseBetaVersion = 0;
+      } else {
+        releaseBetaVersion = parseInt(betaNumber);
+      }
+    }
+    let thisVersion = version.replace(".", "").replace(".", "");
+    let thisBetaVersion = -1;
+    if (thisVersion.includes("-")) {
+      const releaseSplit = thisVersion.split("-");
+      thisVersion = releaseSplit[0];
+      const betaString = releaseSplit[1];
+      const betaNumber = betaString.replace("beta", "");
+      if (betaNumber == "") {
+        thisBetaVersion = 0;
+      } else {
+        thisBetaVersion = parseInt(betaNumber);
+      }
+    }
+    if (parseInt(releaseVersion) > parseInt(thisVersion)) {
+      response.update = {
+        releaseTag: newestReleaseTag,
+        releaseURL: newestReleaseURL,
+      };
+    } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
+      if (
+        (releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
+        releaseBetaVersion > thisBetaVersion
+      ) {
+        response.update = {
+          releaseTag: newestReleaseTag,
+          releaseURL: newestReleaseURL,
+        };
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return response;
 }
 
 function onSetProgressBar(ev: IpcMainEvent, progress: number) {
@@ -1037,7 +1103,7 @@ export function initializeIpcEvents() {
   initialized = true;
   ipcMain.on(IPC.newWindow, onRequestCreateNewWindow);
   ipcMain.handle(IPC.getConstants, onGetConstants);
-  ipcMain.handle(IPC.isFirstWindow, onRequestIsFirstWindow);
+  ipcMain.handle(IPC.initScenePicker, onInitScenePicker);
   ipcMain.handle(IPC.getBackups, onRequestBackups);
   ipcMain.handle(IPC.getAppStorage, onRequestAppStorage);
   ipcMain.on(IPC.saveAppStorage, onSaveAppStorage);

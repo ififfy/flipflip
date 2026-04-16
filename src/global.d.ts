@@ -9,6 +9,7 @@ import LibrarySource from "./common/LibrarySource";
 import LibraryMoveResult from "./common/LibraryMoveResult";
 import { Constants } from "./common/constants";
 import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
+import ScenePickerInitResponse from "./common/ScenePickerInitResponse";
 
 declare global {
   interface Window {
@@ -17,7 +18,7 @@ declare global {
       platform: () => string;
       getConstants(): Promise<Constants>;
       newWindow: () => void;
-      isFirstWindow: () => Promise<boolean>;
+      initScenePicker: (version: string) => Promise<ScenePickerInitResponse>;
       setProgressBar: (progress: number) => void;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;

@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
   getConstants: () => ipcRenderer.invoke(IPC.getConstants),
   newWindow: () => ipcRenderer.send(IPC.newWindow),
-  isFirstWindow: () => ipcRenderer.invoke(IPC.isFirstWindow),
+  initScenePicker: (version: string) =>
+    ipcRenderer.invoke(IPC.initScenePicker, version),
   setProgressBar: (progress: number) =>
     ipcRenderer.send(IPC.setProgressBar, progress),
   getBackups: () => ipcRenderer.invoke(IPC.getBackups),
@@ -256,7 +257,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.getCacheSize, config),
   onScrapeFilesResponse: (callback: (message: any) => void) => {
     const channel = IPC.scrapeFilesResponse;
-    const listener = (event: IpcRendererEvent, message: any) => callback(message);
+    const listener = (event: IpcRendererEvent, message: any) =>
+      callback(message);
     ipcRenderer.on(channel, listener);
     return () => ipcRenderer.off(channel, listener);
   },
