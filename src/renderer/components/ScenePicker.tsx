@@ -2140,6 +2140,7 @@ class ScenePicker extends React.Component<ScenePickerProps> {
 
   onFinishImportScene() {
     if (this.state.importFile.startsWith("http")) {
+      // FIXME combine with readTextFile
       wretch(this.state.importFile)
         .get()
         .text((text) => {

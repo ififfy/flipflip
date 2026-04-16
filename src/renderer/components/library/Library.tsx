@@ -1705,6 +1705,7 @@ class Library extends React.Component<LibraryProps> {
   }
 
   onFinishImportLibrary() {
+    // FIXME combine with readTextFile
     if (this.state.importFile.startsWith("http")) {
       wretch(this.state.importFile)
         .get()

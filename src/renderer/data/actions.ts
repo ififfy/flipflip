@@ -3568,6 +3568,7 @@ export function markOffline(getState: () => State, setState: Function) {
       );
       if (librarySource) {
         librarySource.lastCheck = new Date();
+        // FIXME
         wretch(librarySource.url)
           .get()
           .notFound((res) => {

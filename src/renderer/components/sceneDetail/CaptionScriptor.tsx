@@ -1205,6 +1205,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
           scriptChanged: false,
         });
       } else {
+        // FIXME
         wretch(this.props.openScript.url)
           .get()
           .text((data) => {
@@ -1271,7 +1272,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
       if (url == null) {
         return;
       }
-
+      // FIXME combine with openScript
       wretch(url)
         .get()
         .text((data) => {
@@ -1409,6 +1410,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
       ),
     );
     this.onCloseDialog();
+    // FIXME
     wretch(script.url)
       .get()
       .badRequest(error)

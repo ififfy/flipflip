@@ -119,7 +119,7 @@ export default class ImageView extends React.Component<ImageViewProps> {
     ) {
       try {
         let subURL = img.getAttribute("subtitles");
-        wretch(subURL)
+        wretch(subURL) // FIXME
           .get()
           .blob((blob) => {
             let track: any = document.createElement("track");

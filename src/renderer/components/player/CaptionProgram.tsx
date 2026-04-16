@@ -315,6 +315,7 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
       if (this.props.captionScript.script != null) {
         resolve({ data: [this.props.captionScript.script], helpers: null });
       } else {
+        // FIXME
         wretch(url)
           .get()
           .error(503, (error) => {

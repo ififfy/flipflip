@@ -497,6 +497,7 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
   login() {
     const { piwigoPassword, piwigoUsername } = this.props.config.remoteSettings;
     return (
+      // FIXME
       wretch(this.makeURL())
         .formUrl({
           method: "pwg.session.login",
@@ -536,6 +537,7 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
 
     const getAlbums = () => {
       return (
+        // FIXME
         wretch(this.makeURL())
           .formUrl({
             method: "pwg.categories.getList",
@@ -582,6 +584,7 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
 
     const getTags = () => {
       return (
+        // FIXME
         wretch(this.makeURL())
           .formUrl({ method: "pwg.tags.getList" })
           .post()
