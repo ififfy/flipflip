@@ -81,8 +81,8 @@ export function extractMusicMetadata(
   if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
   } else {
-    const data = toArrayBuffer(fs.readFileSync(audio.url)); // FIXME
-    let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
+    const data = toArrayBuffer(fs.readFileSync(audio.url));
+    let context = new AudioContext();
     context.decodeAudioData(data, (buffer) => {
       audio.duration = buffer.duration;
     });
