@@ -3,7 +3,10 @@ import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { createNewWindow, startScene } from "./WindowManager";
 import started from "electron-squirrel-startup";
-import { unproxy } from "../common/utils";
+import { getSourceType, proxy, unproxy } from "../common/utils";
+import { ST } from "../common/const";
+
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
 // Use this scheme to proxy content URLs
 protocol.registerSchemesAsPrivileged([
@@ -29,8 +32,38 @@ if (started) {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   protocol.handle("ff", async (req) => {
-    const url = unproxy(req.url);
-    return net.fetch(new Request(url, req));
+    try {
+      let url = unproxy(req.url);
+      if (url === 'src/renderer/icons/flipflip_logo.png' || url === 'index.js.map') {
+        const entry = MAIN_WINDOW_WEBPACK_ENTRY
+        url = entry.substring(0, entry.lastIndexOf('/') + 1) + url
+      }
+
+      const promise = net.fetch(new Request(url, req));
+      if (getSourceType(url) === ST.nimja) {
+        const res = await promise
+        let html = await res.text()
+        const baseURL = 'https://hypno.nimja.com'
+        html = html.replace('<head>', `<head><base href="${baseURL}/">`)
+        html = html.replace(
+          '<link rel="manifest" href="/site.webmanifest">',
+          ''
+        )
+        return Promise.resolve(new Response(html, { headers: { 'Content-Type': 'text/html' } }))
+      } else if (url.endsWith('/main_window/index.html')) {
+        const res = await promise
+        let html = await res.text()
+        const baseURL = url.startsWith('http') ? new URL(url).origin : url.substring(0, url.indexOf('/main_window'))
+        html = html.replace(/<script.*\/main_window\/index.js"><\/script>/, `<script defer src="${proxy(baseURL + '/main_window/index.js')}"></script>`)
+        return Promise.resolve(new Response(html, { headers: { 'Content-Type': 'text/html' } }))
+      } else {
+        return promise
+      }
+    }
+    catch (err) {
+      console.error(err)
+      return Promise.resolve(Response.error())
+    }
   });
 
   session.defaultSession.webRequest.onHeadersReceived(
