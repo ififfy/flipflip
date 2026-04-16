@@ -4,7 +4,7 @@ import { CircularProgress, Container, Typography } from "@mui/material";
 
 import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../../common/const";
 import { flatten, getRandomListItem, getRandomNumber } from "../../data/utils";
-import { getSourceType, isVideo } from "../../../common/utils";
+import { getSourceType, isVideo, proxy } from "../../../common/utils";
 import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";
@@ -730,7 +730,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
         };
 
         iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
-        iframe.src = url;
+        iframe.src = proxy(url);
 
         window.clearTimeout(this._imgLoadTimeouts[i]);
         successCallback();
@@ -994,7 +994,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
           }
         };
 
-        video.src = url;
+        video.src = proxy(url);
         video.volume = 0;
         video.preload = "auto";
 
@@ -1203,7 +1203,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
             return;
           }
 
-          img.src = url;
+          img.src = proxy(url);
           window.clearTimeout(this._imgLoadTimeouts[i]);
           this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
         };
@@ -1223,7 +1223,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
             }
           });
         } else {
-          img.src = url;
+          img.src = proxy(url);
           window.clearTimeout(this._imgLoadTimeouts[i]);
           this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
         }

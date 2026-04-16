@@ -1,4 +1,4 @@
-import { removeDuplicatesBy } from "../../common/utils";
+import { removeDuplicatesBy, proxy } from "../../common/utils";
 import {
   applyEffects,
   areWeightsValid,
@@ -3815,7 +3815,7 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
           );
           setTimeout(videoMetadataLoop, 100);
         };
-        video.src = librarySource.url;
+        video.src = proxy(librarySource.url);
       } else {
         // Skip if removed from library during check
         state.progressCurrent = offset + 1;

@@ -42,6 +42,7 @@ import LibrarySource from "../../../common/LibrarySource";
 import Tag from "../../../common/Tag";
 import Clip from "../../../common/Clip";
 import Scene from "../../../common/Scene";
+import {proxy} from "../../../common/utils";
 import ImageView from "../player/ImageView";
 import VideoControl from "../player/VideoControl";
 
@@ -752,7 +753,7 @@ class VideoClipper extends React.Component<VideoClipperProps> {
       this.props.onStartVCTutorial();
     };
 
-    video.src = this.props.source.url;
+    video.src = proxy(this.props.source.url);
     video.preload = "auto";
     video.loop = true;
     if (

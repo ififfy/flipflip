@@ -11,7 +11,7 @@ import {
 
 import { SL, WC } from "../../../common/const";
 import { getRandomListItem } from "../../data/utils";
-import { getFileGroup, getFileName, urlToPath } from "../../../common/utils";
+import { getFileGroup, getFileName, urlToPath, proxy } from "../../../common/utils";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import Config from "../../../common/Config";
@@ -842,7 +842,7 @@ export default class Player extends React.Component<PlayerProps> {
     ) {
       let thumbImage = new Image();
       if (this.state.currentAudio.thumb) {
-        thumbImage.src = this.state.currentAudio.thumb;
+        thumbImage.src = proxy(this.state.currentAudio.thumb);
       } else {
         thumbImage.src = "src/renderer/icons/flipflip_logo.png";
       }
@@ -930,7 +930,7 @@ export default class Player extends React.Component<PlayerProps> {
     if (this.state.currentAudio) {
       let thumbImage = new Image();
       if (this.state.currentAudio.thumb) {
-        thumbImage.src = this.state.currentAudio.thumb;
+        thumbImage.src = proxy(this.state.currentAudio.thumb);
       } else {
         thumbImage.src = "src/renderer/icons/flipflip_logo.png";
       }

@@ -1,5 +1,13 @@
 import { ST } from "./const";
 
+const scheme = "ff://proxy/";
+export function proxy(url: string) {
+  return scheme + encodeURIComponent(url);
+}
+export function unproxy(proxied: string) {
+  return decodeURIComponent(proxied.substring(scheme.length));
+}
+
 export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
   let mySet = new Set();
   return array.filter(function (x: any) {

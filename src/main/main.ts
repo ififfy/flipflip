@@ -1,8 +1,23 @@
-import { app, Menu, session } from "electron";
+import { app, protocol, net, Menu, session } from "electron";
 import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { createNewWindow, startScene } from "./WindowManager";
 import started from "electron-squirrel-startup";
+import { unproxy } from "../common/utils";
+
+// Use this scheme to proxy content URLs
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "ff",
+    privileges: {
+      standard: true,
+      secure: true,
+      bypassCSP: true,
+      supportFetchAPI: true,
+      stream: true,
+    },
+  },
+]);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -13,6 +28,11 @@ if (started) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
+  protocol.handle("ff", async (req) => {
+    const url = unproxy(req.url);
+    return net.fetch(new Request(url, req));
+  });
+
   session.defaultSession.webRequest.onHeadersReceived(
     (details: any, callback: any) => {
       callback({
