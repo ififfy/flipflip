@@ -351,4 +351,5 @@ contextBridge.exposeInMainWorld("ipc", {
   piwigoGetAlbums: (url: string) =>
     ipcRenderer.invoke(IPC.piwigoGetAlbums, url),
   piwigoGetTags: (url: string) => ipcRenderer.invoke(IPC.piwigoGetTags, url),
+  markOffline: (url: string) => ipcRenderer.invoke(IPC.markOffline, url),
 });

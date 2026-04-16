@@ -305,6 +305,7 @@ const IPC = {
   piwigoLogin: "ipc.piwigoLogin",
   piwigoGetAlbums: "ipc.piwigoGetAlbums",
   piwigoGetTags: "ipc.piwigoGetTags",
+  markOffline: "ipc.markOffline",
 };
 
 const MO = {
@@ -588,6 +589,13 @@ const SS = {
   success: "success",
 };
 
+const MOR = {
+  // Mark offline response
+  notFound: "mor.notFound",
+  found: "mor.found",
+  error: "mor.error",
+};
+
 export {
   AF,
   ALT,
@@ -604,6 +612,7 @@ export {
   IT,
   LT,
   MO,
+  MOR,
   OF,
   OT,
   PR,

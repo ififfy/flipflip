@@ -34,7 +34,7 @@ import {
   setProgressBar,
   openImage,
 } from "./WindowManager";
-import { IPC, ST } from "../common/const";
+import { IPC, MOR, ST } from "../common/const";
 import {
   generateThumbnailFile,
   extractMusicMetadata,
@@ -1232,6 +1232,23 @@ async function onPiwigoGetTags(ev: IpcMainInvokeEvent, url: string) {
   return [];
 }
 
+function onMarkOffline(ev: IpcMainInvokeEvent, url: string) {
+  return new Promise((resolve) => {
+    wretch(url)
+      .get()
+      .notFound((res) => {
+        resolve(MOR.notFound);
+      })
+      .res((res) => {
+        resolve(MOR.found);
+      })
+      .catch((e) => {
+        console.error(e);
+        resolve(MOR.error);
+      });
+  });
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1316,6 +1333,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin);
   ipcMain.handle(IPC.piwigoGetAlbums, onPiwigoGetAlbums);
   ipcMain.handle(IPC.piwigoGetTags, onPiwigoGetTags);
+  ipcMain.handle(IPC.markOffline, onMarkOffline);
 }
 
 export function releaseIpcEvents() {
