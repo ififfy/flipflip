@@ -338,13 +338,13 @@ contextBridge.exposeInMainWorld("ipc", {
   getAudioBPMMetadata: (url: string) =>
     ipcRenderer.invoke(IPC.getAudioBPMMetadata, url),
   getAudioBuffer: (url: string) => ipcRenderer.invoke(IPC.getAudioBuffer, url),
-  authHydrus: (schema: string, host: string, port: string, apiKey: string) =>
-    ipcRenderer.invoke(IPC.authHydrus, schema, host, port, apiKey),
-  authPiwigo: (
+  hydrusAuth: (schema: string, host: string, port: string, apiKey: string) =>
+    ipcRenderer.invoke(IPC.hydrusAuth, schema, host, port, apiKey),
+  piwigoAuth: (
     schema: string,
     host: string,
     username: string,
     password: string,
-  ) => ipcRenderer.invoke(IPC.authPiwigo, schema, host, username, password),
-        loginPiwigo: (url: string, username: string, password: string) => ipcRenderer.invoke(IPC.loginPiwigo, url, username, password)
+  ) => ipcRenderer.invoke(IPC.piwigoAuth, schema, host, username, password),
+  piwigoLogin: (url: string, username: string, password: string) => ipcRenderer.invoke(IPC.piwigoLogin, url, username, password)
 });

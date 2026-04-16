@@ -1094,7 +1094,7 @@ function onPlayerMenuSetPlayPause(ev: IpcMainEvent, playing: boolean) {
   PlayerMenu.setIsPlaying(playing);
 }
 
-async function onAuthHydrus(
+async function onHydrusAuth(
   ev: IpcMainInvokeEvent,
   schema: string,
   host: string,
@@ -1125,7 +1125,7 @@ async function onAuthHydrus(
   return response;
 }
 
-async function onAuthPiwigo(
+async function onPiwigoAuth(
   ev: IpcMainInvokeEvent,
   schema: string,
   host: string,
@@ -1166,7 +1166,7 @@ async function onAuthPiwigo(
   }
 }
 
-async  function onLoginPiwigo(ev: IpcMainInvokeEvent, url: string, username: string, password: string) {
+async  function onPiwigoLogin(ev: IpcMainInvokeEvent, url: string, username: string, password: string) {
   let loggedIn = false
   try {
     const json = await wretch(url)
@@ -1266,9 +1266,9 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
   ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
-  ipcMain.handle(IPC.authHydrus, onAuthHydrus);
-  ipcMain.handle(IPC.authPiwigo, onAuthPiwigo);
-  ipcMain.handle(IPC.loginPiwigo, onLoginPiwigo)
+  ipcMain.handle(IPC.hydrusAuth, onHydrusAuth);
+  ipcMain.handle(IPC.piwigoAuth, onPiwigoAuth);
+  ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin)
 }
 
 export function releaseIpcEvents() {

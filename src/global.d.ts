@@ -183,19 +183,19 @@ declare global {
       ) => Promise<Audio | undefined>;
       getAudioBPMMetadata: (url: string) => Promise<number>;
       getAudioBuffer: (url: string) => Promise<GetAudioBufferResponse>;
-      authHydrus: (
+      hydrusAuth: (
         schema: string,
         host: string,
         port: string,
         apiKey: string,
       ) => Promise<HydrusAuthResponse>;
-      authPiwigo: (
+      piwigoAuth: (
         schema: string,
         host: string,
         username: string,
         password: string,
       ) => Promise<string | undefined>;
-      loginPiwigo: (url: string, username: string, password: string) => Promise<boolean>
+      piwigoLogin: (url: string, username: string, password: string) => Promise<boolean>
     };
   }
 }

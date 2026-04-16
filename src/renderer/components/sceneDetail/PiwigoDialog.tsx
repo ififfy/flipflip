@@ -496,7 +496,7 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
 
   login() {
     const { piwigoPassword, piwigoUsername } = this.props.config.remoteSettings;
-    return window.ipc.loginPiwigo(this.makeURL(), piwigoUsername, piwigoPassword).then((loggedIn) => {
+    return window.ipc.piwigoLogin(this.makeURL(), piwigoUsername, piwigoPassword).then((loggedIn) => {
       if (loggedIn) {
             this.setState({ loggedIn });
           }

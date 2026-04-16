@@ -920,7 +920,7 @@ class APICard extends React.Component<APICardProps> {
 
   onFinishAuthHydrus() {
     window.ipc
-      .authHydrus(
+      .hydrusAuth(
         this.state.input1,
         this.state.input2,
         this.state.input3,
@@ -961,7 +961,7 @@ class APICard extends React.Component<APICardProps> {
 
   onFinishAuthPiwigo() {
     window.ipc
-      .authPiwigo(
+      .piwigoAuth(
         this.state.input1,
         this.state.input2,
         this.state.input3,

@@ -300,9 +300,9 @@ const IPC = {
   getAudioBPMMetadata: "ipc.getAudioBPMMetadata",
   addAudioURL: "ipc.addAudioURL",
   getAudioBuffer: "ipc.getAudioBuffer",
-  authHydrus: "ipc.authHydrus",
-  authPiwigo: "ipc.authPiwigo",
-  loginPiwigo: "ipc.loginPiwigo",
+  hydrusAuth: "ipc.hydrusAuth",
+  piwigoAuth: "ipc.piwigoAuth",
+  piwigoLogin: "ipc.piwigoLogin",
 };
 
 const MO = {
