@@ -40,14 +40,12 @@ import {
   extractMusicMetadata,
   parseMusicMetadata,
   toArrayBuffer,
-} from "./utils";
-import {
-  getBackups,
+    getBackups,
   getLocalPath,
   getCachePath,
   portablePath,
   saveDir,
-} from "./utils-main";
+} from "./utils";
 import {
   createNewAppStorage,
   saveAppStorage,

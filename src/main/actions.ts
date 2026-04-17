@@ -4,7 +4,7 @@ import moment from "moment";
 import { rimrafSync } from "rimraf";
 import { BrowserWindow, webFrame } from "electron";
 import Config from "../common/Config";
-import { saveDir, savePath, getBackups } from "./utils-main";
+import { saveDir, savePath, getBackups } from "./utils";
 import Backup from "../common/Backup";
 import AppStorageState from "../common/AppStorageState";
 import LibrarySource from "../common/LibrarySource";

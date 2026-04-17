@@ -28,6 +28,7 @@ import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { getMsRemainder, getTimestamp } from "../../data/utils";
 import { RP, TF } from "../../../common/const";
+import { proxyAudio } from "../../../common/utils";
 import Audio from "../../../common/Audio";
 import SoundTick from "./SoundTick";
 
@@ -123,7 +124,7 @@ class AudioControl extends React.Component<AudioControlProps> {
           )}
         {this.props.audioEnabled && !this.props.audio.tick && (
           <Sound
-            url={this.props.audio.url}
+            url={proxyAudio(this.props.audio.url)}
             playStatus={playing}
             playbackRate={this.props.audio.speed / 10}
             volume={this.props.audio.volume}

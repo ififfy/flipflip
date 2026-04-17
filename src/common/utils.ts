@@ -1,6 +1,21 @@
 import { ST } from "./const";
 
 const scheme = "ff://proxy/";
+// IMPORTANT make sure sub schemes are same length as scheme
+const audioScheme = "ff://audio/"
+const videoScheme = "ff://video/"
+export function proxyAudio(url: string) {
+    return audioScheme + encodeURIComponent(url);
+}
+export function isProxiedAudio(proxied: string) {
+  return proxied.startsWith(audioScheme)
+}
+export function proxyVideo(url: string) {
+    return videoScheme + encodeURIComponent(url);
+}
+export function isProxiedVideo(proxied: string) {
+  return proxied.startsWith(videoScheme)
+}
 export function proxy(url: string) {
   return scheme + encodeURIComponent(url);
 }

@@ -5568,6 +5568,7 @@ __metadata:
     eslint: "npm:^10.2.0"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-react: "npm:^7.37.5"
+    file-type: "npm:^16.5.4"
     file-url: "npm:^3.0.0"
     font-list: "npm:^1.4.5"
     fork-ts-checker-webpack-plugin: "npm:^7.3.0"

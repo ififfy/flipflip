@@ -1,10 +1,13 @@
+import fs from 'fs'
 import { app, protocol, net, Menu, session } from "electron";
 import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { createNewWindow, startScene } from "./WindowManager";
 import started from "electron-squirrel-startup";
-import { getSourceType, proxy, unproxy } from "../common/utils";
+import { getSourceType, isProxiedAudio, isProxiedVideo, proxy, unproxy } from "../common/utils";
 import { ST } from "../common/const";
+import { localFileResponse } from "./utils"
+import { fileURLToPath } from 'url'
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
@@ -34,6 +37,35 @@ app.on("ready", () => {
   protocol.handle("ff", async (req) => {
     try {
       let url = unproxy(req.url);
+      if (isProxiedAudio(req.url)) {
+        if (url.startsWith('http')) {
+          return net.fetch(new Request(url, req));
+        } else if (fs.existsSync(url)) {
+          return localFileResponse(url, req)
+        } else {
+          return Promise.resolve(new Response(null, { status: 404 }))
+        }
+      }
+      if (isProxiedVideo(req.url)) {
+        if (url.startsWith('http')) {
+          return net.fetch(new Request(url, req));
+        } else {
+          if (url.startsWith('file://')) {
+            url = fileURLToPath(url)
+          }
+
+          let exists
+          try {
+            exists = fs.existsSync(url)
+          } catch(err) {
+            exists = false
+          }
+
+          return exists 
+            ? localFileResponse(url, req) 
+            : Promise.resolve(new Response(null, { status: 404 }))
+        }
+      }
       if (url === 'src/renderer/icons/flipflip_logo.png' || url === 'index.js.map') {
         const entry = MAIN_WINDOW_WEBPACK_ENTRY
         url = entry.substring(0, entry.lastIndexOf('/') + 1) + url

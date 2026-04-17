@@ -4,7 +4,7 @@ import { CircularProgress, Container, Typography } from "@mui/material";
 
 import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../../common/const";
 import { flatten, getRandomListItem, getRandomNumber } from "../../data/utils";
-import { getSourceType, isVideo, proxy } from "../../../common/utils";
+import { getSourceType, isVideo, proxy, proxyVideo, unproxy } from "../../../common/utils";
 import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";
@@ -929,8 +929,9 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
               video &&
               video.src)
           ) {
-            if (!this._playedURLs.includes(video.src)) {
-              this._playedURLs.push(video.src);
+            const videoURL = unproxy(video.src)
+            if (!this._playedURLs.includes(videoURL)) {
+              this._playedURLs.push(videoURL);
             }
           }
           if (this.props.scene.orderFunction == OF.strict) {
@@ -994,7 +995,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
           }
         };
 
-        video.src = proxy(url);
+        video.src = proxyVideo(url);
         video.volume = 0;
         video.preload = "auto";
 
@@ -1081,8 +1082,9 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
               img &&
               img.src)
           ) {
-            if (!this._playedURLs.includes(img.src)) {
-              this._playedURLs.push(img.src);
+            const imgURL = unproxy(img.src)
+            if (!this._playedURLs.includes(imgURL)) {
+              this._playedURLs.push(imgURL);
             }
           }
           if (this.props.scene.orderFunction == OF.strict) {
@@ -1361,8 +1363,9 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
             nextImg &&
             nextImg.src))
       ) {
-        if (!this._playedURLs.includes(nextImg.src)) {
-          this._playedURLs.push(nextImg.src);
+        const nextImgURL = unproxy(nextImg.src)
+        if (!this._playedURLs.includes(nextImgURL)) {
+          this._playedURLs.push(nextImgURL);
         }
       }
     } else {

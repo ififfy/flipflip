@@ -15,6 +15,7 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import { CircularProgress } from "@mui/material";
+import { proxyAudio } from "../../../common/utils";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -138,7 +139,7 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
           return (
             <Sound
               key={a.alias}
-              url={a.file}
+              url={proxyAudio(a.file)}
               playStatus={
                 a.playing
                   ? (Sound as any).status.PLAYING
