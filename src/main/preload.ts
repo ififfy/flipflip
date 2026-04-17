@@ -47,10 +47,13 @@ contextBridge.exposeInMainWorld("ipc", {
   getFonts: () => ipcRenderer.invoke(IPC.getFonts),
   tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) =>
     ipcRenderer.send(IPC.tumblrAuthRequest, tumblrKey, tumblrSecret),
-  onTumblrAuthResponse: (callback: (response: AuthResponse) => void) =>
+  onTumblrAuthResponse: (callback: (response: AuthResponse) => void) => {
+    // make sure there's only one listener, user might have abandoned auth midway
+    ipcRenderer.removeAllListeners(IPC.tumblrAuthResponse);
     ipcRenderer.once(IPC.tumblrAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
-    ),
+    );
+  },
   tumblrFollowing: (
     key: string,
     secret: string,
@@ -70,10 +73,13 @@ contextBridge.exposeInMainWorld("ipc", {
     ),
   redditAuthRequest: (userAgent: string, clientID: string, deviceID: string) =>
     ipcRenderer.send(IPC.redditAuthRequest, userAgent, clientID, deviceID),
-  onRedditAuthResponse: (callback: (response: AuthResponse) => void) =>
+  onRedditAuthResponse: (callback: (response: AuthResponse) => void) => {
+    // make sure there's only one listener, user might have abandoned auth midway
+    ipcRenderer.removeAllListeners(IPC.redditAuthResponse);
     ipcRenderer.once(IPC.redditAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
-    ),
+    );
+  },
   redditSubscriptions: (
     userAgent: string,
     clientId: string,
