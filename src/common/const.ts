@@ -210,7 +210,7 @@ const AF = {
 
 const IPC = {
   newWindow: "ipc.newWindow",
-  isFirstWindow: "ipc.isFirstWindow",
+  initScenePicker: "ipc.initScenePicker",
   startScene: "ipc.startScene",
   getBackups: "ipc.getBackups",
   createBackup: "ipc.createBackup",
@@ -300,6 +300,14 @@ const IPC = {
   getAudioBPMMetadata: "ipc.getAudioBPMMetadata",
   addAudioURL: "ipc.addAudioURL",
   getAudioBuffer: "ipc.getAudioBuffer",
+  hydrusAuth: "ipc.hydrusAuth",
+  piwigoAuth: "ipc.piwigoAuth",
+  piwigoLogin: "ipc.piwigoLogin",
+  piwigoGetAlbums: "ipc.piwigoGetAlbums",
+  piwigoGetTags: "ipc.piwigoGetTags",
+  markOffline: "ipc.markOffline",
+  getTextFromURL: "ipc.getTextFromURL",
+  getSubtitles: "ipc.getSubtitles",
 };
 
 const MO = {
@@ -583,6 +591,13 @@ const SS = {
   success: "success",
 };
 
+const MOR = {
+  // Mark offline response
+  notFound: "mor.notFound",
+  found: "mor.found",
+  error: "mor.error",
+};
+
 export {
   AF,
   ALT,
@@ -599,6 +614,7 @@ export {
   IT,
   LT,
   MO,
+  MOR,
   OF,
   OT,
   PR,

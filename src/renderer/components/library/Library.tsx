@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import wretch from "wretch";
 
 import {
   AppBar,
@@ -1706,21 +1705,19 @@ class Library extends React.Component<LibraryProps> {
 
   onFinishImportLibrary() {
     if (this.state.importFile.startsWith("http")) {
-      wretch(this.state.importFile)
-        .get()
-        .text((text) => {
-          let json;
+      window.ipc.getTextFromURL(this.state.importFile).then((text) => {
+        if (text != null) {
           try {
-            json = JSON.parse(text);
+            const json = JSON.parse(text);
             this.props.onImportLibrary(json);
             this.onCloseDialog();
           } catch (e) {
             this.props.systemMessage("This is not a valid JSON file");
           }
-        })
-        .catch((e) => {
+        } else {
           this.props.systemMessage("Error accessing URL");
-        });
+        }
+      });
     } else {
       window.ipc.readTextFile(this.state.importFile).then((text) => {
         this.props.onImportLibrary(JSON.parse(text));

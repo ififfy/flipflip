@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
   getConstants: () => ipcRenderer.invoke(IPC.getConstants),
   newWindow: () => ipcRenderer.send(IPC.newWindow),
-  isFirstWindow: () => ipcRenderer.invoke(IPC.isFirstWindow),
+  initScenePicker: (version: string) =>
+    ipcRenderer.invoke(IPC.initScenePicker, version),
   setProgressBar: (progress: number) =>
     ipcRenderer.send(IPC.setProgressBar, progress),
   getBackups: () => ipcRenderer.invoke(IPC.getBackups),
@@ -46,10 +47,13 @@ contextBridge.exposeInMainWorld("ipc", {
   getFonts: () => ipcRenderer.invoke(IPC.getFonts),
   tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) =>
     ipcRenderer.send(IPC.tumblrAuthRequest, tumblrKey, tumblrSecret),
-  onTumblrAuthResponse: (callback: (response: AuthResponse) => void) =>
+  onTumblrAuthResponse: (callback: (response: AuthResponse) => void) => {
+    // make sure there's only one listener, user might have abandoned auth midway
+    ipcRenderer.removeAllListeners(IPC.tumblrAuthResponse);
     ipcRenderer.once(IPC.tumblrAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
-    ),
+    );
+  },
   tumblrFollowing: (
     key: string,
     secret: string,
@@ -69,10 +73,13 @@ contextBridge.exposeInMainWorld("ipc", {
     ),
   redditAuthRequest: (userAgent: string, clientID: string, deviceID: string) =>
     ipcRenderer.send(IPC.redditAuthRequest, userAgent, clientID, deviceID),
-  onRedditAuthResponse: (callback: (response: AuthResponse) => void) =>
+  onRedditAuthResponse: (callback: (response: AuthResponse) => void) => {
+    // make sure there's only one listener, user might have abandoned auth midway
+    ipcRenderer.removeAllListeners(IPC.redditAuthResponse);
     ipcRenderer.once(IPC.redditAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
-    ),
+    );
+  },
   redditSubscriptions: (
     userAgent: string,
     clientId: string,
@@ -254,10 +261,13 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.send(IPC.cacheImage, config, url, source),
   getCacheSize: (config: Config) =>
     ipcRenderer.invoke(IPC.getCacheSize, config),
-  onScrapeFilesResponse: (callback: (message: any) => void) =>
-    ipcRenderer.once(IPC.scrapeFilesResponse, (event, message: any) =>
-      callback(message),
-    ),
+  onScrapeFilesResponse: (callback: (message: any) => void) => {
+    const channel = IPC.scrapeFilesResponse;
+    const listener = (event: IpcRendererEvent, message: any) =>
+      callback(message);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.off(channel, listener);
+  },
   scrapeFiles: (
     allURLs: Map<string, string[]>,
     allPosts: Map<string, string>,
@@ -334,4 +344,20 @@ contextBridge.exposeInMainWorld("ipc", {
   getAudioBPMMetadata: (url: string) =>
     ipcRenderer.invoke(IPC.getAudioBPMMetadata, url),
   getAudioBuffer: (url: string) => ipcRenderer.invoke(IPC.getAudioBuffer, url),
+  hydrusAuth: (schema: string, host: string, port: string, apiKey: string) =>
+    ipcRenderer.invoke(IPC.hydrusAuth, schema, host, port, apiKey),
+  piwigoAuth: (
+    schema: string,
+    host: string,
+    username: string,
+    password: string,
+  ) => ipcRenderer.invoke(IPC.piwigoAuth, schema, host, username, password),
+  piwigoLogin: (url: string, username: string, password: string) =>
+    ipcRenderer.invoke(IPC.piwigoLogin, url, username, password),
+  piwigoGetAlbums: (url: string) =>
+    ipcRenderer.invoke(IPC.piwigoGetAlbums, url),
+  piwigoGetTags: (url: string) => ipcRenderer.invoke(IPC.piwigoGetTags, url),
+  markOffline: (url: string) => ipcRenderer.invoke(IPC.markOffline, url),
+  getTextFromURL: (url: string) => ipcRenderer.invoke(IPC.getTextFromURL, url),
+  getSubtitles: (url: string) => ipcRenderer.invoke(IPC.getSubtitles, url),
 });

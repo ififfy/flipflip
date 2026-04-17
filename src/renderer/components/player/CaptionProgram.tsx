@@ -1,5 +1,4 @@
 import * as React from "react";
-import wretch from "wretch";
 import Sound from "react-sound";
 
 import captionProgramDefaults, {
@@ -16,6 +15,7 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import { CircularProgress } from "@mui/material";
+import { proxyAudio } from "../../../common/utils";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -139,7 +139,7 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
           return (
             <Sound
               key={a.alias}
-              url={a.file}
+              url={proxyAudio(a.file)}
               playStatus={
                 a.playing
                   ? (Sound as any).status.PLAYING
@@ -315,16 +315,11 @@ export default class CaptionProgram extends React.Component<CaptionProgramProps>
       if (this.props.captionScript.script != null) {
         resolve({ data: [this.props.captionScript.script], helpers: null });
       } else {
-        wretch(url)
-          .get()
-          .error(503, (error) => {
-            console.warn(
-              "Unable to access " + url + " - Service is unavailable",
-            );
-          })
-          .text((data) => {
-            resolve({ data: [data], helpers: null });
-          });
+        window.ipc.getTextFromURL(url).then((text) => {
+          if (text != null) {
+            resolve({ data: [text], helpers: null });
+          }
+        });
       }
     });
     this._runningPromise.then(async (data) => {

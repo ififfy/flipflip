@@ -7,7 +7,6 @@ import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import Audio from "../../../common/Audio";
 import Strobe from "./Strobe";
-import wretch from "wretch";
 import FadeInOut from "./FadeInOut";
 import Panning from "./Panning";
 import CrossFade from "./CrossFade";
@@ -117,27 +116,26 @@ export default class ImageView extends React.Component<ImageViewProps> {
       img instanceof HTMLVideoElement &&
       img.hasAttribute("subtitles")
     ) {
-      try {
-        let subURL = img.getAttribute("subtitles");
-        wretch(subURL)
-          .get()
-          .blob((blob) => {
-            let track: any = document.createElement("track");
-            track.kind = "captions";
-            track.label = "English";
-            track.srclang = "en";
-            track.src = URL.createObjectURL(blob);
-            if (img.textTracks.length == 0) {
-              img.append(track);
-            } else {
-              img.textTracks[0] = track;
-            }
-            track.mode = "showing";
-            img.textTracks[0].mode = "showing";
-          });
-      } catch (e) {
-        console.error(e);
-      }
+      let subURL = img.getAttribute("subtitles");
+      window.ipc.getSubtitles(subURL).then((buffer) => {
+        if (buffer == null) {
+          return;
+        }
+
+        const track: any = document.createElement("track");
+        track.kind = "captions";
+        track.label = "English";
+        track.srclang = "en";
+        const blob = new Blob([buffer], { type: "text/vtt" });
+        track.src = URL.createObjectURL(blob);
+        if (img.textTracks.length == 0) {
+          img.append(track);
+        } else {
+          img.textTracks[0] = track;
+        }
+        track.mode = "showing";
+        img.textTracks[0].mode = "showing";
+      });
     }
 
     const videoLoop = (v: any) => {

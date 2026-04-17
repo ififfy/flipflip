@@ -2150,7 +2150,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/range-parser@npm:*":
+"@types/range-parser@npm:*, @types/range-parser@npm:^1.2.7":
   version: 1.2.7
   resolution: "@types/range-parser@npm:1.2.7"
   checksum: 10c0/361bb3e964ec5133fa40644a0b942279ed5df1949f21321d77de79f48b728d39253e5ce0408c9c17e4e0fd95ca7899da36841686393b9f7a1e209916e9381a3c
@@ -5549,6 +5549,7 @@ __metadata:
     "@types/electron-squirrel-startup": "npm:^1.0.2"
     "@types/jsdom": "npm:^28.0.1"
     "@types/oauth": "npm:^0.9.6"
+    "@types/range-parser": "npm:^1.2.7"
     "@types/react": "npm:^17.0.2"
     "@types/react-dom": "npm:^17.0.2"
     "@typescript-eslint/eslint-plugin": "npm:^5.62.0"
@@ -5568,6 +5569,7 @@ __metadata:
     eslint: "npm:^10.2.0"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-react: "npm:^7.37.5"
+    file-type: "npm:^16.5.4"
     file-url: "npm:^3.0.0"
     font-list: "npm:^1.4.5"
     fork-ts-checker-webpack-plugin: "npm:^7.3.0"
@@ -5582,6 +5584,7 @@ __metadata:
     node-loader: "npm:^2.1.0"
     oauth: "npm:^0.10.0"
     prettier: "npm:^3.8.1"
+    range-parser: "npm:^1.2.1"
     react: "npm:^17.0.2"
     react-codemirror2: "npm:^7.2.1"
     react-color: "npm:^2.19.3"

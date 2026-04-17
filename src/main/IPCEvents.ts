@@ -34,20 +34,18 @@ import {
   setProgressBar,
   openImage,
 } from "./WindowManager";
-import { IPC, ST } from "../common/const";
+import { IPC, MOR, ST } from "../common/const";
 import {
   generateThumbnailFile,
   extractMusicMetadata,
   parseMusicMetadata,
   toArrayBuffer,
-} from "./utils";
-import {
   getBackups,
   getLocalPath,
   getCachePath,
   portablePath,
   saveDir,
-} from "./utils-main";
+} from "./utils";
 import {
   createNewAppStorage,
   saveAppStorage,
@@ -76,6 +74,9 @@ import { Constants } from "../common/constants";
 import Audio from "../common/Audio";
 import GetAudioBufferResponse from "../common/GetAudioBufferResponse";
 import { loadSources } from "./scraper/ScraperManager";
+import ScenePickerInitResponse from "../common/ScenePickerInitResponse";
+import HydrusAuthResponse from "../common/HydrusAuthResponse";
+import OpenScriptResponse from "../common/OpenScriptResponse";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -153,7 +154,18 @@ async function onOpenSubtitle(ev: IpcMainEvent) {
 }
 
 async function onOpenScript(ev: IpcMainEvent) {
-  return await openScript(ev.sender.id);
+  const filePath = await openScript(ev.sender.id);
+  if (filePath != null) {
+    try {
+      const data = fs.readFileSync(filePath, "utf-8");
+      const response: OpenScriptResponse = { url: filePath, data };
+      return response;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  return undefined;
 }
 
 async function onSaveScriptAs(
@@ -199,8 +211,73 @@ function onRedditAuthRequest(
   redditAuth(window, userAgent, clientID, deviceID);
 }
 
-function onRequestIsFirstWindow(ev: IpcMainInvokeEvent) {
-  return ev.sender.id === 1;
+async function onInitScenePicker(ev: IpcMainInvokeEvent, version: string) {
+  const response: ScenePickerInitResponse = {
+    isFirstWindow: ev.sender.id === 1,
+  };
+  if (!response.isFirstWindow) {
+    return response;
+  }
+
+  try {
+    const json = await wretch(
+      "https://api.github.com/repos/regtemp8/flipflip/releases",
+    )
+      .get()
+      .json();
+
+    const newestReleaseTag = json[0].tag_name;
+    const newestReleaseURL = json[0].html_url;
+    let releaseVersion = newestReleaseTag
+      .replace("v", "")
+      .replace(".", "")
+      .replace(".", "");
+    let releaseBetaVersion = -1;
+    if (releaseVersion.includes("-")) {
+      const releaseSplit = releaseVersion.split("-");
+      releaseVersion = releaseSplit[0];
+      const betaString = releaseSplit[1];
+      const betaNumber = betaString.replace("beta", "");
+      if (betaNumber == "") {
+        releaseBetaVersion = 0;
+      } else {
+        releaseBetaVersion = parseInt(betaNumber);
+      }
+    }
+    let thisVersion = version.replace(".", "").replace(".", "");
+    let thisBetaVersion = -1;
+    if (thisVersion.includes("-")) {
+      const releaseSplit = thisVersion.split("-");
+      thisVersion = releaseSplit[0];
+      const betaString = releaseSplit[1];
+      const betaNumber = betaString.replace("beta", "");
+      if (betaNumber == "") {
+        thisBetaVersion = 0;
+      } else {
+        thisBetaVersion = parseInt(betaNumber);
+      }
+    }
+    if (parseInt(releaseVersion) > parseInt(thisVersion)) {
+      response.update = {
+        releaseTag: newestReleaseTag,
+        releaseURL: newestReleaseURL,
+      };
+    } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
+      if (
+        (releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
+        releaseBetaVersion > thisBetaVersion
+      ) {
+        response.update = {
+          releaseTag: newestReleaseTag,
+          releaseURL: newestReleaseURL,
+        };
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return response;
 }
 
 function onSetProgressBar(ev: IpcMainEvent, progress: number) {
@@ -1027,6 +1104,181 @@ function onPlayerMenuSetPlayPause(ev: IpcMainEvent, playing: boolean) {
   PlayerMenu.setIsPlaying(playing);
 }
 
+async function onHydrusAuth(
+  ev: IpcMainInvokeEvent,
+  schema: string,
+  host: string,
+  port: string,
+  apiKey: string,
+) {
+  const response: HydrusAuthResponse = {};
+  const url = `${schema}://${host}:${port}/session_key`;
+  try {
+    const json = await wretch(url)
+      .headers({ "Hydrus-Client-API-Access-Key": apiKey })
+      .get()
+      .setTimeout(5000)
+      .json();
+
+    if (json.session_key) {
+      response.sessionKey = json.session_key;
+    } else {
+      const error = "Invalid response from Hydrus server";
+      console.error(error);
+      response.error = error;
+    }
+  } catch (err) {
+    console.error(err);
+    response.error = `Error: ${err.message}`;
+  }
+
+  return response;
+}
+
+async function onPiwigoAuth(
+  ev: IpcMainInvokeEvent,
+  schema: string,
+  host: string,
+  username: string,
+  password: string,
+) {
+  if (!host.endsWith("/")) {
+    host += "/";
+  }
+
+  let reqURL = `${schema}://${host}ws.php?format=json`;
+  if (!username) {
+    reqURL += "&method=reflection.getMethodList";
+  }
+
+  let req = wretch(reqURL);
+  if (username) {
+    req = req.formUrl({
+      method: "pwg.session.login",
+      username,
+      password,
+    });
+  }
+
+  try {
+    const json = await req.post().setTimeout(5000).json();
+
+    if (json.stat !== "ok") {
+      const error = "Invalid response from Piwigo server";
+      console.error(error);
+      return error;
+    } else {
+      return undefined;
+    }
+  } catch (err) {
+    console.error(err);
+    return err.message;
+  }
+}
+
+async function onPiwigoLogin(
+  ev: IpcMainInvokeEvent,
+  url: string,
+  username: string,
+  password: string,
+) {
+  let loggedIn = false;
+  try {
+    const json = await wretch(url)
+      .formUrl({
+        method: "pwg.session.login",
+        username,
+        password,
+      })
+      .post()
+      .setTimeout(5000)
+      .json();
+
+    loggedIn = json.stat == "ok";
+  } catch (err) {
+    console.error(err);
+  }
+
+  return loggedIn;
+}
+
+async function onPiwigoGetAlbums(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    const json = await wretch(url)
+      .formUrl({
+        method: "pwg.categories.getList",
+        recursive: true,
+        tree_output: true,
+      })
+      .post()
+      .setTimeout(5000)
+      .json();
+
+    if (json.stat == "ok") {
+      return json.result;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return [];
+}
+
+async function onPiwigoGetTags(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    const json = await wretch(url)
+      .formUrl({ method: "pwg.tags.getList" })
+      .post()
+      .setTimeout(5000)
+      .json();
+
+    if (json.stat == "ok") {
+      return json.result.tags;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return [];
+}
+
+function onMarkOffline(ev: IpcMainInvokeEvent, url: string) {
+  return new Promise((resolve) => {
+    wretch(url)
+      .get()
+      .notFound((res) => {
+        resolve(MOR.notFound);
+      })
+      .res((res) => {
+        resolve(MOR.found);
+      })
+      .catch((e) => {
+        console.error(e);
+        resolve(MOR.error);
+      });
+  });
+}
+
+async function onGetTextFromURL(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    return await wretch(this.state.importFile).get().text();
+  } catch (err) {
+    console.error(err);
+  }
+
+  return undefined;
+}
+
+async function onGetSubtitles(ev: IpcMainInvokeEvent, url: string) {
+  try {
+    return await wretch(url).get().arrayBuffer();
+  } catch (err) {
+    console.error(err);
+  }
+
+  return undefined;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -1037,7 +1289,7 @@ export function initializeIpcEvents() {
   initialized = true;
   ipcMain.on(IPC.newWindow, onRequestCreateNewWindow);
   ipcMain.handle(IPC.getConstants, onGetConstants);
-  ipcMain.handle(IPC.isFirstWindow, onRequestIsFirstWindow);
+  ipcMain.handle(IPC.initScenePicker, onInitScenePicker);
   ipcMain.handle(IPC.getBackups, onRequestBackups);
   ipcMain.handle(IPC.getAppStorage, onRequestAppStorage);
   ipcMain.on(IPC.saveAppStorage, onSaveAppStorage);
@@ -1106,13 +1358,19 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getAudioBPMMetadata, onGetAudioBPMMetadata);
   ipcMain.handle(IPC.addAudioURL, onAddAudioURL);
   ipcMain.handle(IPC.getAudioBuffer, onGetAudioBuffer);
+  ipcMain.handle(IPC.hydrusAuth, onHydrusAuth);
+  ipcMain.handle(IPC.piwigoAuth, onPiwigoAuth);
+  ipcMain.handle(IPC.piwigoLogin, onPiwigoLogin);
+  ipcMain.handle(IPC.piwigoGetAlbums, onPiwigoGetAlbums);
+  ipcMain.handle(IPC.piwigoGetTags, onPiwigoGetTags);
+  ipcMain.handle(IPC.markOffline, onMarkOffline);
+  ipcMain.handle(IPC.getTextFromURL, onGetTextFromURL);
+  ipcMain.handle(IPC.getSubtitles, onGetSubtitles);
 }
 
 export function releaseIpcEvents() {
   if (initialized) {
-    ipcMain.removeAllListeners(IPC.newWindow);
-    ipcMain.removeAllListeners(IPC.getBackups);
-    // FIXME removeAllListeners for all initialized events
+    ipcMain.removeAllListeners();
   }
 
   initialized = false;

@@ -4,6 +4,99 @@ import crypto from "crypto";
 import wretch from "wretch";
 import Audio from "../common/Audio";
 import { parseBuffer, parseFile } from "music-metadata";
+import { Readable } from "stream";
+import FileType from "file-type";
+import { app } from "electron";
+import Backup from "../common/Backup";
+import { ST } from "../common/const";
+import { getFileGroup, getSourceType } from "../common/utils";
+import Config from "../common/Config";
+import en from "../common/en";
+import parseRange from "range-parser";
+
+export const saveDir = path.join(app.getPath("appData"), "flipflip");
+export const savePath = path.join(saveDir, "data.json");
+export const portablePath = path.join(
+  path.dirname(app.getAppPath()),
+  "data.json",
+);
+
+export function getBackups(): Array<Backup> {
+  const files = fs.readdirSync(saveDir);
+  const backups = Array<Backup>();
+  for (let file of files) {
+    if (file.startsWith("data.json.") && file != "data.json.new") {
+      const stats = fs.statSync(path.join(saveDir, file));
+      backups.push({ url: file, size: stats.size });
+    }
+  }
+  backups.sort((a, b) => {
+    const aFile = a.url;
+    const bFile = b.url;
+    if (aFile > bFile) {
+      return -1;
+    } else if (aFile < bFile) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+  return backups;
+}
+
+export function getLocalPath(source: string, config: Config) {
+  return cachePath(source, "local", config);
+}
+
+export function getCachePath(source: string, config: Config) {
+  const typeDir = en.get(getSourceType(source)).toLowerCase();
+  return cachePath(source, typeDir, config);
+}
+
+function cachePath(source: string, typeDir: string, config: Config) {
+  if (config.caching.directory != "") {
+    let baseDir = config.caching.directory;
+    if (!baseDir.endsWith(path.sep)) {
+      baseDir += path.sep;
+    }
+    if (source) {
+      if (source != ST.video && source != ST.playlist) {
+        return (
+          baseDir +
+          typeDir +
+          path.sep +
+          getFileGroup(source, path.sep) +
+          path.sep
+        );
+      } else {
+        return baseDir + typeDir + path.sep;
+      }
+    } else {
+      return baseDir;
+    }
+  } else {
+    if (source) {
+      if (source != ST.video && source != ST.playlist) {
+        return (
+          saveDir +
+          path.sep +
+          "ImageCache" +
+          path.sep +
+          typeDir +
+          path.sep +
+          getFileGroup(source, path.sep) +
+          path.sep
+        );
+      } else {
+        return (
+          saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep
+        );
+      }
+    } else {
+      return saveDir + path.sep + "ImageCache" + path.sep;
+    }
+  }
+}
 
 export function toArrayBuffer(buf: Buffer) {
   let ab = new ArrayBuffer(buf.length);
@@ -81,8 +174,8 @@ export function extractMusicMetadata(
   if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
   } else {
-    const data = toArrayBuffer(fs.readFileSync(audio.url)); // FIXME
-    let context = new AudioContext(); // FIXME pass in AudioHTMLElement with URL (file://, http://)
+    const data = toArrayBuffer(fs.readFileSync(audio.url));
+    let context = new AudioContext();
     context.decodeAudioData(data, (buffer) => {
       audio.duration = buffer.duration;
     });
@@ -104,4 +197,45 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
     fs.writeFileSync(checksumThumbnailPath, data);
   }
   return checksumThumbnailPath;
+}
+
+export async function localFileResponse(filePath: string, request: Request) {
+  const stat = fs.statSync(filePath);
+  const fileType = await FileType.fromFile(filePath);
+  const contentType = fileType?.mime ?? "application/octet-stream";
+
+  const range = request.headers.get("Range");
+  const ranges = range ? parseRange(stat.size, range) : undefined;
+  if (ranges == -1) {
+    // Unsatisfiable range parser result, return HTTP status 416: range not satisfiable
+    return new Response(null, {
+      status: 416,
+      headers: { "Content-Range": `bytes */${stat.size}` },
+    });
+  } else if (ranges == -2) {
+    // Syntactically invalid parser result, return HTTP status 400: bad request
+    return new Response(null, { status: 400 });
+  } else {
+    let start = 0;
+    let end = stat.size - 1;
+    let status = 200;
+    const headers: Record<string, string> = {
+      "Content-Type": contentType,
+      "Accept-Ranges": "bytes",
+    };
+
+    if (ranges != null && ranges.length > 0 && ranges.type === "bytes") {
+      start = ranges[0].start;
+      end = ranges[0].end;
+      status = 206;
+      headers["Content-Range"] = `bytes ${start}-${end}/${stat.size}`;
+    }
+
+    headers["Content-Length"] = `${end - start + 1}`
+    const nodeStream = fs.createReadStream(filePath, { start, end });
+    return new Response(Readable.toWeb(nodeStream) as any, {
+      status,
+      headers,
+    });
+  }
 }

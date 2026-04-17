@@ -5,6 +5,7 @@ import windowStateKeeper from "electron-window-state";
 
 import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
+import { proxy } from "../common/utils";
 import { getFilesRecursively } from "./utils";
 import {
   isText,
@@ -82,7 +83,7 @@ export function createNewWindow() {
     }
   });
 
-  newWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  newWindow.loadURL(proxy(MAIN_WINDOW_WEBPACK_ENTRY));
 
   // Open the DevTools.
   const isDevToolsDisabled = Boolean(

@@ -17,7 +17,7 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { getSourceType } from "../../../common/utils";
+import { getSourceType, proxyVideo } from "../../../common/utils";
 import { ST } from "../../../common/const";
 import Clip from "../../../common/Clip";
 import LibrarySource from "../../../common/LibrarySource";
@@ -204,7 +204,7 @@ class BatchClipDialog extends React.Component<BatchClipDialogProps> {
           errorCallback("Unable to load video: " + sourceURL);
         };
 
-        video.src = sourceURL;
+        video.src = proxyVideo(sourceURL);
         video.preload = "auto";
       } else {
         createBatchClips();

@@ -9,6 +9,11 @@ import LibrarySource from "./common/LibrarySource";
 import LibraryMoveResult from "./common/LibraryMoveResult";
 import { Constants } from "./common/constants";
 import GetAudioBufferResponse from "./common/GetAudioBufferResponse";
+import ScenePickerInitResponse from "./common/ScenePickerInitResponse";
+import HydrusAuthResponse from "./common/HydrusAuthResponse";
+import Album from "./renderer/data/piwigo/Album";
+import Tag from "./renderer/data/piwigo/Tag";
+import OpenScriptResponse from "./common/OpenScriptResponse";
 
 declare global {
   interface Window {
@@ -17,7 +22,7 @@ declare global {
       platform: () => string;
       getConstants(): Promise<Constants>;
       newWindow: () => void;
-      isFirstWindow: () => Promise<boolean>;
+      initScenePicker: (version: string) => Promise<ScenePickerInitResponse>;
       setProgressBar: (progress: number) => void;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;
@@ -37,7 +42,7 @@ declare global {
       openAudios: (shiftKey: boolean) => Promise<string[]>;
       openScripts: (shiftKey: boolean) => Promise<string[]>;
       openSubtitle: () => Promise<string | undefined>;
-      openScript: () => Promise<string | undefined>;
+      openScript: () => Promise<OpenScriptResponse | undefined>;
       saveScript: (url: string, script: string) => Promise<void>;
       saveScriptAs: (
         script: string,
@@ -120,7 +125,7 @@ declare global {
       readTextFile: (path: string) => Promise<string>;
       cacheImage: (config: Config, url: string, source: string) => void;
       getCacheSize: (config: Config) => Promise<number>;
-      onScrapeFilesResponse: (callback: (message: any) => void) => void;
+      onScrapeFilesResponse: (callback: (message: any) => void) => () => void;
       scrapeFiles: (
         allURLs: Map<string, string[]>,
         allPosts: Map<string, string>,
@@ -181,6 +186,28 @@ declare global {
       ) => Promise<Audio | undefined>;
       getAudioBPMMetadata: (url: string) => Promise<number>;
       getAudioBuffer: (url: string) => Promise<GetAudioBufferResponse>;
+      hydrusAuth: (
+        schema: string,
+        host: string,
+        port: string,
+        apiKey: string,
+      ) => Promise<HydrusAuthResponse>;
+      piwigoAuth: (
+        schema: string,
+        host: string,
+        username: string,
+        password: string,
+      ) => Promise<string | undefined>;
+      piwigoLogin: (
+        url: string,
+        username: string,
+        password: string,
+      ) => Promise<boolean>;
+      piwigoGetAlbums: (url: string) => Promise<Album[]>;
+      piwigoGetTags: (url: string) => Promise<Tag[]>;
+      markOffline: (url: string) => Promise<string>;
+      getTextFromURL: (url: string) => Promise<string | undefined>;
+      getSubtitles: (url: string) => Promise<ArrayBuffer | undefined>;
     };
   }
 }

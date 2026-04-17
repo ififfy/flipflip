@@ -1,6 +1,6 @@
 import * as React from "react";
 import Sound from "react-sound";
-
+import { proxyAudio } from "../../../common/utils";
 interface SoundTickProps {
   url: string;
   playing: any;
@@ -26,7 +26,7 @@ export default class SoundTick extends React.Component<SoundTickProps> {
   render() {
     return (
       <Sound
-        url={this.props.url}
+        url={proxyAudio(this.props.url)}
         playStatus={this.props.playing}
         playbackRate={this.props.speed}
         autoLoad

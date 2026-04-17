@@ -10,18 +10,16 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    name: 'FlipFlip',
-    icon: 'src/renderer/icons/flipflip_logo'
+    name: "FlipFlip",
+    icon: "src/renderer/icons/flipflip_logo",
   },
   rebuildConfig: {},
-  makers: [
-    new MakerZIP({}),
-  ],
+  makers: [new MakerZIP({})],
   plugins: [
     new WebpackPlugin({
       mainConfig,
       devContentSecurityPolicy:
-        "default-src 'self' data:; worker-src 'self' blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.github.com; frame-src https://www.imagefap.com http://www.imagefap.com https://hypno.nimja.com/ http://hypno.nimja.com/",
+        "default-src 'self' data:; worker-src 'self' blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; frame-src https://www.imagefap.com http://www.imagefap.com https://hypno.nimja.com/ http://hypno.nimja.com/",
       renderer: {
         config: rendererConfig,
         entryPoints: [

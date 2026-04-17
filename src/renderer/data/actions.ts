@@ -1,6 +1,4 @@
-import wretch from "wretch";
-
-import { removeDuplicatesBy } from "../../common/utils";
+import { removeDuplicatesBy, proxyVideo } from "../../common/utils";
 import {
   applyEffects,
   areWeightsValid,
@@ -22,6 +20,7 @@ import {
   IF,
   IT,
   LT,
+  MOR,
   OF,
   PR,
   PT,
@@ -3568,36 +3567,28 @@ export function markOffline(getState: () => State, setState: Function) {
       );
       if (librarySource) {
         librarySource.lastCheck = new Date();
-        wretch(librarySource.url)
-          .get()
-          .notFound((res) => {
-            librarySource.offline = true;
-            state.progressCurrent = offset + 1;
-            setState({ progressCurrent: state.progressCurrent });
-            window.ipc.setProgressBar(
-              state.progressCurrent / state.progressTotal,
-            );
-            setTimeout(offlineLoop, 1000);
-          })
-          .res((res) => {
-            librarySource.offline = false;
-            state.progressCurrent = offset + 1;
-            setState({ progressCurrent: state.progressCurrent });
-            window.ipc.setProgressBar(
-              state.progressCurrent / state.progressTotal,
-            );
-            setTimeout(offlineLoop, 1000);
-          })
-          .catch((e) => {
-            console.error(e);
-            librarySource.lastCheck = null;
-            state.progressCurrent = offset + 1;
-            setState({ progressCurrent: state.progressCurrent });
-            window.ipc.setProgressBar(
-              state.progressCurrent / state.progressTotal,
-            );
-            setTimeout(offlineLoop, 100);
-          });
+        window.ipc.markOffline(librarySource.url).then((response) => {
+          let timeout = 1000;
+          switch (response) {
+            case MOR.notFound:
+              librarySource.offline = true;
+              break;
+            case MOR.found:
+              librarySource.offline = false;
+              break;
+            default:
+              librarySource.lastCheck = null;
+              timeout = 100;
+              break;
+          }
+
+          state.progressCurrent = offset + 1;
+          setState({ progressCurrent: state.progressCurrent });
+          window.ipc.setProgressBar(
+            state.progressCurrent / state.progressTotal,
+          );
+          setTimeout(offlineLoop, timeout);
+        });
       } else {
         // Skip if removed from library during check
         state.progressCurrent = offset + 1;
@@ -3824,7 +3815,7 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
           );
           setTimeout(videoMetadataLoop, 100);
         };
-        video.src = librarySource.url;
+        video.src = proxyVideo(librarySource.url);
       } else {
         // Skip if removed from library during check
         state.progressCurrent = offset + 1;

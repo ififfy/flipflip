@@ -1,5 +1,4 @@
 import * as React from "react";
-import wretch from "wretch";
 import Sortable from "react-sortablejs";
 
 import {
@@ -40,6 +39,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { AF, PW, PWS } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
 import en from "../../../common/en";
+import Album from "../../data/piwigo/Album";
+import Tag from "../../data/piwigo/Tag";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -88,20 +89,6 @@ const styles = (theme: Theme) =>
       marginLeft: 10,
     },
   });
-
-interface Album {
-  id: number;
-  tn_url: string;
-  name: string;
-  comment: string;
-  sub_categories: Album[];
-}
-
-interface Tag {
-  id: number;
-  name: string;
-  counter: number;
-}
 
 interface Column {
   label: string;
@@ -496,38 +483,13 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
 
   login() {
     const { piwigoPassword, piwigoUsername } = this.props.config.remoteSettings;
-    return (
-      wretch(this.makeURL())
-        .formUrl({
-          method: "pwg.session.login",
-          username: piwigoUsername,
-          password: piwigoPassword,
-        })
-        .post()
-        .setTimeout(5000)
-        // .notFound((e) => pm({
-        //   error: e.message,
-        //   helpers: helpers,
-        //   source: source,
-        //   timeout: timeout,
-        // }))
-        // .internalError((e) => pm({
-        //   error: e.message,
-        //   helpers: helpers,
-        //   source: source,
-        //   timeout: timeout,
-        // }))
-        .json((json) => {
-          if (json.stat == "ok") {
-            this.setState({ loggedIn: true });
-          } else {
-            //
-          }
-        })
-        .catch((e) => {
-          //
-        })
-    );
+    return window.ipc
+      .piwigoLogin(this.makeURL(), piwigoUsername, piwigoPassword)
+      .then((loggedIn) => {
+        if (loggedIn) {
+          this.setState({ loggedIn });
+        }
+      });
   }
 
   getAlbums() {
@@ -535,38 +497,11 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
     const { loggedIn = false } = this.state;
 
     const getAlbums = () => {
-      return (
-        wretch(this.makeURL())
-          .formUrl({
-            method: "pwg.categories.getList",
-            recursive: true,
-            tree_output: true,
-          })
-          .post()
-          .setTimeout(5000)
-          // .notFound((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          // .internalError((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          .json((json) => {
-            if (json.stat == "ok") {
-              this.setState({ albums: json.result.map((a: Album) => a) });
-            } else {
-              //
-            }
-          })
-          .catch((e) => {
-            //
-          })
-      );
+      window.ipc.piwigoGetAlbums(this.makeURL()).then((albums) => {
+        if (albums) {
+          this.setState({ albums });
+        }
+      });
     };
 
     if (!loggedIn && !!piwigoUsername) {
@@ -581,34 +516,11 @@ class PiwigoDialog extends React.Component<PiwigoDialogProps> {
     const { loggedIn = false } = this.state;
 
     const getTags = () => {
-      return (
-        wretch(this.makeURL())
-          .formUrl({ method: "pwg.tags.getList" })
-          .post()
-          .setTimeout(5000)
-          // .notFound((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          // .internalError((e) => pm({
-          //   error: e.message,
-          //   helpers: helpers,
-          //   source: source,
-          //   timeout: timeout,
-          // }))
-          .json((json) => {
-            if (json.stat == "ok") {
-              this.setState({ tags: json.result.tags.map((t: Tag) => t) });
-            } else {
-              //
-            }
-          })
-          .catch((e) => {
-            //
-          })
-      );
+      window.ipc.piwigoGetTags(this.makeURL()).then((tags) => {
+        if (tags) {
+          this.setState({ tags });
+        }
+      });
     };
 
     if (!loggedIn && !!piwigoUsername) {
