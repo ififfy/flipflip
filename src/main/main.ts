@@ -43,16 +43,7 @@ app.on("ready", () => {
   protocol.handle("ff", async (req) => {
     try {
       let url = unproxy(req.url);
-      if (isProxiedAudio(req.url)) {
-        if (url.startsWith("http")) {
-          return net.fetch(new Request(url, req));
-        } else if (fs.existsSync(url)) {
-          return localFileResponse(url, req);
-        } else {
-          return Promise.resolve(new Response(null, { status: 404 }));
-        }
-      }
-      if (isProxiedVideo(req.url)) {
+      if (isProxiedVideo(req.url) || isProxiedAudio(req.url)) {
         if (url.startsWith("http")) {
           return net.fetch(new Request(url, req));
         } else {
@@ -69,7 +60,7 @@ app.on("ready", () => {
 
           return exists
             ? localFileResponse(url, req)
-            : Promise.resolve(new Response(null, { status: 404 }));
+            : new Response(null, { status: 404 });
         }
       }
       if (
@@ -90,9 +81,7 @@ app.on("ready", () => {
           '<link rel="manifest" href="/site.webmanifest">',
           "",
         );
-        return Promise.resolve(
-          new Response(html, { headers: { "Content-Type": "text/html" } }),
-        );
+        return new Response(html, { headers: { "Content-Type": "text/html" } });
       } else if (url.endsWith("/main_window/index.html")) {
         const res = await promise;
         let html = await res.text();
@@ -103,15 +92,13 @@ app.on("ready", () => {
           /<script.*\/main_window\/index.js"><\/script>/,
           `<script defer src="${proxy(baseURL + "/main_window/index.js")}"></script>`,
         );
-        return Promise.resolve(
-          new Response(html, { headers: { "Content-Type": "text/html" } }),
-        );
+        return new Response(html, { headers: { "Content-Type": "text/html" } });
       } else {
         return promise;
       }
     } catch (err) {
       console.error(err);
-      return Promise.resolve(Response.error());
+      return Response.error();
     }
   });
 

@@ -12,6 +12,7 @@ import { ST } from "../common/const";
 import { getFileGroup, getSourceType } from "../common/utils";
 import Config from "../common/Config";
 import en from "../common/en";
+import parseRange from "range-parser";
 
 export const saveDir = path.join(app.getPath("appData"), "flipflip");
 export const savePath = path.join(saveDir, "data.json");
@@ -201,33 +202,40 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
 export async function localFileResponse(filePath: string, request: Request) {
   const stat = fs.statSync(filePath);
   const fileType = await FileType.fromFile(filePath);
-  const contentType = fileType?.mime ?? "";
+  const contentType = fileType?.mime ?? "application/octet-stream";
 
-  const range = request.headers.get("range");
-  if (range) {
-    const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(startStr, 10);
-    const end = endStr ? parseInt(endStr, 10) : stat.size - 1;
+  const range = request.headers.get("Range");
+  const ranges = range ? parseRange(stat.size, range) : undefined;
+  if (ranges == -1) {
+    // Unsatisfiable range parser result, return HTTP status 416: range not satisfiable
+    return new Response(null, {
+      status: 416,
+      headers: { "Content-Range": `bytes */${stat.size}` },
+    });
+  } else if (ranges == -2) {
+    // Syntactically invalid parser result, return HTTP status 400: bad request
+    return new Response(null, { status: 400 });
+  } else {
+    let start = 0;
+    let end = stat.size - 1;
+    let status = 200;
+    const headers: Record<string, string> = {
+      "Content-Type": contentType,
+      "Accept-Ranges": "bytes",
+    };
 
+    if (ranges != null && ranges.length > 0 && ranges.type === "bytes") {
+      start = ranges[0].start;
+      end = ranges[0].end;
+      status = 206;
+      headers["Content-Range"] = `bytes ${start}-${end}/${stat.size}`;
+    }
+
+    headers["Content-Length"] = `${end - start + 1}`
     const nodeStream = fs.createReadStream(filePath, { start, end });
     return new Response(Readable.toWeb(nodeStream) as any, {
-      status: 206,
-      headers: {
-        "Content-Type": contentType,
-        "Accept-Ranges": "bytes",
-        "Content-Range": `bytes ${start}-${end}/${stat.size}`,
-        "Content-Length": `${end - start + 1}`,
-      },
-    });
-  } else {
-    const nodeStream = fs.createReadStream(filePath);
-    return new Response(Readable.toWeb(nodeStream) as any, {
-      status: 200,
-      headers: {
-        "Content-Type": contentType,
-        "Accept-Ranges": "bytes",
-        "Content-Length": `${stat.size}`,
-      },
+      status,
+      headers,
     });
   }
 }
