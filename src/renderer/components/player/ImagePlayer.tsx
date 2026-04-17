@@ -4,7 +4,13 @@ import { CircularProgress, Container, Typography } from "@mui/material";
 
 import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../../common/const";
 import { flatten, getRandomListItem, getRandomNumber } from "../../data/utils";
-import { getSourceType, isVideo, proxy, proxyVideo, unproxy } from "../../../common/utils";
+import {
+  getSourceType,
+  isVideo,
+  proxy,
+  proxyVideo,
+  unproxy,
+} from "../../../common/utils";
 import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";
@@ -929,7 +935,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
               video &&
               video.src)
           ) {
-            const videoURL = unproxy(video.src)
+            const videoURL = unproxy(video.src);
             if (!this._playedURLs.includes(videoURL)) {
               this._playedURLs.push(videoURL);
             }
@@ -1082,7 +1088,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
               img &&
               img.src)
           ) {
-            const imgURL = unproxy(img.src)
+            const imgURL = unproxy(img.src);
             if (!this._playedURLs.includes(imgURL)) {
               this._playedURLs.push(imgURL);
             }
@@ -1363,7 +1369,7 @@ export default class ImagePlayer extends React.Component<ImagePlayerProps> {
             nextImg &&
             nextImg.src))
       ) {
-        const nextImgURL = unproxy(nextImg.src)
+        const nextImgURL = unproxy(nextImg.src);
         if (!this._playedURLs.includes(nextImgURL)) {
           this._playedURLs.push(nextImgURL);
         }

@@ -1,13 +1,19 @@
-import fs from 'fs'
+import fs from "fs";
 import { app, protocol, net, Menu, session } from "electron";
 import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
 import { createNewWindow, startScene } from "./WindowManager";
 import started from "electron-squirrel-startup";
-import { getSourceType, isProxiedAudio, isProxiedVideo, proxy, unproxy } from "../common/utils";
+import {
+  getSourceType,
+  isProxiedAudio,
+  isProxiedVideo,
+  proxy,
+  unproxy,
+} from "../common/utils";
 import { ST } from "../common/const";
-import { localFileResponse } from "./utils"
-import { fileURLToPath } from 'url'
+import { localFileResponse } from "./utils";
+import { fileURLToPath } from "url";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
@@ -38,63 +44,74 @@ app.on("ready", () => {
     try {
       let url = unproxy(req.url);
       if (isProxiedAudio(req.url)) {
-        if (url.startsWith('http')) {
+        if (url.startsWith("http")) {
           return net.fetch(new Request(url, req));
         } else if (fs.existsSync(url)) {
-          return localFileResponse(url, req)
+          return localFileResponse(url, req);
         } else {
-          return Promise.resolve(new Response(null, { status: 404 }))
+          return Promise.resolve(new Response(null, { status: 404 }));
         }
       }
       if (isProxiedVideo(req.url)) {
-        if (url.startsWith('http')) {
+        if (url.startsWith("http")) {
           return net.fetch(new Request(url, req));
         } else {
-          if (url.startsWith('file://')) {
-            url = fileURLToPath(url)
+          if (url.startsWith("file://")) {
+            url = fileURLToPath(url);
           }
 
-          let exists
+          let exists;
           try {
-            exists = fs.existsSync(url)
-          } catch(err) {
-            exists = false
+            exists = fs.existsSync(url);
+          } catch (err) {
+            exists = false;
           }
 
-          return exists 
-            ? localFileResponse(url, req) 
-            : Promise.resolve(new Response(null, { status: 404 }))
+          return exists
+            ? localFileResponse(url, req)
+            : Promise.resolve(new Response(null, { status: 404 }));
         }
       }
-      if (url === 'src/renderer/icons/flipflip_logo.png' || url === 'index.js.map') {
-        const entry = MAIN_WINDOW_WEBPACK_ENTRY
-        url = entry.substring(0, entry.lastIndexOf('/') + 1) + url
+      if (
+        url === "src/renderer/icons/flipflip_logo.png" ||
+        url === "index.js.map"
+      ) {
+        const entry = MAIN_WINDOW_WEBPACK_ENTRY;
+        url = entry.substring(0, entry.lastIndexOf("/") + 1) + url;
       }
 
       const promise = net.fetch(new Request(url, req));
       if (getSourceType(url) === ST.nimja) {
-        const res = await promise
-        let html = await res.text()
-        const baseURL = 'https://hypno.nimja.com'
-        html = html.replace('<head>', `<head><base href="${baseURL}/">`)
+        const res = await promise;
+        let html = await res.text();
+        const baseURL = "https://hypno.nimja.com";
+        html = html.replace("<head>", `<head><base href="${baseURL}/">`);
         html = html.replace(
           '<link rel="manifest" href="/site.webmanifest">',
-          ''
-        )
-        return Promise.resolve(new Response(html, { headers: { 'Content-Type': 'text/html' } }))
-      } else if (url.endsWith('/main_window/index.html')) {
-        const res = await promise
-        let html = await res.text()
-        const baseURL = url.startsWith('http') ? new URL(url).origin : url.substring(0, url.indexOf('/main_window'))
-        html = html.replace(/<script.*\/main_window\/index.js"><\/script>/, `<script defer src="${proxy(baseURL + '/main_window/index.js')}"></script>`)
-        return Promise.resolve(new Response(html, { headers: { 'Content-Type': 'text/html' } }))
+          "",
+        );
+        return Promise.resolve(
+          new Response(html, { headers: { "Content-Type": "text/html" } }),
+        );
+      } else if (url.endsWith("/main_window/index.html")) {
+        const res = await promise;
+        let html = await res.text();
+        const baseURL = url.startsWith("http")
+          ? new URL(url).origin
+          : url.substring(0, url.indexOf("/main_window"));
+        html = html.replace(
+          /<script.*\/main_window\/index.js"><\/script>/,
+          `<script defer src="${proxy(baseURL + "/main_window/index.js")}"></script>`,
+        );
+        return Promise.resolve(
+          new Response(html, { headers: { "Content-Type": "text/html" } }),
+        );
       } else {
-        return promise
+        return promise;
       }
-    }
-    catch (err) {
-      console.error(err)
-      return Promise.resolve(Response.error())
+    } catch (err) {
+      console.error(err);
+      return Promise.resolve(Response.error());
     }
   });
 

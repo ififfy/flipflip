@@ -11,7 +11,12 @@ import {
 
 import { SL, WC } from "../../../common/const";
 import { getRandomListItem } from "../../data/utils";
-import { getFileGroup, getFileName, urlToPath, proxy } from "../../../common/utils";
+import {
+  getFileGroup,
+  getFileName,
+  urlToPath,
+  proxy,
+} from "../../../common/utils";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import Config from "../../../common/Config";

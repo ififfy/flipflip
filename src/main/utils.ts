@@ -5,7 +5,7 @@ import wretch from "wretch";
 import Audio from "../common/Audio";
 import { parseBuffer, parseFile } from "music-metadata";
 import { Readable } from "stream";
-import FileType from 'file-type'
+import FileType from "file-type";
 import { app } from "electron";
 import Backup from "../common/Backup";
 import { ST } from "../common/const";
@@ -200,12 +200,12 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
 
 export async function localFileResponse(filePath: string, request: Request) {
   const stat = fs.statSync(filePath);
-  const fileType = await FileType.fromFile(filePath)
-  const contentType = fileType?.mime ?? ''
+  const fileType = await FileType.fromFile(filePath);
+  const contentType = fileType?.mime ?? "";
 
-  const range = request.headers.get('range');
+  const range = request.headers.get("range");
   if (range) {
-    const [startStr, endStr] = range.replace(/bytes=/, '').split('-');
+    const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
     const start = parseInt(startStr, 10);
     const end = endStr ? parseInt(endStr, 10) : stat.size - 1;
 
@@ -213,21 +213,21 @@ export async function localFileResponse(filePath: string, request: Request) {
     return new Response(Readable.toWeb(nodeStream) as any, {
       status: 206,
       headers: {
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
-        'Content-Length': `${end - start + 1}`
-      }
+        "Content-Type": contentType,
+        "Accept-Ranges": "bytes",
+        "Content-Range": `bytes ${start}-${end}/${stat.size}`,
+        "Content-Length": `${end - start + 1}`,
+      },
     });
   } else {
     const nodeStream = fs.createReadStream(filePath);
     return new Response(Readable.toWeb(nodeStream) as any, {
       status: 200,
       headers: {
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': `${stat.size}`
-      }
+        "Content-Type": contentType,
+        "Accept-Ranges": "bytes",
+        "Content-Length": `${stat.size}`,
+      },
     });
   }
 }

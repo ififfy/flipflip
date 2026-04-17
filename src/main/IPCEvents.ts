@@ -40,7 +40,7 @@ import {
   extractMusicMetadata,
   parseMusicMetadata,
   toArrayBuffer,
-    getBackups,
+  getBackups,
   getLocalPath,
   getCachePath,
   portablePath,

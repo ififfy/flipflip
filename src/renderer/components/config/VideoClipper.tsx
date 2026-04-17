@@ -42,7 +42,7 @@ import LibrarySource from "../../../common/LibrarySource";
 import Tag from "../../../common/Tag";
 import Clip from "../../../common/Clip";
 import Scene from "../../../common/Scene";
-import {proxyVideo} from "../../../common/utils";
+import { proxyVideo } from "../../../common/utils";
 import ImageView from "../player/ImageView";
 import VideoControl from "../player/VideoControl";
 
