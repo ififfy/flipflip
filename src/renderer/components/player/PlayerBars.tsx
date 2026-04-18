@@ -960,16 +960,37 @@ class PlayerBars extends React.Component<PlayerBarsProps> {
     this._drawerTimeout = null;
     this._tagDrawerTimeout = null;
 
-    this._removeOnPlayPause();
-    this._removeOnNavigateBack();
-    this._removeOnToggleFullscreen();
-    this._removeOnToggleAlwaysOnTop();
-    this._removeOnToggleMenuBarDisplay();
-    this._removeOnHistoryBack();
-    this._removeOnHistoryForward();
-    this._removeOnDelete();
-    this._removeOnPrevSource();
-    this._removeOnNextSource();
+    if (this._removeOnPlayPause != null) {
+      this._removeOnPlayPause();
+    }
+    if (this._removeOnNavigateBack != null) {
+      this._removeOnNavigateBack();
+    }
+    if (this._removeOnToggleFullscreen != null) {
+      this._removeOnToggleFullscreen();
+    }
+    if (this._removeOnToggleAlwaysOnTop != null) {
+      this._removeOnToggleAlwaysOnTop();
+    }
+    if (this._removeOnToggleMenuBarDisplay != null) {
+      this._removeOnToggleMenuBarDisplay();
+    }
+    if (this._removeOnHistoryBack != null) {
+      this._removeOnHistoryBack();
+    }
+    if (this._removeOnHistoryForward != null) {
+      this._removeOnHistoryForward();
+    }
+    if (this._removeOnDelete != null) {
+      this._removeOnDelete();
+    }
+    if (this._removeOnPrevSource != null) {
+      this._removeOnPrevSource();
+    }
+    if (this._removeOnNextSource != null) {
+      this._removeOnNextSource();
+    }
+
     window.ipc.destroyPlayerMenu();
 
     if (this._removeOnBlacklistFile != null) {

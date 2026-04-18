@@ -36,6 +36,10 @@ export default class PlayerMenu {
   }
 
   public static destroy() {
+    if (this.counter === 0) {
+      return;
+    }
+
     this.counter--;
     if (this.counter === 0) {
       PlayerMenu.instance = undefined;

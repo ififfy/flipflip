@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { app, protocol, net, Menu, session } from "electron";
 import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
 import { createMainMenu, createMenuTemplate } from "./MainMenu";
@@ -68,7 +69,11 @@ app.on("ready", () => {
         url === "index.js.map"
       ) {
         const entry = MAIN_WINDOW_WEBPACK_ENTRY;
-        url = entry.substring(0, entry.lastIndexOf("/") + 1) + url;
+        const sep = new URL(entry).protocol === "file:" ? path.sep : "/";
+        if (sep !== "/") {
+          url = url.replace(/\//g, sep);
+        }
+        url = entry.substring(0, entry.lastIndexOf(sep) + 1) + url;
       }
 
       const promise = net.fetch(new Request(url, req));
@@ -82,12 +87,18 @@ app.on("ready", () => {
           "",
         );
         return new Response(html, { headers: { "Content-Type": "text/html" } });
-      } else if (url.endsWith("/main_window/index.html")) {
+      }
+
+      let suffix = "/main_window/index.html";
+      if (new URL(url).protocol === "file:") {
+        suffix = suffix.replace(/\//g, path.sep);
+      }
+      if (url.endsWith(suffix)) {
         const res = await promise;
         let html = await res.text();
         const baseURL = url.startsWith("http")
           ? new URL(url).origin
-          : url.substring(0, url.indexOf("/main_window"));
+          : url.substring(0, url.indexOf(suffix));
         html = html.replace(
           /<script.*\/main_window\/index.js"><\/script>/,
           `<script defer src="${proxy(baseURL + "/main_window/index.js")}"></script>`,
