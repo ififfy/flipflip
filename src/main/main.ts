@@ -69,9 +69,9 @@ app.on("ready", () => {
         url === "index.js.map"
       ) {
         const entry = MAIN_WINDOW_WEBPACK_ENTRY;
-        const sep = new URL(entry).protocol === 'file:' ? path.sep : '/'
-        if(sep !== '/') {
-          url = url.replace(/\//g, sep)
+        const sep = new URL(entry).protocol === "file:" ? path.sep : "/";
+        if (sep !== "/") {
+          url = url.replace(/\//g, sep);
         }
         url = entry.substring(0, entry.lastIndexOf(sep) + 1) + url;
       }
@@ -87,12 +87,12 @@ app.on("ready", () => {
           "",
         );
         return new Response(html, { headers: { "Content-Type": "text/html" } });
-      } 
-      
-      let suffix = "/main_window/index.html"
-      if(new URL(url).protocol === 'file:') {
+      }
+
+      let suffix = "/main_window/index.html";
+      if (new URL(url).protocol === "file:") {
         suffix = suffix.replace(/\//g, path.sep);
-      } 
+      }
       if (url.endsWith(suffix)) {
         const res = await promise;
         let html = await res.text();

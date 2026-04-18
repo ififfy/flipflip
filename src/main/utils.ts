@@ -231,7 +231,7 @@ export async function localFileResponse(filePath: string, request: Request) {
       headers["Content-Range"] = `bytes ${start}-${end}/${stat.size}`;
     }
 
-    headers["Content-Length"] = `${end - start + 1}`
+    headers["Content-Length"] = `${end - start + 1}`;
     const nodeStream = fs.createReadStream(filePath, { start, end });
     return new Response(Readable.toWeb(nodeStream) as any, {
       status,
