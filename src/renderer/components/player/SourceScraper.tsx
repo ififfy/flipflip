@@ -87,6 +87,9 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
   }> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
   _nextAllPosts: Map<string, string> = null;
+  _removeOnSourceResponse: () => void = null;
+  _removeOnNextSourceResponse: () => void = null;
+  _removeOnPromiseResponse: () => void = null;
 
   render() {
     let style: any = { opacity: this.props.opacity };
@@ -220,7 +223,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+      this._removeOnSourceResponse = window.ipc.onScrapeFilesResponse(
         (object: any) => {
           if (
             object?.type == "RPC" ||
@@ -229,7 +232,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             return;
           }
 
-          removeOnResponse();
+          this._removeOnSourceResponse();
           if (object?.captcha != null && this.state.captcha == null) {
             this.setState({
               captcha: {
@@ -322,7 +325,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         d.clips = [];
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+      this._removeOnNextSourceResponse = window.ipc.onScrapeFilesResponse(
         (object: any) => {
           if (
             object?.type == "RPC" ||
@@ -331,7 +334,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             return;
           }
 
-          removeOnResponse();
+          this._removeOnNextSourceResponse();
           if (object?.error != null) {
             console.error(
               "Error retrieving " +
@@ -404,7 +407,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
         return;
       }
 
-      const removeOnResponse = window.ipc.onScrapeFilesResponse(
+      this._removeOnPromiseResponse = window.ipc.onScrapeFilesResponse(
         (object: any) => {
           if (
             object?.type == "RPC" ||
@@ -413,7 +416,7 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
             return;
           }
 
-          removeOnResponse();
+          this._removeOnPromiseResponse();
           if (object?.captcha != null && this.state.captcha == null) {
             this.setState({
               captcha: {
@@ -599,6 +602,16 @@ export default class SourceScraper extends React.Component<SourceScraperProps> {
     this._nextAllPosts = null;
     window.clearTimeout(this._backForth);
     this._backForth = null;
+
+    if (this._removeOnSourceResponse != null) {
+      this._removeOnSourceResponse();
+    }
+    if (this._removeOnNextSourceResponse != null) {
+      this._removeOnNextSourceResponse();
+    }
+    if (this._removeOnPromiseResponse != null) {
+      this._removeOnPromiseResponse();
+    }
   }
 }
 
