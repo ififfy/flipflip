@@ -864,7 +864,7 @@ const loadImageFapGallery = (
             const ahrefs = new JSDOM(html, {
               contentType: "text/html",
             }).window.document.querySelectorAll<HTMLAnchorElement>(
-              'a[href^="https://cdn.imagefap.com/images/full/"]',
+              'a[href^="https://cdnc.imagefap.com/images/full/"]',
             );
             if (ahrefs.length > 0) {
               for (let i = 0; i < ahrefs.length; i++) {
