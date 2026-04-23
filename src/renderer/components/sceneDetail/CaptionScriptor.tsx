@@ -530,11 +530,11 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
                               (this.state.captionScript.url &&
                                 this.state.captionScript.url.startsWith("http"))
                             }
-                            onClick={this.onSave.bind(this)}
+                            onClick={this.onSave.bind(this, null)}
                           >
                             Save
                           </MenuItem>
-                          <MenuItem onClick={this.onSaveAs.bind(this)}>
+                          <MenuItem onClick={this.onSaveAs.bind(this, null)}>
                             Save As
                           </MenuItem>
                           <MenuItem
