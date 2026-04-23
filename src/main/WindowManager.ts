@@ -110,6 +110,9 @@ export async function saveExport(
   if (window == null) {
     return;
   }
+  if(!fs.existsSync(filePath)) {
+    filePath = undefined
+  }
 
   const result = await dialog.showSaveDialog(window, {
     filters: [{ name: "JSON Document", extensions: ["json"] }],
@@ -335,6 +338,9 @@ export async function saveScriptAs(
   const window = currentWindows.get(windowId);
   if (window == null) {
     return undefined;
+  }
+  if(!fs.existsSync(defaultPath)) {
+    defaultPath = undefined
   }
 
   const result = await dialog.showSaveDialog(window, {
