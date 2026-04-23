@@ -1,4 +1,13 @@
 # Changelog
+#### v5.0.0 <small>(04/23/2026)</small>
+- Fix grid mirror
+- Fix ImageFap
+- Upgrade 3rd party libraries
+- Fix bug when save dialog uses default path that doesn't exist
+- Fix bug when saving caption script by binding null
+- Fix grid mirror functionality
+- Fix SourceScraper by unsubscribing listeners on unmount
+
 #### v5.0.0-beta2 <small>(04/18/2026)</small>
 - SourceScraper only stop listening once response received
 - Move web requests to main process
