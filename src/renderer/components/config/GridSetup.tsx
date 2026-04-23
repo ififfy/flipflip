@@ -665,18 +665,23 @@ class GridSetup extends React.Component<GridSetupProps> {
   onDragDrop(
     rowIndex: number,
     colIndex: number,
-    e: any,
+    e: MouseEvent,
     position: DraggableData,
   ) {
-    if (!e.path || e.path.length == 0) return;
+    const path = e.composedPath();
+    if (!path || path.length == 0) {
+      return;
+    }
 
-    const newRowIndex = e.path[0].id.split("-")[0];
-    const newColIndex = e.path[0].id.split("-")[1];
+    const id = (path[0] as HTMLElement).id;
+    const newRowIndex = Number(id.split("-")[0]);
+    const newColIndex = Number(id.split("-")[1]);
     if (
       (rowIndex == newRowIndex && colIndex == newColIndex) ||
       this.props.scene.grid[rowIndex][colIndex].sceneID == -1
-    )
+    ) {
       return;
+    }
 
     const newGrid = this.props.scene.grid;
     newGrid[newRowIndex][newColIndex].sceneID = -1;
