@@ -75,6 +75,7 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
+import HydrusDialog from "../sceneDetail/HydrusDialog";
 
 const drawerWidth = 240;
 
@@ -281,6 +282,12 @@ const styles = (theme: Theme) =>
     addPiwigoButton: {
       marginBottom: 225,
     },
+    addHydrusButton: {
+      marginBottom: 225,
+    },
+    addHydrusButtonAlt: {
+      marginBottom: 280,
+    },
     removeAllButton: {
       backgroundColor: theme.palette.error.main,
       margin: 0,
@@ -422,6 +429,8 @@ class Library extends React.Component<LibraryProps> {
     const piwigoConfigured =
       this.props.config.remoteSettings.piwigoProtocol != "" &&
       this.props.config.remoteSettings.piwigoHost != "";
+    const hydrusConfigured =
+      this.props.config.remoteSettings.hydrusAPIKey != "";
     const remoteAuthorized = tumblrAuthorized || redditAuthorized;
 
     let cancelProgressMessage;
@@ -1137,6 +1146,30 @@ class Library extends React.Component<LibraryProps> {
                 </Fab>
               </Tooltip>
             )}
+            {hydrusConfigured && (
+              <Tooltip
+                disableInteractive
+                title={this.state.filters.length > 0 ? "" : "Hydrus"}
+                placement="left"
+              >
+                <Fab
+                  className={clsx(
+                    classes.addButton,
+                    piwigoConfigured
+                      ? classes.addHydrusButtonAlt
+                      : classes.addHydrusButton,
+                    this.state.openMenu != MO.new && classes.addButtonClose,
+                    this.state.openMenu == MO.new && classes.backdropTop,
+                    this.state.filters.length > 0 && classes.hidden,
+                  )}
+                  disabled={this.state.filters.length > 0}
+                  onClick={this.openHydrusDialog.bind(this)}
+                  size="small"
+                >
+                  <SourceIcon className={classes.icon} type={ST.hydrus} />
+                </Fab>
+              </Tooltip>
+            )}
             <Tooltip
               disableInteractive
               title={
@@ -1216,6 +1249,13 @@ class Library extends React.Component<LibraryProps> {
         <PiwigoDialog
           config={this.props.config}
           open={this.state.openMenu == MO.piwigo}
+          onClose={this.onCloseDialog.bind(this)}
+          onImportURL={this.onAddSource.bind(this)}
+        />
+        <HydrusDialog
+          config={this.props.config}
+          tags={this.props.tags}
+          open={this.state.openMenu == MO.hydrus}
           onClose={this.onCloseDialog.bind(this)}
           onImportURL={this.onAddSource.bind(this)}
         />
@@ -1458,6 +1498,10 @@ class Library extends React.Component<LibraryProps> {
 
   openPiwigoDialog() {
     this.setState({ openMenu: MO.piwigo });
+  }
+
+  openHydrusDialog() {
+    this.setState({ openMenu: MO.hydrus });
   }
 
   onFinishMove() {

@@ -97,6 +97,7 @@ import SceneGrid from "../../../common/SceneGrid";
 import PiwigoDialog from "./PiwigoDialog";
 import SourceIcon from "../library/SourceIcon";
 import URLDialog from "./URLDialog";
+import HydrusDialog from "./HydrusDialog";
 
 const drawerWidth = 240;
 
@@ -344,12 +345,23 @@ const styles = (theme: Theme) =>
     piwigoImportButton: {
       marginBottom: 280,
     },
+    hydrusImportButton: {
+      marginBottom: 280,
+    },
+    hydrusImportButtonAlt: {
+      marginBottom: 335,
+    },
     removeAllButton: {
       backgroundColor: theme.palette.error.main,
       marginBottom: 280,
     },
     removeAllButtonAlt: {
+      backgroundColor: theme.palette.error.main,
       marginBottom: 335,
+    },
+    removeAllButtonAlt2: {
+      backgroundColor: theme.palette.error.main,
+      marginBottom: 390,
     },
     addButtonClose: {
       marginBottom: 0,
@@ -504,6 +516,8 @@ class SceneDetail extends React.Component<SceneDetailProps> {
     const piwigoConfigured =
       this.props.config.remoteSettings.piwigoProtocol != "" &&
       this.props.config.remoteSettings.piwigoHost != "";
+    const hydrusConfigured =
+      this.props.config.remoteSettings.hydrusAPIKey != "";
     return (
       <div className={classes.root}>
         <AppBar
@@ -1057,8 +1071,15 @@ class SceneDetail extends React.Component<SceneDetailProps> {
                 <Fab
                   className={clsx(
                     classes.addButton,
-                    !piwigoConfigured && classes.removeAllButton,
-                    piwigoConfigured && classes.removeAllButtonAlt,
+                    !piwigoConfigured &&
+                      !hydrusConfigured &&
+                      classes.removeAllButton,
+                    ((piwigoConfigured && !hydrusConfigured) ||
+                      (!piwigoConfigured && hydrusConfigured)) &&
+                      classes.removeAllButtonAlt,
+                    piwigoConfigured &&
+                      hydrusConfigured &&
+                      classes.removeAllButtonAlt2,
                     this.state.openMenu != MO.new && classes.addButtonClose,
                     this.state.openMenu == MO.new && classes.backdropTop,
                     this.props.tutorial && classes.disable,
@@ -1145,6 +1166,25 @@ class SceneDetail extends React.Component<SceneDetailProps> {
                   size="small"
                 >
                   <SourceIcon type={ST.piwigo} className={classes.icon} />
+                </Fab>
+              </Tooltip>
+            )}
+            {hydrusConfigured && (
+              <Tooltip disableInteractive title="From Hydrus" placement="left">
+                <Fab
+                  className={clsx(
+                    classes.addButton,
+                    piwigoConfigured
+                      ? classes.hydrusImportButtonAlt
+                      : classes.hydrusImportButton,
+                    this.state.openMenu != MO.new && classes.addButtonClose,
+                    this.state.openMenu == MO.new && classes.backdropTop,
+                    this.props.tutorial && classes.disable,
+                  )}
+                  onClick={this.onOpenHydrusMenu.bind(this)}
+                  size="small"
+                >
+                  <SourceIcon type={ST.hydrus} className={classes.icon} />
                 </Fab>
               </Tooltip>
             )}
@@ -1245,6 +1285,13 @@ class SceneDetail extends React.Component<SceneDetailProps> {
             <PiwigoDialog
               config={this.props.config}
               open={this.state.openMenu == MO.piwigo}
+              onClose={this.onCloseDialog.bind(this)}
+              onImportURL={this.onAddSource.bind(this)}
+            />
+            <HydrusDialog
+              config={this.props.config}
+              tags={this.props.tags}
+              open={this.state.openMenu == MO.hydrus}
               onClose={this.onCloseDialog.bind(this)}
               onImportURL={this.onAddSource.bind(this)}
             />
@@ -1785,6 +1832,10 @@ class SceneDetail extends React.Component<SceneDetailProps> {
 
   onOpenPiwigoMenu() {
     this.setState({ openMenu: MO.piwigo });
+  }
+
+  onOpenHydrusMenu() {
+    this.setState({ openMenu: MO.hydrus });
   }
 
   onOpenSceneEffectsMenu() {

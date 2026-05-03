@@ -110,8 +110,8 @@ export async function saveExport(
   if (window == null) {
     return;
   }
-  if(!fs.existsSync(filePath)) {
-    filePath = undefined
+  if (!fs.existsSync(filePath)) {
+    filePath = undefined;
   }
 
   const result = await dialog.showSaveDialog(window, {
@@ -339,8 +339,8 @@ export async function saveScriptAs(
   if (window == null) {
     return undefined;
   }
-  if(!fs.existsSync(defaultPath)) {
-    defaultPath = undefined
+  if (!fs.existsSync(defaultPath)) {
+    defaultPath = undefined;
   }
 
   const result = await dialog.showSaveDialog(window, {
