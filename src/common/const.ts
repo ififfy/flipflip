@@ -340,6 +340,7 @@ const MO = {
   load: "mo.load",
   select: "mo.select",
   piwigo: "mo.piwigo",
+  hydrus: "mo.hydrus",
   effects: "mo.effects",
 };
 
