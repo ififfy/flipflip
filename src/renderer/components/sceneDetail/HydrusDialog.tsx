@@ -1,5 +1,4 @@
 import * as React from "react";
-import Sortable from "react-sortablejs";
 
 import {
   Button,
@@ -8,39 +7,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
-  MenuItem,
-  Select,
   Theme,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  Container,
-  Card,
-  CardContent,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  Tooltip,
-  Divider,
-  Chip,
 } from "@mui/material";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { Rating } from "@mui/material";
 
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-
-import { AF, PW, PWS } from "../../../common/const";
-import { arrayMove } from "../../data/utils";
-import en from "../../../common/en";
-import Album from "../../data/piwigo/Album";
-import Tag from "../../data/piwigo/Tag";
+import { AF } from "../../../common/const";
 import LibrarySearch from "../library/LibrarySearch";
 
 const styles = (theme: Theme) =>
