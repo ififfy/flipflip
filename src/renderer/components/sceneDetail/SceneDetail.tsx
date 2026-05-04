@@ -982,9 +982,6 @@ class SceneDetail extends React.Component<SceneDetailProps> {
             {this.props.scene.generatorWeights &&
               this.props.scene.openTab === 4 && (
                 <Typography
-                  className={clsx(
-                    this.props.scene.openTab === 4 && classes.generateSection,
-                  )}
                   component="div"
                 >
                   <div className={classes.tabPanel}>
