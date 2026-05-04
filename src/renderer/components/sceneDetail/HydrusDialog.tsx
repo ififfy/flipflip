@@ -45,50 +45,6 @@ import LibrarySearch from "../library/LibrarySearch";
 
 const styles = (theme: Theme) =>
   createStyles({
-    list: {},
-    subList: {
-      paddingLeft: 10,
-    },
-    rootInput: {
-      marginLeft: theme.spacing(2),
-      flexGrow: 1,
-    },
-    sortListDisabled: {
-      pointerEvents: "none",
-      opacity: 0.6,
-    },
-    sortCol: {
-      marginBottom: 5,
-    },
-    sortColContent: {
-      display: "flex",
-      padding: "5px !important",
-    },
-    sortColLabel: {
-      lineHeight: 2,
-      marginRight: "auto",
-    },
-    sortColDir: {
-      marginTop: 8,
-    },
-    tagChip: {
-      marginTop: 0,
-      marginRight: 5,
-      marginBottom: 5,
-      marginLeft: 0,
-    },
-    areaHeaderFirst: {
-      marginTop: 0,
-    },
-    areaHeader: {
-      marginTop: 15,
-    },
-    ratingArea: {
-      display: "flex",
-    },
-    typeSelect: {
-      marginLeft: 10,
-    },
     noScroll: {
       overflow: "visible",
     },
