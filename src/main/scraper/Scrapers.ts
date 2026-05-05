@@ -2905,15 +2905,9 @@ export const loadHydrus = (
       return;
     }
 
-    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
-    let noTags = tagsRegex == null || tagsRegex.length <= 1;
-
     let pages = 0;
     const search = () => {
-      const url = noTags
-        ? hydrusURL + "/get_files/search_files"
-        : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
-      wretch(url)
+      wretch(source.url)
         .headers({ "Hydrus-Client-API-Access-Key": apiKey })
         .get()
         .setTimeout(15000)
