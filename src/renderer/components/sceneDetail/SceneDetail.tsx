@@ -981,9 +981,7 @@ class SceneDetail extends React.Component<SceneDetailProps> {
 
             {this.props.scene.generatorWeights &&
               this.props.scene.openTab === 4 && (
-                <Typography
-                  component="div"
-                >
+                <Typography component="div">
                   <div className={classes.tabPanel}>
                     <div className={classes.drawerSpacer} />
                     <Box p={1} className={classes.fill}>
