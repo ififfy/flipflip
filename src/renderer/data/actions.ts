@@ -427,6 +427,38 @@ export function cleanBackups(config: Config) {
   }
 }
 
+export function cacheImageBlob(path: string, blob: Blob, source: LibrarySource, config: Config): string {
+  const cachePath = getCachePath(null, config);
+  if (!fs.existsSync(cachePath)) {
+    fs.mkdirSync(cachePath)
+  }
+  const sourceCachePath = getCachePath(source.url, config);
+  const filePath = sourceCachePath + getFileName(path);
+  const downloadImage = () => {
+    if (!fs.existsSync(filePath)) {
+      wretch(path)
+        .get()
+        .blob(blob => {
+          const reader = new FileReader();
+          reader.onload = function () {
+            if (reader.readyState == 2) {
+              const arrayBuffer = reader.result as ArrayBuffer;
+              const buffer = Buffer.alloc(arrayBuffer.byteLength);
+              const view = new Uint8Array(arrayBuffer);
+              for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                buffer[i] = view[i];
+              }
+              outputFile(filePath, buffer);
+            }
+          };
+          reader.readAsArrayBuffer(blob);
+        });
+    }
+  };
+  downloadImage();
+  return filePath;
+}
+
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
   if (state.config.caching.enabled) {
     const fileType = getSourceType(i.getAttribute("source"));
