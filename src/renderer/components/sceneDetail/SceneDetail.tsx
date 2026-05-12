@@ -2088,22 +2088,22 @@ class SceneDetail extends React.Component<SceneDetailProps> {
           ) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = !regex.test(source.url);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
           } else {
             // This is a search filter
-            filter = filter.replace("\\", "\\\\");
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = !regex.test(source.url);
             } else {
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(source.url);
             }
           }

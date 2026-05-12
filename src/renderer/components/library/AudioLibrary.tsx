@@ -2161,14 +2161,14 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
               if (filter.length == 0) {
                 matchesFilter = source.comment && source.comment.length > 0;
               } else {
-                const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+                const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
                 matchesFilter = !regex.test(source.comment);
               }
             } else {
               if (filter.length == 0) {
                 matchesFilter = !source.comment || source.comment.length == 0;
               } else {
-                const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+                const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
                 matchesFilter = regex.test(source.comment);
               }
             }
@@ -2197,7 +2197,7 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
           ) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter =
                 !regex.test(source.url) &&
                 !regex.test(source.name) &&
@@ -2205,7 +2205,7 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
                 !regex.test(source.album);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter =
                 regex.test(source.url) ||
                 regex.test(source.name) ||
@@ -2214,17 +2214,17 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
             }
           } else {
             // This is a search filter
-            filter = filter.replace("\\", "\\\\");
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter =
                 !regex.test(source.url) &&
                 !regex.test(source.name) &&
                 !regex.test(source.artist) &&
                 !regex.test(source.album);
             } else {
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter =
                 regex.test(source.url) ||
                 regex.test(source.name) ||
