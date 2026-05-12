@@ -2266,22 +2266,22 @@ class ScenePicker extends React.Component<ScenePickerProps> {
           ) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = !regex.test(scene.name);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = regex.test(scene.name);
             }
           } else {
             // This is a search filter
-            filter = filter.replace("\\", "\\\\");
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = !regex.test(scene.name);
             } else {
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = regex.test(scene.name);
             }
           }
@@ -2312,22 +2312,22 @@ class ScenePicker extends React.Component<ScenePickerProps> {
           ) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = !regex.test(grid.name);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = regex.test(grid.name);
             }
           } else {
             // This is a search filter
-            filter = filter.replace("\\", "\\\\");
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = !regex.test(grid.name);
             } else {
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
               matchesFilter = regex.test(grid.name);
             }
           }
