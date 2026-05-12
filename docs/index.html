@@ -7,6 +7,7 @@
   <title>FlipFlip</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-versioned-plugin@0.0.1/styles.css">
 </head>
 <style>
   .cover-main img {
@@ -25,16 +26,65 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'FlipFlip',
+      name: '<a id="name-link" class="app-name-link" href="/flipflip"><h1>FlipFlip</h1></a>' +
+        '<div class="container"><select id="version-selector" name="version" class="custom-select">' +
+          '<option value="v3">v3.0.0</value>' +
+          '<option value="v4">v4.0.0</value>' +
+          '<option value="v5">v5.0.0</value>' +
+        '</select></div>',
       loadSidebar: true,
       maxLevel: 4,
       subMaxLevel: 2,
       auto2top: true,
       coverpage: true,
-      ga: 'UA-143309627-2',
+      routerMode: 'hash',
+      relativePath: true,
+      alias: {
+        '/v3/.*_sidebar.md': 'https://raw.githubusercontent.com/regtemp8/flipflip/master/docs/_sidebar.md',
+        '/v4/.*_sidebar.md': 'https://raw.githubusercontent.com/regtemp8/flipflip/v4.0.0/docs/_sidebar.md',
+        '/v5/.*_sidebar.md': 'https://raw.githubusercontent.com/regtemp8/flipflip/v5.0.0/docs/_sidebar.md',
+        '/v3/': 'https://raw.githubusercontent.com/regtemp8/flipflip/master/docs/README.md',
+        '/v4/': 'https://raw.githubusercontent.com/regtemp8/flipflip/v4.0.0/docs/README.md',
+        '/v5/': 'https://raw.githubusercontent.com/regtemp8/flipflip/v5.0.0/docs/README.md',
+        '/v3/(.*)': 'https://raw.githubusercontent.com/regtemp8/flipflip/master/docs/$1',
+        '/v4/(.*)': 'https://raw.githubusercontent.com/regtemp8/flipflip/v4.0.0/docs/$1',
+        '/v5/(.*)': 'https://raw.githubusercontent.com/regtemp8/flipflip/v5.0.0/docs/$1',
+      },
+      namespaces: [
+        {
+          id: "version",
+          values: ["v3", "v4", "v5"],
+          default: "v5",
+          optional: true,
+          selector: "#version-selector"
+        }
+      ],
+      plugins: [
+        function rewriteImageURLs(hook, vm) {
+          hook.afterEach(html => {
+            const file = vm.route.file;
+            const url = file.substring(0, file.lastIndexOf('/'));
+
+            const el = document.createElement( 'html' );
+            el.innerHTML = `<html><head></head><body>${html}</body></html>`;
+            const imgs = el.getElementsByTagName('img');
+            const replace = ['/doc_images/', '/doc_icons/'];
+            for(const img of imgs) {
+              for(const r of replace) {
+                let index = img.src.indexOf(r);
+                if(index != -1) {
+                  img.src = url + img.src.substring(index);
+                }
+              }
+            }
+
+            return el.getElementsByTagName('body')[0].innerHTML;
+          });
+        },
+      ],
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/ga.min.js"></script>
+  <script src="//unpkg.com/docsify-namespaced@0.1.1/dist/docsify-namespaced.min.js"></script>
 </body>
 </html>
