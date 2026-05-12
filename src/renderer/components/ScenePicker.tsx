@@ -2264,13 +2264,14 @@ class ScenePicker extends React.Component<ScenePickerProps> {
             ((filter.startsWith("'") || filter.startsWith("-'")) &&
               filter.endsWith("'"))
           ) {
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = !regex.test(scene.name);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(scene.name);
             }
           } else {
@@ -2278,10 +2279,10 @@ class ScenePicker extends React.Component<ScenePickerProps> {
             filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = !regex.test(scene.name);
             } else {
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(scene.name);
             }
           }
@@ -2310,13 +2311,14 @@ class ScenePicker extends React.Component<ScenePickerProps> {
             ((filter.startsWith("'") || filter.startsWith("-'")) &&
               filter.endsWith("'"))
           ) {
+            filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = !regex.test(grid.name);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(grid.name);
             }
           } else {
@@ -2324,10 +2326,10 @@ class ScenePicker extends React.Component<ScenePickerProps> {
             filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = !regex.test(grid.name);
             } else {
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(grid.name);
             }
           }

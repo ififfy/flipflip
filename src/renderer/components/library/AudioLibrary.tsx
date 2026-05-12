@@ -2217,14 +2217,14 @@ class AudioLibrary extends React.Component<AudioLibraryProps> {
             filter = filter.replace(/\\/g, "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter =
                 !regex.test(source.url) &&
                 !regex.test(source.name) &&
                 !regex.test(source.artist) &&
                 !regex.test(source.album);
             } else {
-              const regex = new RegExp(filter.replace(/\\/g, "\\\\"), "i");
+              const regex = new RegExp(filter, "i");
               matchesFilter =
                 regex.test(source.url) ||
                 regex.test(source.name) ||
