@@ -330,7 +330,7 @@ class AudioPlaylist extends React.Component {
 
   restart() {
     let audios = this.props.playlist.audios;
-    if (this.props.startPlaying) {
+    if (this.props.startPlaying && this.state.playingAudios.length == 0) {
       if (this.props.playlist.shuffle) {
         audios = randomizeList(Array.from(audios));
       }
