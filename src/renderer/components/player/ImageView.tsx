@@ -15,8 +15,9 @@ import CrossFade from "./CrossFade";
 import ZoomMove from "./ZoomMove";
 import Slide from "./Slide";
 import StrobeImage from "./StrobeImage";
+import InteractiveMediaZoom from './InteractiveMediaZoom';
 
-export default class ImageView extends React.Component {
+export default class ImageView extends React.Component<any, {interactiveZoomActive: boolean}> {
   readonly props: {
     image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     fitParent: boolean,
@@ -42,6 +43,14 @@ export default class ImageView extends React.Component {
   _image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement = null;
   _scale: number = null;
   _timeouts: Array<Timeout>;
+
+  readonly state = {interactiveZoomActive: false};
+
+  setInteractiveZoomActive = (interactiveZoomActive: boolean) => {
+    if (interactiveZoomActive !== this.state.interactiveZoomActive) {
+      this.setState({interactiveZoomActive});
+    }
+  };
 
   componentDidMount() {
     this._timeouts = new Array<Timeout>();
@@ -571,8 +580,9 @@ export default class ImageView extends React.Component {
     }
   }
 
-  shouldComponentUpdate(props: any): boolean {
-    return (!this.props.image && props.image) ||
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return state.interactiveZoomActive !== this.state.interactiveZoomActive ||
+      (!this.props.image && props.image) ||
       (props.image && this.props.image &&
         (props.image.src !== this.props.image.src ||
           props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
@@ -703,7 +713,8 @@ export default class ImageView extends React.Component {
           </Strobe>
       }
     }
-    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
+    const disableAutomaticMotion = this.state.interactiveZoomActive;
+    if (!disableAutomaticMotion && (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none)) {
       imageDiv =
         <ZoomMove
           scene={this.props.scene}
@@ -724,7 +735,7 @@ export default class ImageView extends React.Component {
           {imageDiv}
         </FadeInOut>
     }
-    if (this.props.scene.panning) {
+    if (!disableAutomaticMotion && this.props.scene.panning) {
       imageDiv =
         <Panning
           image={this.props.image}
@@ -738,6 +749,19 @@ export default class ImageView extends React.Component {
           {imageDiv}
         </Panning>
     }
+    const mediaKey = [
+      this.props.image?.src,
+      this.props.image?.getAttribute?.('start'),
+      this.props.image?.getAttribute?.('end'),
+    ].join('|');
+    imageDiv = (
+      <InteractiveMediaZoom
+        mediaKey={mediaKey}
+        disabled={!!this.props.pictureGrid}
+        onZoomStateChange={this.setInteractiveZoomActive}>
+        {imageDiv}
+      </InteractiveMediaZoom>
+    );
     viewDiv =
       <React.Fragment>
         {imageDiv}

@@ -1,5 +1,5 @@
 import IncomingMessage = Electron.IncomingMessage;
-import {webFrame} from "electron";
+// webFrame removed — visual zoom locking is now handled globally in Meta.tsx
 import * as React from 'react';
 import request from 'request';
 import fs from "fs";
@@ -77,6 +77,7 @@ export default class ImagePlayer extends React.Component {
   _toggleStrobe: boolean;
   _runFetchLoopCallRequests: Array<number>;
   _animationFrameHandle: number;
+  _animationTimeout: NodeJS.Timeout;
 
   render() {
     let offset = this.getHistoryOffset();
@@ -200,6 +201,7 @@ export default class ImagePlayer extends React.Component {
 
   componentWillUnmount() {
     cancelAnimationFrame(this._animationFrameHandle);
+    clearTimeout(this._animationTimeout);
     clearTimeout(this._backForth);
     clearTimeout(this._timeout);
     for (let timeout of this._waitTimeouts) {
@@ -358,7 +360,7 @@ export default class ImagePlayer extends React.Component {
     if (requestAnimation) {
       this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
     } else {
-      setTimeout(this.animationFrame, 100);
+      this._animationTimeout = setTimeout(this.animationFrame, 100);
     }
   }
 

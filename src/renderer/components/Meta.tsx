@@ -1,4 +1,4 @@
-import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
+import {remote, ipcRenderer, webFrame, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import {
@@ -66,6 +66,13 @@ export default class Meta extends React.Component {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
     ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
+
+    // Disable Electron's built-in pinch-to-zoom for the entire renderer window.
+    // Without this, a two-finger pinch on the trackpad zooms the whole app UI
+    // instead of (or in addition to) our custom InteractiveMediaZoom handler.
+    // Called here once at startup so it applies to every page (player, options,
+    // library, …), not just when InteractiveMediaZoom happens to be mounted.
+    webFrame.setVisualZoomLevelLimits(1, 1);
 
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({debugMode: false});
